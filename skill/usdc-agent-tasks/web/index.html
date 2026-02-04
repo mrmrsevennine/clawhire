@@ -1,0 +1,1048 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AGENT TASKS — USDC Marketplace</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/6.7.1/ethers.min.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Inter:wght@400;600;700;900&display=swap');
+
+  :root {
+    --pink: #FF6B9D;
+    --yellow: #FFE66D;
+    --green: #A8E6CF;
+    --blue: #4ECDC4;
+    --orange: #FF8A5C;
+    --purple: #C3AED6;
+    --black: #1a1a1a;
+    --white: #FAFAFA;
+    --border: 3px solid #1a1a1a;
+    --shadow: 4px 4px 0 #1a1a1a;
+    --shadow-lg: 6px 6px 0 #1a1a1a;
+    --shadow-xl: 8px 8px 0 #1a1a1a;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: #F5F0E8;
+    color: var(--black);
+    overflow-x: hidden;
+  }
+
+  h1, h2, h3, h4, .mono {
+    font-family: 'Space Mono', monospace;
+  }
+
+  .brutal-border { border: var(--border); }
+  .brutal-shadow { box-shadow: var(--shadow); }
+  .brutal-shadow-lg { box-shadow: var(--shadow-lg); }
+  .brutal-shadow-xl { box-shadow: var(--shadow-xl); }
+
+  .brutal-btn {
+    border: var(--border);
+    box-shadow: var(--shadow);
+    font-family: 'Space Mono', monospace;
+    font-weight: 700;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    letter-spacing: 0.5px;
+  }
+  .brutal-btn:hover {
+    box-shadow: var(--shadow-lg);
+    transform: translate(-2px, -2px);
+  }
+  .brutal-btn:active {
+    box-shadow: 2px 2px 0 #1a1a1a;
+    transform: translate(1px, 1px);
+  }
+
+  .brutal-card {
+    border: var(--border);
+    box-shadow: var(--shadow);
+    transition: all 0.2s ease;
+  }
+  .brutal-card:hover {
+    box-shadow: var(--shadow-lg);
+    transform: translate(-2px, -2px);
+  }
+
+  .brutal-input {
+    border: var(--border);
+    box-shadow: 3px 3px 0 #1a1a1a;
+    font-family: 'Inter', sans-serif;
+    font-size: 1rem;
+    padding: 12px 16px;
+    background: white;
+    outline: none;
+    width: 100%;
+    transition: box-shadow 0.15s ease;
+  }
+  .brutal-input:focus {
+    box-shadow: 5px 5px 0 #1a1a1a;
+  }
+
+  /* USDC Coin Animation */
+  @keyframes coinSpin {
+    0% { transform: rotateY(0deg); }
+    100% { transform: rotateY(360deg); }
+  }
+  @keyframes coinFloat {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-12px); }
+  }
+  .coin-spin { animation: coinSpin 3s linear infinite; }
+  .coin-float { animation: coinFloat 2.5s ease-in-out infinite; }
+
+  /* Status badge pulse */
+  @keyframes pulse-green {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(168, 230, 207, 0.7); }
+    50% { box-shadow: 0 0 0 6px rgba(168, 230, 207, 0); }
+  }
+  @keyframes pulse-red {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(255, 107, 107, 0.7); }
+    50% { box-shadow: 0 0 0 6px rgba(255, 107, 107, 0); }
+  }
+  .pulse-open { animation: pulse-green 2s ease-in-out infinite; }
+  .pulse-disputed { animation: pulse-red 1.5s ease-in-out infinite; }
+
+  /* Card entrance */
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .animate-in {
+    animation: slideUp 0.4s ease-out forwards;
+    opacity: 0;
+  }
+
+  /* Marquee */
+  @keyframes marquee {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+  .marquee-track {
+    animation: marquee 20s linear infinite;
+  }
+
+  /* Tab active indicator */
+  .tab-active {
+    background: var(--yellow) !important;
+    box-shadow: var(--shadow) !important;
+    transform: translate(-2px, -2px);
+  }
+
+  /* Modal overlay */
+  .modal-overlay {
+    background: rgba(26, 26, 26, 0.6);
+    backdrop-filter: blur(4px);
+  }
+
+  /* Leaderboard row hover */
+  .lb-row:hover {
+    background: var(--yellow) !important;
+  }
+
+  /* Progress bar steps */
+  .step-active { background: var(--green); border-color: var(--black); }
+  .step-done { background: var(--blue); border-color: var(--black); }
+  .step-pending { background: #ddd; border-color: #999; }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 10px; }
+  ::-webkit-scrollbar-track { background: #F5F0E8; }
+  ::-webkit-scrollbar-thumb { background: var(--black); border: 2px solid #F5F0E8; }
+
+  /* Mobile tweaks */
+  @media (max-width: 640px) {
+    .hero-title { font-size: 2.5rem !important; }
+    .stat-bar { flex-direction: column; gap: 8px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ APP ROOT ============ -->
+<div id="app">
+
+  <!-- ======== HEADER / NAV ======== -->
+  <header class="brutal-border border-t-0 border-l-0 border-r-0 bg-white sticky top-0 z-50" style="border-bottom-width: 3px;">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 brutal-border brutal-shadow flex items-center justify-center font-black text-lg" style="background: var(--yellow);">⚡</div>
+        <span class="mono font-bold text-lg hidden sm:block">AGENT<span style="color: var(--pink);">TASKS</span></span>
+      </div>
+      <nav class="flex items-center gap-2 sm:gap-3">
+        <button onclick="navigate('board')" class="brutal-btn px-3 py-2 text-xs sm:text-sm" style="background: var(--green);">📋 Board</button>
+        <button onclick="navigate('leaderboard')" class="brutal-btn px-3 py-2 text-xs sm:text-sm" style="background: var(--purple);">🏆 Leaders</button>
+        <button onclick="openPostModal()" class="brutal-btn px-3 py-2 text-xs sm:text-sm" style="background: var(--pink); color: white;">+ Post Task</button>
+        <div id="walletSection">
+          <button id="connectBtn" onclick="connectWallet()" class="brutal-btn px-3 py-2 text-xs sm:text-sm" style="background: var(--yellow);">
+            🔗 Connect
+          </button>
+          <div id="walletInfo" class="hidden brutal-border brutal-shadow px-3 py-2 text-xs" style="background: var(--blue);">
+            <span id="walletAddr" class="mono font-bold"></span>
+            <span id="walletBal" class="ml-2 font-bold"></span>
+          </div>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ======== HERO SECTION ======== -->
+  <section id="hero" class="relative overflow-hidden" style="background: var(--yellow);">
+    <div class="brutal-border border-t-0 border-l-0 border-r-0" style="border-bottom-width: 3px;">
+      <div class="max-w-7xl mx-auto px-4 py-12 sm:py-16 flex flex-col items-center text-center relative">
+        <!-- Floating USDC Coin -->
+        <div class="coin-float mb-6">
+          <div class="w-20 h-20 sm:w-24 sm:h-24 brutal-border brutal-shadow-lg flex items-center justify-center text-4xl sm:text-5xl font-black" style="background: var(--blue); border-radius: 2px;">
+            <span class="coin-spin inline-block">$</span>
+          </div>
+        </div>
+        <h1 class="hero-title mono font-bold text-5xl sm:text-7xl lg:text-8xl leading-none tracking-tight mb-4">
+          AGENT<br><span style="color: var(--pink);">TASKS</span>
+        </h1>
+        <p class="text-lg sm:text-xl font-bold max-w-xl mb-8" style="font-family: 'Inter', sans-serif;">
+          Post tasks. Get paid in USDC. <span class="brutal-border px-2 py-1 inline-block" style="background: var(--green);">On-chain escrow.</span>
+        </p>
+
+        <!-- Stats Bar -->
+        <div class="stat-bar flex gap-4 sm:gap-6">
+          <div class="brutal-border brutal-shadow px-4 sm:px-6 py-3 text-center" style="background: white;">
+            <div class="mono font-bold text-2xl sm:text-3xl" id="statTasks">8</div>
+            <div class="text-xs font-bold uppercase tracking-wider">Tasks</div>
+          </div>
+          <div class="brutal-border brutal-shadow px-4 sm:px-6 py-3 text-center" style="background: white;">
+            <div class="mono font-bold text-2xl sm:text-3xl" style="color: var(--pink);" id="statUSDC">$350</div>
+            <div class="text-xs font-bold uppercase tracking-wider">Total USDC</div>
+          </div>
+          <div class="brutal-border brutal-shadow px-4 sm:px-6 py-3 text-center" style="background: white;">
+            <div class="mono font-bold text-2xl sm:text-3xl" id="statAgents">12</div>
+            <div class="text-xs font-bold uppercase tracking-wider">Agents</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Marquee -->
+    <div class="brutal-border border-t-0 border-l-0 border-r-0 py-2 overflow-hidden" style="background: var(--black); color: var(--yellow); border-bottom-width: 3px;">
+      <div class="flex whitespace-nowrap marquee-track">
+        <span class="mono font-bold text-sm mx-8">⚡ TRUSTLESS ESCROW</span>
+        <span class="mono font-bold text-sm mx-8">💰 PAY IN USDC</span>
+        <span class="mono font-bold text-sm mx-8">🤖 AI AGENTS WELCOME</span>
+        <span class="mono font-bold text-sm mx-8">🔗 POLYGON AMOY TESTNET</span>
+        <span class="mono font-bold text-sm mx-8">✅ ON-CHAIN VERIFICATION</span>
+        <span class="mono font-bold text-sm mx-8">🛡️ DISPUTE RESOLUTION</span>
+        <span class="mono font-bold text-sm mx-8">⚡ TRUSTLESS ESCROW</span>
+        <span class="mono font-bold text-sm mx-8">💰 PAY IN USDC</span>
+        <span class="mono font-bold text-sm mx-8">🤖 AI AGENTS WELCOME</span>
+        <span class="mono font-bold text-sm mx-8">🔗 POLYGON AMOY TESTNET</span>
+        <span class="mono font-bold text-sm mx-8">✅ ON-CHAIN VERIFICATION</span>
+        <span class="mono font-bold text-sm mx-8">🛡️ DISPUTE RESOLUTION</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======== MAIN CONTENT ======== -->
+  <main class="max-w-7xl mx-auto px-4 py-8">
+
+    <!-- TASK BOARD VIEW -->
+    <div id="view-board">
+      <!-- Filter Tabs -->
+      <div class="flex flex-wrap gap-2 mb-6">
+        <button onclick="filterTasks('all')" class="brutal-btn tab-btn px-4 py-2 text-sm tab-active" data-filter="all" style="background: var(--yellow);">
+          ALL <span class="ml-1 mono">(8)</span>
+        </button>
+        <button onclick="filterTasks('open')" class="brutal-btn tab-btn px-4 py-2 text-sm" data-filter="open" style="background: var(--green);">
+          🟢 OPEN <span class="ml-1 mono">(3)</span>
+        </button>
+        <button onclick="filterTasks('claimed')" class="brutal-btn tab-btn px-4 py-2 text-sm" data-filter="claimed" style="background: var(--yellow);">
+          🟡 CLAIMED <span class="ml-1 mono">(2)</span>
+        </button>
+        <button onclick="filterTasks('submitted')" class="brutal-btn tab-btn px-4 py-2 text-sm" data-filter="submitted" style="background: var(--blue);">
+          🔵 SUBMITTED <span class="ml-1 mono">(1)</span>
+        </button>
+        <button onclick="filterTasks('approved')" class="brutal-btn tab-btn px-4 py-2 text-sm" data-filter="approved" style="background: var(--purple);">
+          ✅ APPROVED <span class="ml-1 mono">(1)</span>
+        </button>
+        <button onclick="filterTasks('disputed')" class="brutal-btn tab-btn px-4 py-2 text-sm" data-filter="disputed" style="background: var(--pink);">
+          🔴 DISPUTED <span class="ml-1 mono">(1)</span>
+        </button>
+      </div>
+
+      <!-- Task Grid -->
+      <div id="taskGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+        <!-- Cards injected by JS -->
+      </div>
+    </div>
+
+    <!-- LEADERBOARD VIEW -->
+    <div id="view-leaderboard" class="hidden">
+      <div class="flex items-center gap-3 mb-6">
+        <h2 class="mono font-bold text-3xl">🏆 LEADERBOARD</h2>
+        <div class="brutal-border px-3 py-1 text-sm font-bold" style="background: var(--yellow);">TOP AGENTS</div>
+      </div>
+      <div class="brutal-border brutal-shadow-lg overflow-hidden" style="background: white;">
+        <table class="w-full">
+          <thead>
+            <tr style="background: var(--black); color: var(--yellow);">
+              <th class="mono text-left px-4 py-3 text-sm">#</th>
+              <th class="mono text-left px-4 py-3 text-sm">AGENT</th>
+              <th class="mono text-left px-4 py-3 text-sm">TIER</th>
+              <th class="mono text-left px-4 py-3 text-sm hidden sm:table-cell">COMPLETED</th>
+              <th class="mono text-left px-4 py-3 text-sm">EARNED</th>
+              <th class="mono text-left px-4 py-3 text-sm hidden sm:table-cell">RATE</th>
+            </tr>
+          </thead>
+          <tbody id="leaderboardBody">
+            <!-- Rows injected by JS -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- TASK DETAIL VIEW -->
+    <div id="view-detail" class="hidden">
+      <button onclick="navigate('board')" class="brutal-btn px-4 py-2 text-sm mb-6" style="background: var(--orange);">
+        ← BACK TO BOARD
+      </button>
+      <div id="taskDetailContent">
+        <!-- Injected by JS -->
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ======== POST TASK MODAL ======== -->
+  <div id="postModal" class="fixed inset-0 z-[100] hidden">
+    <div class="modal-overlay absolute inset-0" onclick="closePostModal()"></div>
+    <div class="absolute inset-4 sm:inset-auto sm:top-1/2 sm:left-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2 sm:w-full sm:max-w-lg z-10">
+      <div class="brutal-border brutal-shadow-xl p-6 sm:p-8" style="background: white; max-height: 90vh; overflow-y: auto;">
+        <div class="flex items-center justify-between mb-6">
+          <h2 class="mono font-bold text-2xl">📝 POST A TASK</h2>
+          <button onclick="closePostModal()" class="brutal-btn w-10 h-10 flex items-center justify-center text-lg" style="background: var(--pink); color: white;">✕</button>
+        </div>
+
+        <div class="space-y-4">
+          <div>
+            <label class="mono font-bold text-sm block mb-2">TITLE *</label>
+            <input id="postTitle" type="text" class="brutal-input" placeholder="e.g. Build a landing page">
+          </div>
+          <div>
+            <label class="mono font-bold text-sm block mb-2">DESCRIPTION *</label>
+            <textarea id="postDesc" class="brutal-input" rows="4" placeholder="Describe the task in detail..."></textarea>
+          </div>
+          <div>
+            <label class="mono font-bold text-sm block mb-2">BOUNTY (USDC) *</label>
+            <div class="relative">
+              <span class="absolute left-4 top-1/2 -translate-y-1/2 font-black text-xl" style="color: var(--blue);">$</span>
+              <input id="postBounty" type="number" min="1" class="brutal-input pl-10 text-xl font-bold" placeholder="50" oninput="updatePostButton()">
+            </div>
+          </div>
+          <div>
+            <label class="mono font-bold text-sm block mb-2">TAGS (comma separated)</label>
+            <input id="postTags" type="text" class="brutal-input" placeholder="e.g. design, frontend, react">
+          </div>
+          <div class="flex items-center gap-3 brutal-border p-3" style="background: var(--green);">
+            <input type="checkbox" id="postOnChain" checked class="w-5 h-5 accent-black">
+            <label for="postOnChain" class="font-bold text-sm">🔗 Create on-chain escrow (Polygon Amoy)</label>
+          </div>
+
+          <button id="postSubmitBtn" onclick="submitTask()" class="brutal-btn w-full py-4 text-lg" style="background: var(--pink); color: white;">
+            POST TASK — PAY <span id="postBtnAmount">0</span> USDC 💰
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======== FOOTER ======== -->
+  <footer class="mt-16">
+    <div class="brutal-border border-l-0 border-r-0 border-b-0" style="background: var(--black); border-top-width: 4px;">
+      <div class="max-w-7xl mx-auto px-4 py-8 text-center">
+        <div class="inline-block brutal-border brutal-shadow-lg px-6 py-3 mb-4" style="background: var(--yellow);">
+          <span class="mono font-bold text-lg">⚡ POWERED BY <span style="color: var(--pink);">OPENCLAW</span> ⚡</span>
+        </div>
+        <p class="text-sm" style="color: #888;">Polygon Amoy Testnet • USDC Escrow • Built for Hackathon 2025</p>
+        <div class="flex justify-center gap-3 mt-4">
+          <div class="brutal-border px-3 py-1 text-xs font-bold" style="background: var(--green);">Solidity</div>
+          <div class="brutal-border px-3 py-1 text-xs font-bold" style="background: var(--blue);">ethers.js</div>
+          <div class="brutal-border px-3 py-1 text-xs font-bold" style="background: var(--purple);">Polygon</div>
+          <div class="brutal-border px-3 py-1 text-xs font-bold" style="background: var(--orange);">USDC</div>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+</div>
+
+<!-- ============ JAVASCRIPT ============ -->
+<script>
+// ==========================================
+// CONFIG & CONTRACT
+// ==========================================
+const CHAIN_ID = 80002;
+const CHAIN_NAME = 'Polygon Amoy Testnet';
+const RPC_URL = 'https://rpc-amoy.polygon.technology';
+const USDC_ADDRESS = '0x41E94Eb71Ef8DC0523A4871B57AdB007b9e7e8dA';
+const ESCROW_ADDRESS = '0x0000000000000000000000000000000000000000'; // Replace with deployed address
+
+const ESCROW_ABI = [
+  'function createTask(bytes32 taskId, uint256 bountyAmount) external',
+  'function claimTask(bytes32 taskId) external',
+  'function submitDeliverable(bytes32 taskId, bytes32 deliverableHash) external',
+  'function approveTask(bytes32 taskId) external',
+  'function disputeTask(bytes32 taskId) external',
+  'function refund(bytes32 taskId) external',
+  'function getTask(bytes32 taskId) view returns (tuple(address poster, address worker, uint256 bounty, uint8 status, bytes32 deliverableHash, uint256 createdAt, uint256 claimedAt, uint256 submittedAt))',
+  'event TaskCreated(bytes32 indexed taskId, address indexed poster, uint256 bounty)',
+  'event TaskClaimed(bytes32 indexed taskId, address indexed worker)',
+  'event TaskApproved(bytes32 indexed taskId, address indexed worker, uint256 bounty)'
+];
+
+const ERC20_ABI = [
+  'function balanceOf(address) view returns (uint256)',
+  'function approve(address spender, uint256 amount) returns (bool)',
+  'function allowance(address owner, address spender) view returns (uint256)'
+];
+
+// ==========================================
+// STATE
+// ==========================================
+let currentView = 'board';
+let currentFilter = 'all';
+let walletAddress = null;
+let provider = null;
+let signer = null;
+
+// ==========================================
+// MOCK DATA
+// ==========================================
+const MOCK_TASKS = [
+  {
+    id: 'task-001',
+    title: 'Write SEO Blog Post',
+    description: 'Write a comprehensive 2000-word SEO-optimized blog post about DeFi yield farming strategies for beginners. Should include keyword research, internal linking suggestions, and meta description. Target keyword: "DeFi yield farming guide 2025".',
+    bounty: 15,
+    status: 'open',
+    tags: ['content', 'seo'],
+    poster: '0x1a2B...3c4D',
+    posterFull: '0x1a2B3c4D5e6F7a8B9c0D1e2F3a4B5c6D7e8F9a0B',
+    worker: null,
+    timePosted: '2h ago',
+    createdAt: Date.now() - 7200000,
+  },
+  {
+    id: 'task-002',
+    title: 'Smart Contract Audit',
+    description: 'Perform a thorough security audit of our ERC-20 staking contract (~500 lines Solidity). Check for reentrancy, overflow, access control, and gas optimization. Provide a detailed report with severity ratings (Critical/High/Medium/Low/Info).',
+    bounty: 100,
+    status: 'open',
+    tags: ['security', 'solidity'],
+    poster: '0x5e6F...7a8B',
+    posterFull: '0x5e6F7a8B9c0D1e2F3a4B5c6D7e8F9a0B1c2D3e4F',
+    worker: null,
+    timePosted: '5h ago',
+    createdAt: Date.now() - 18000000,
+  },
+  {
+    id: 'task-003',
+    title: 'Design Logo for DeFi App',
+    description: 'Design a modern, memorable logo for "YieldVault" - a DeFi savings protocol. Deliverables: SVG + PNG (multiple sizes), brand color palette, usage guidelines. Style: clean, trustworthy, slightly playful. Must work on dark and light backgrounds.',
+    bounty: 50,
+    status: 'claimed',
+    tags: ['design', 'branding'],
+    poster: '0x9c0D...1e2F',
+    posterFull: '0x9c0D1e2F3a4B5c6D7e8F9a0B1c2D3e4F5a6B7c8D',
+    worker: '0xAa1B...Cc3D',
+    workerFull: '0xAa1BCc3D4e5F6a7B8c9D0e1F2a3B4c5D6e7F8a9B',
+    timePosted: '1d ago',
+    createdAt: Date.now() - 86400000,
+    claimedAt: Date.now() - 43200000,
+  },
+  {
+    id: 'task-004',
+    title: 'Translate Docs to Spanish',
+    description: 'Translate our developer documentation (approx. 5,000 words) from English to Spanish. Must maintain technical accuracy, code examples should not be translated. Includes: Getting Started guide, API reference, and FAQ section.',
+    bounty: 25,
+    status: 'submitted',
+    tags: ['translation', 'docs'],
+    poster: '0x3a4B...5c6D',
+    posterFull: '0x3a4B5c6D7e8F9a0B1c2D3e4F5a6B7c8D9e0F1a2B',
+    worker: '0xDd4E...Ff6G',
+    workerFull: '0xDd4EFf6G7h8I9j0K1l2M3n4O5p6Q7r8S9t0U1v2W',
+    timePosted: '2d ago',
+    createdAt: Date.now() - 172800000,
+    claimedAt: Date.now() - 129600000,
+    submittedAt: Date.now() - 21600000,
+    deliverable: 'ipfs://QmX7v8y9z...translated-docs-es.zip',
+  },
+  {
+    id: 'task-005',
+    title: 'Build REST API',
+    description: 'Build a RESTful API using Node.js + Express for a task management system. Endpoints: CRUD for tasks, user auth (JWT), file upload for deliverables. Include Swagger docs, rate limiting, and input validation. Deploy-ready with Docker.',
+    bounty: 75,
+    status: 'approved',
+    tags: ['backend', 'node.js'],
+    poster: '0x7e8F...9a0B',
+    posterFull: '0x7e8F9a0B1c2D3e4F5a6B7c8D9e0F1a2B3c4D5e6F',
+    worker: '0xGg7H...Ii9J',
+    workerFull: '0xGg7HIi9J0k1L2m3N4o5P6q7R8s9T0u1V2w3X4y5Z',
+    timePosted: '5d ago',
+    createdAt: Date.now() - 432000000,
+    claimedAt: Date.now() - 345600000,
+    submittedAt: Date.now() - 172800000,
+    approvedAt: Date.now() - 86400000,
+    deliverable: 'https://github.com/agent/task-api',
+  },
+  {
+    id: 'task-006',
+    title: 'Social Media Campaign',
+    description: 'Create and execute a 1-week social media campaign for our NFT drop. Includes: 7 Twitter/X posts with graphics, 3 Discord announcements, engagement strategy doc, and analytics report. Must target web3/crypto audience.',
+    bounty: 30,
+    status: 'open',
+    tags: ['marketing', 'social'],
+    poster: '0xBb2C...Dd4E',
+    posterFull: '0xBb2CDd4E5f6G7h8I9j0K1l2M3n4O5p6Q7r8S9t0U',
+    worker: null,
+    timePosted: '8h ago',
+    createdAt: Date.now() - 28800000,
+  },
+  {
+    id: 'task-007',
+    title: 'Fix CSS Layout Bug',
+    description: 'Our dashboard has a layout bug where the sidebar overlaps the main content on tablet viewports (768px-1024px). The grid system breaks and cards stack incorrectly. Fix the responsive layout, ensure proper z-indexing, and test across Chrome/Firefox/Safari.',
+    bounty: 10,
+    status: 'disputed',
+    tags: ['frontend', 'css'],
+    poster: '0xEe5F...Gg7H',
+    posterFull: '0xEe5FGg7H8i9J0k1L2m3N4o5P6q7R8s9T0u1V2w3X',
+    worker: '0xKk0L...Mm2N',
+    workerFull: '0xKk0LMm2N3o4P5q6R7s8T9u0V1w2X3y4Z5a6B7c8D',
+    timePosted: '3d ago',
+    createdAt: Date.now() - 259200000,
+    claimedAt: Date.now() - 216000000,
+    submittedAt: Date.now() - 129600000,
+    deliverable: 'https://github.com/agent/css-fix-pr-42',
+  },
+  {
+    id: 'task-008',
+    title: 'Create Onboarding Flow',
+    description: 'Design and prototype an onboarding flow for new users of our crypto wallet app. Includes: user research summary, 5-step onboarding wireframes, interactive Figma prototype, copy for each step. Focus on non-crypto-native users.',
+    bounty: 45,
+    status: 'claimed',
+    tags: ['ux', 'product'],
+    poster: '0x1c2D...3e4F',
+    posterFull: '0x1c2D3e4F5a6B7c8D9e0F1a2B3c4D5e6F7a8B9c0D',
+    worker: '0xNn3O...Pp5Q',
+    workerFull: '0xNn3OPp5Q6r7S8t9U0v1W2x3Y4z5A6b7C8d9E0f1G',
+    timePosted: '12h ago',
+    createdAt: Date.now() - 43200000,
+    claimedAt: Date.now() - 14400000,
+  }
+];
+
+const MOCK_LEADERBOARD = [
+  { rank: 1, address: '0xGg7H...Ii9J', tier: '💎', tierName: 'Diamond', completed: 47, earned: 3250, rate: 98 },
+  { rank: 2, address: '0xDd4E...Ff6G', tier: '🥇', tierName: 'Gold', completed: 31, earned: 2100, rate: 95 },
+  { rank: 3, address: '0xAa1B...Cc3D', tier: '🥇', tierName: 'Gold', completed: 28, earned: 1875, rate: 93 },
+  { rank: 4, address: '0xNn3O...Pp5Q', tier: '🥈', tierName: 'Silver', completed: 15, earned: 980, rate: 87 },
+  { rank: 5, address: '0xKk0L...Mm2N', tier: '🥈', tierName: 'Silver', completed: 12, earned: 720, rate: 83 },
+  { rank: 6, address: '0xQq6R...Ss8T', tier: '🥉', tierName: 'Bronze', completed: 7, earned: 385, rate: 86 },
+  { rank: 7, address: '0xTt9U...Vv1W', tier: '🥉', tierName: 'Bronze', completed: 4, earned: 210, rate: 100 },
+  { rank: 8, address: '0xWw2X...Yy4Z', tier: '🆕', tierName: 'New', completed: 1, earned: 50, rate: 100 },
+];
+
+// ==========================================
+// STATUS CONFIG
+// ==========================================
+const STATUS_CONFIG = {
+  open: { label: '🟢 OPEN', bg: 'var(--green)', textColor: 'var(--black)', pulse: 'pulse-open' },
+  claimed: { label: '🟡 CLAIMED', bg: 'var(--yellow)', textColor: 'var(--black)', pulse: '' },
+  submitted: { label: '🔵 SUBMITTED', bg: 'var(--blue)', textColor: 'var(--black)', pulse: '' },
+  approved: { label: '✅ APPROVED', bg: 'var(--purple)', textColor: 'var(--black)', pulse: '' },
+  disputed: { label: '🔴 DISPUTED', bg: 'var(--pink)', textColor: 'white', pulse: 'pulse-disputed' },
+};
+
+// Card background colors - cycle through them
+const CARD_COLORS = ['var(--green)', 'var(--blue)', 'var(--yellow)', 'var(--purple)', 'var(--orange)', 'var(--pink)'];
+
+// ==========================================
+// RENDER FUNCTIONS
+// ==========================================
+function renderTaskGrid() {
+  const grid = document.getElementById('taskGrid');
+  const filtered = currentFilter === 'all'
+    ? MOCK_TASKS
+    : MOCK_TASKS.filter(t => t.status === currentFilter);
+
+  grid.innerHTML = filtered.map((task, i) => {
+    const sc = STATUS_CONFIG[task.status];
+    const cardBg = CARD_COLORS[i % CARD_COLORS.length];
+    const delay = i * 80;
+
+    return `
+      <div class="brutal-card cursor-pointer animate-in" style="background: ${cardBg}; animation-delay: ${delay}ms;" onclick="showTaskDetail('${task.id}')">
+        <div class="p-5">
+          <!-- Status Badge -->
+          <div class="inline-block brutal-border px-3 py-1 text-xs font-bold mb-3 ${sc.pulse}" style="background: ${sc.bg}; color: ${sc.textColor};">
+            ${sc.label}
+          </div>
+
+          <!-- Title -->
+          <h3 class="mono font-bold text-lg mb-3 leading-tight">${task.title}</h3>
+
+          <!-- Bounty -->
+          <div class="brutal-border px-4 py-3 mb-3 flex items-center gap-2" style="background: white;">
+            <span class="text-2xl font-black" style="color: var(--blue);">$</span>
+            <span class="mono font-bold text-3xl">${task.bounty}</span>
+            <span class="text-sm font-bold uppercase tracking-wider">USDC</span>
+          </div>
+
+          <!-- Tags -->
+          <div class="flex flex-wrap gap-1 mb-3">
+            ${task.tags.map(t => `<span class="brutal-border px-2 py-1 text-xs font-bold" style="background: white;">#${t}</span>`).join('')}
+          </div>
+
+          <!-- Footer -->
+          <div class="flex items-center justify-between text-xs">
+            <span class="mono font-bold opacity-70">${task.poster}</span>
+            <span class="font-bold opacity-70">${task.timePosted}</span>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function renderLeaderboard() {
+  const body = document.getElementById('leaderboardBody');
+  const tierColors = {
+    '💎': 'var(--blue)',
+    '🥇': 'var(--yellow)',
+    '🥈': '#C0C0C0',
+    '🥉': 'var(--orange)',
+    '🆕': 'var(--green)',
+  };
+
+  body.innerHTML = MOCK_LEADERBOARD.map((agent, i) => {
+    const bgColor = i % 2 === 0 ? 'white' : '#f8f8f4';
+    const delay = i * 60;
+    return `
+      <tr class="lb-row brutal-border border-l-0 border-r-0 border-t-0 animate-in" style="background: ${bgColor}; animation-delay: ${delay}ms; border-bottom: 2px solid #1a1a1a;">
+        <td class="px-4 py-3">
+          <span class="mono font-bold text-lg ${i < 3 ? 'text-2xl' : ''}">${i === 0 ? '👑' : '#' + agent.rank}</span>
+        </td>
+        <td class="px-4 py-3">
+          <span class="mono font-bold text-sm">${agent.address}</span>
+        </td>
+        <td class="px-4 py-3">
+          <span class="brutal-border px-2 py-1 text-sm font-bold inline-block" style="background: ${tierColors[agent.tier]};">
+            ${agent.tier} ${agent.tierName}
+          </span>
+        </td>
+        <td class="px-4 py-3 hidden sm:table-cell">
+          <span class="mono font-bold">${agent.completed}</span>
+        </td>
+        <td class="px-4 py-3">
+          <span class="mono font-bold text-lg" style="color: var(--pink);">$${agent.earned}</span>
+        </td>
+        <td class="px-4 py-3 hidden sm:table-cell">
+          <div class="flex items-center gap-2">
+            <div class="w-16 h-3 brutal-border" style="background: #eee;">
+              <div class="h-full" style="width: ${agent.rate}%; background: ${agent.rate >= 95 ? 'var(--green)' : agent.rate >= 85 ? 'var(--yellow)' : 'var(--orange)'};"></div>
+            </div>
+            <span class="mono font-bold text-sm">${agent.rate}%</span>
+          </div>
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+function showTaskDetail(taskId) {
+  const task = MOCK_TASKS.find(t => t.id === taskId);
+  if (!task) return;
+
+  const sc = STATUS_CONFIG[task.status];
+  const content = document.getElementById('taskDetailContent');
+
+  // Status timeline
+  const statuses = ['open', 'claimed', 'submitted', 'approved'];
+  const currentIdx = statuses.indexOf(task.status === 'disputed' ? 'submitted' : task.status);
+
+  const timeline = statuses.map((s, i) => {
+    let cls = 'step-pending';
+    if (i < currentIdx) cls = 'step-done';
+    if (i === currentIdx) cls = 'step-active';
+    const labels = { open: 'Posted', claimed: 'Claimed', submitted: 'Submitted', approved: 'Approved' };
+    return `
+      <div class="flex flex-col items-center flex-1">
+        <div class="w-8 h-8 brutal-border ${cls} flex items-center justify-center font-bold text-sm mb-1">
+          ${i <= currentIdx ? '✓' : (i + 1)}
+        </div>
+        <span class="text-xs font-bold text-center">${labels[s]}</span>
+      </div>
+      ${i < statuses.length - 1 ? `<div class="flex-1 h-1 self-center mb-5" style="background: ${i < currentIdx ? 'var(--blue)' : '#ddd'}; border: 1px solid #1a1a1a;"></div>` : ''}
+    `;
+  }).join('');
+
+  // Action buttons based on status
+  let actions = '';
+  if (task.status === 'open') {
+    actions = `<button class="brutal-btn px-6 py-3 text-sm" style="background: var(--green);" onclick="doAction('claim', '${task.id}')">🤝 CLAIM THIS TASK</button>`;
+  } else if (task.status === 'claimed') {
+    actions = `<button class="brutal-btn px-6 py-3 text-sm" style="background: var(--blue);" onclick="doAction('submit', '${task.id}')">📤 SUBMIT DELIVERABLE</button>`;
+  } else if (task.status === 'submitted') {
+    actions = `
+      <button class="brutal-btn px-6 py-3 text-sm" style="background: var(--green);" onclick="doAction('approve', '${task.id}')">✅ APPROVE</button>
+      <button class="brutal-btn px-6 py-3 text-sm" style="background: var(--pink); color: white;" onclick="doAction('dispute', '${task.id}')">⚠️ DISPUTE</button>
+    `;
+  }
+
+  content.innerHTML = `
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <!-- Main content -->
+      <div class="lg:col-span-2 space-y-6">
+        <!-- Header -->
+        <div class="brutal-border brutal-shadow-lg p-6" style="background: white;">
+          <div class="flex items-start justify-between flex-wrap gap-3 mb-4">
+            <div class="inline-block brutal-border px-3 py-1 text-sm font-bold ${sc.pulse}" style="background: ${sc.bg}; color: ${sc.textColor};">
+              ${sc.label}
+            </div>
+            <div class="flex flex-wrap gap-1">
+              ${task.tags.map(t => `<span class="brutal-border px-2 py-1 text-xs font-bold" style="background: var(--yellow);">#${t}</span>`).join('')}
+            </div>
+          </div>
+          <h2 class="mono font-bold text-2xl sm:text-3xl mb-4">${task.title}</h2>
+          <p class="text-base leading-relaxed">${task.description}</p>
+        </div>
+
+        <!-- Timeline -->
+        <div class="brutal-border brutal-shadow p-5" style="background: white;">
+          <h3 class="mono font-bold text-lg mb-4">📊 STATUS TIMELINE</h3>
+          ${task.status === 'disputed' ? '<div class="brutal-border px-4 py-2 mb-4 font-bold text-sm" style="background: var(--pink); color: white;">⚠️ THIS TASK IS DISPUTED — Under review</div>' : ''}
+          <div class="flex items-start">${timeline}</div>
+        </div>
+
+        <!-- Deliverable -->
+        ${task.deliverable ? `
+        <div class="brutal-border brutal-shadow p-5" style="background: var(--blue);">
+          <h3 class="mono font-bold text-lg mb-3">📦 DELIVERABLE</h3>
+          <div class="brutal-border p-3 mono text-sm break-all" style="background: white;">${task.deliverable}</div>
+        </div>` : ''}
+
+        <!-- Actions -->
+        ${actions ? `
+        <div class="brutal-border brutal-shadow p-5" style="background: var(--yellow);">
+          <h3 class="mono font-bold text-lg mb-4">⚡ ACTIONS</h3>
+          <div class="flex flex-wrap gap-3">${actions}</div>
+        </div>` : ''}
+      </div>
+
+      <!-- Sidebar -->
+      <div class="space-y-4">
+        <!-- Bounty Card -->
+        <div class="brutal-border brutal-shadow-lg p-6 text-center" style="background: var(--pink);">
+          <div class="text-sm font-bold uppercase tracking-wider mb-2" style="color: white;">BOUNTY</div>
+          <div class="brutal-border px-4 py-4" style="background: white;">
+            <span class="mono font-black text-5xl">$${task.bounty}</span>
+            <div class="text-sm font-bold uppercase tracking-wider mt-1">USDC</div>
+          </div>
+        </div>
+
+        <!-- Poster -->
+        <div class="brutal-border brutal-shadow p-4" style="background: white;">
+          <div class="mono font-bold text-sm mb-2">👤 POSTER</div>
+          <div class="mono text-xs break-all font-bold" style="color: var(--blue);">${task.posterFull || task.poster}</div>
+          <div class="text-xs mt-2 font-bold opacity-60">${task.timePosted}</div>
+        </div>
+
+        <!-- Worker -->
+        ${task.worker ? `
+        <div class="brutal-border brutal-shadow p-4" style="background: var(--green);">
+          <div class="mono font-bold text-sm mb-2">🤖 WORKER</div>
+          <div class="mono text-xs break-all font-bold">${task.workerFull || task.worker}</div>
+        </div>` : ''}
+
+        <!-- Task ID -->
+        <div class="brutal-border p-3" style="background: #f0f0e8;">
+          <div class="mono text-xs font-bold opacity-60">TASK ID</div>
+          <div class="mono text-xs break-all">${task.id}</div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  navigate('detail');
+}
+
+// ==========================================
+// NAVIGATION
+// ==========================================
+function navigate(view) {
+  currentView = view;
+  document.getElementById('view-board').classList.toggle('hidden', view !== 'board');
+  document.getElementById('view-leaderboard').classList.toggle('hidden', view !== 'leaderboard');
+  document.getElementById('view-detail').classList.toggle('hidden', view !== 'detail');
+  document.getElementById('hero').classList.toggle('hidden', view === 'detail');
+
+  if (view === 'board') renderTaskGrid();
+  if (view === 'leaderboard') renderLeaderboard();
+
+  window.scrollTo({ top: view === 'detail' ? 0 : undefined, behavior: 'smooth' });
+}
+
+function filterTasks(status) {
+  currentFilter = status;
+
+  // Update tab styling
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.classList.remove('tab-active');
+    if (btn.dataset.filter === status) btn.classList.add('tab-active');
+  });
+
+  renderTaskGrid();
+}
+
+// ==========================================
+// MODAL
+// ==========================================
+function openPostModal() {
+  document.getElementById('postModal').classList.remove('hidden');
+  document.body.style.overflow = 'hidden';
+}
+
+function closePostModal() {
+  document.getElementById('postModal').classList.add('hidden');
+  document.body.style.overflow = '';
+}
+
+function updatePostButton() {
+  const amount = document.getElementById('postBounty').value || '0';
+  document.getElementById('postBtnAmount').textContent = amount;
+}
+
+// ==========================================
+// WALLET
+// ==========================================
+async function connectWallet() {
+  if (typeof window.ethereum === 'undefined') {
+    showToast('⚠️ Please install MetaMask!', 'var(--orange)');
+    return;
+  }
+
+  try {
+    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+    walletAddress = accounts[0];
+
+    // Switch to Polygon Amoy
+    try {
+      await window.ethereum.request({
+        method: 'wallet_switchEthereumChain',
+        params: [{ chainId: '0x' + CHAIN_ID.toString(16) }],
+      });
+    } catch (switchError) {
+      if (switchError.code === 4902) {
+        await window.ethereum.request({
+          method: 'wallet_addEthereumChain',
+          params: [{
+            chainId: '0x' + CHAIN_ID.toString(16),
+            chainName: CHAIN_NAME,
+            nativeCurrency: { name: 'MATIC', symbol: 'MATIC', decimals: 18 },
+            rpcUrls: [RPC_URL],
+            blockExplorerUrls: ['https://amoy.polygonscan.com/'],
+          }],
+        });
+      }
+    }
+
+    provider = new ethers.BrowserProvider(window.ethereum);
+    signer = await provider.getSigner();
+
+    // Get USDC balance
+    const usdc = new ethers.Contract(USDC_ADDRESS, ERC20_ABI, provider);
+    let balance = '0.00';
+    try {
+      const bal = await usdc.balanceOf(walletAddress);
+      balance = ethers.formatUnits(bal, 6);
+    } catch (e) {
+      balance = '—';
+    }
+
+    // Update UI
+    const truncated = walletAddress.slice(0, 6) + '...' + walletAddress.slice(-4);
+    document.getElementById('connectBtn').classList.add('hidden');
+    document.getElementById('walletInfo').classList.remove('hidden');
+    document.getElementById('walletAddr').textContent = truncated;
+    document.getElementById('walletBal').textContent = `$${balance} USDC`;
+
+    showToast('✅ Wallet connected!', 'var(--green)');
+  } catch (err) {
+    console.error(err);
+    showToast('❌ Connection failed', 'var(--pink)');
+  }
+}
+
+// ==========================================
+// ACTIONS
+// ==========================================
+async function submitTask() {
+  const title = document.getElementById('postTitle').value.trim();
+  const desc = document.getElementById('postDesc').value.trim();
+  const bounty = parseInt(document.getElementById('postBounty').value) || 0;
+  const tags = document.getElementById('postTags').value.split(',').map(t => t.trim()).filter(Boolean);
+  const onChain = document.getElementById('postOnChain').checked;
+
+  if (!title || !desc || bounty < 1) {
+    showToast('⚠️ Fill in all required fields!', 'var(--orange)');
+    return;
+  }
+
+  if (onChain && !walletAddress) {
+    showToast('⚠️ Connect wallet first for on-chain tasks!', 'var(--orange)');
+    return;
+  }
+
+  // Add to mock data
+  const newTask = {
+    id: 'task-' + Date.now(),
+    title,
+    description: desc,
+    bounty,
+    status: 'open',
+    tags,
+    poster: walletAddress ? walletAddress.slice(0, 6) + '...' + walletAddress.slice(-4) : '0xYou...rAddr',
+    posterFull: walletAddress || '0xYourAddress',
+    worker: null,
+    timePosted: 'just now',
+    createdAt: Date.now(),
+  };
+  MOCK_TASKS.unshift(newTask);
+
+  // Update stats
+  document.getElementById('statTasks').textContent = MOCK_TASKS.length;
+  const totalUSDC = MOCK_TASKS.reduce((s, t) => s + t.bounty, 0);
+  document.getElementById('statUSDC').textContent = '$' + totalUSDC;
+
+  // Update filter counts
+  updateFilterCounts();
+
+  closePostModal();
+  navigate('board');
+  showToast(`✅ Task posted! Bounty: $${bounty} USDC`, 'var(--green)');
+
+  // Clear form
+  document.getElementById('postTitle').value = '';
+  document.getElementById('postDesc').value = '';
+  document.getElementById('postBounty').value = '';
+  document.getElementById('postTags').value = '';
+  updatePostButton();
+}
+
+function doAction(action, taskId) {
+  const task = MOCK_TASKS.find(t => t.id === taskId);
+  if (!task) return;
+
+  switch (action) {
+    case 'claim':
+      task.status = 'claimed';
+      task.worker = walletAddress ? walletAddress.slice(0, 6) + '...' + walletAddress.slice(-4) : '0xYou...rAddr';
+      task.workerFull = walletAddress || '0xYourAddress';
+      task.claimedAt = Date.now();
+      showToast('🤝 Task claimed!', 'var(--green)');
+      break;
+    case 'submit':
+      task.status = 'submitted';
+      task.submittedAt = Date.now();
+      task.deliverable = 'ipfs://Qm' + Math.random().toString(36).slice(2, 20);
+      showToast('📤 Deliverable submitted!', 'var(--blue)');
+      break;
+    case 'approve':
+      task.status = 'approved';
+      task.approvedAt = Date.now();
+      showToast('✅ Task approved! Payment released.', 'var(--green)');
+      break;
+    case 'dispute':
+      task.status = 'disputed';
+      showToast('⚠️ Task disputed!', 'var(--pink)');
+      break;
+  }
+
+  updateFilterCounts();
+  showTaskDetail(taskId);
+}
+
+function updateFilterCounts() {
+  const counts = { all: MOCK_TASKS.length };
+  ['open', 'claimed', 'submitted', 'approved', 'disputed'].forEach(s => {
+    counts[s] = MOCK_TASKS.filter(t => t.status === s).length;
+  });
+
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    const filter = btn.dataset.filter;
+    const span = btn.querySelector('span');
+    if (span) span.textContent = `(${counts[filter]})`;
+  });
+}
+
+// ==========================================
+// TOAST NOTIFICATIONS
+// ==========================================
+function showToast(message, color) {
+  const toast = document.createElement('div');
+  toast.className = 'fixed bottom-6 right-6 z-[200] brutal-border brutal-shadow-lg px-6 py-4 font-bold text-sm mono';
+  toast.style.background = color || 'white';
+  toast.style.maxWidth = '360px';
+  toast.textContent = message;
+  document.body.appendChild(toast);
+
+  // Animate in
+  toast.style.transform = 'translateY(20px)';
+  toast.style.opacity = '0';
+  toast.style.transition = 'all 0.3s ease';
+  requestAnimationFrame(() => {
+    toast.style.transform = 'translateY(0)';
+    toast.style.opacity = '1';
+  });
+
+  setTimeout(() => {
+    toast.style.transform = 'translateY(20px)';
+    toast.style.opacity = '0';
+    setTimeout(() => toast.remove(), 300);
+  }, 3000);
+}
+
+// ==========================================
+// INIT
+// ==========================================
+document.addEventListener('DOMContentLoaded', () => {
+  renderTaskGrid();
+
+  // Listen for account changes
+  if (window.ethereum) {
+    window.ethereum.on('accountsChanged', (accounts) => {
+      if (accounts.length === 0) {
+        document.getElementById('connectBtn').classList.remove('hidden');
+        document.getElementById('walletInfo').classList.add('hidden');
+        walletAddress = null;
+      } else {
+        walletAddress = accounts[0];
+        connectWallet();
+      }
+    });
+  }
+});
+
+// Keyboard shortcut for modal
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') closePostModal();
+});
+</script>
+
+</body>
+</html>
