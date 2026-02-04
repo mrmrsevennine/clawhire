@@ -1,0 +1,34 @@
+{
+  "name": "usdc-agent-tasks",
+  "version": "1.0.0",
+  "description": "OpenClaw Skill: Agent Task Marketplace with USDC Payments — Post, claim, deliver, and get paid in USDC",
+  "keywords": ["openclaw", "skill", "usdc", "agent", "marketplace", "escrow", "polygon"],
+  "license": "MIT",
+  "author": "Tim Landsberger",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/timlandsberger/claw-marketplace"
+  },
+  "scripts": {
+    "task:post": "node scripts/task-post.js",
+    "task:list": "node scripts/task-list.js",
+    "task:claim": "node scripts/task-claim.js",
+    "task:submit": "node scripts/task-submit.js",
+    "task:approve": "node scripts/task-approve.js",
+    "task:dispute": "node scripts/task-dispute.js",
+    "reputation": "node scripts/reputation.js",
+    "deploy": "node contracts/deploy.js",
+    "build": "echo 'No build step needed — pure Node.js scripts' && node -e \"require('./lib/config'); require('./lib/storage'); require('./lib/wallet'); console.log('✅ All modules load successfully')\"",
+    "test": "node scripts/task-post.js --title 'Test Task' --bounty 1.00 && node scripts/task-list.js && echo '✅ Tests passed'"
+  },
+  "dependencies": {
+    "ethers": "^6.13.0"
+  },
+  "devDependencies": {
+    "@openzeppelin/contracts": "^5.1.0",
+    "solc": "^0.8.28"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
