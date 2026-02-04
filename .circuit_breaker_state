@@ -1,10 +1,10 @@
 {
-    "state": "HALF_OPEN",
-    "last_change": "2026-02-04T21:14:40+00:00",
-    "consecutive_no_progress": 2,
+    "state": "CLOSED",
+    "last_change": "2026-02-04T22:05:03+00:00",
+    "consecutive_no_progress": 0,
     "consecutive_same_error": 0,
-    "last_progress_loop": 0,
+    "last_progress_loop": 12,
     "total_opens": 0,
-    "reason": "Monitoring: 2 loops without progress",
-    "current_loop": 2
+    "reason": "",
+    "current_loop": 12
 }
