@@ -1,32 +1,54 @@
 {
   "name": "usdc-agent-tasks",
-  "version": "1.0.0",
-  "description": "OpenClaw Skill: Agent Task Marketplace with USDC Payments — Post, claim, deliver, and get paid in USDC",
-  "keywords": ["openclaw", "skill", "usdc", "agent", "marketplace", "escrow", "polygon"],
+  "version": "2.0.0",
+  "description": "The Agent Economy Protocol — AI agents post tasks, bid on work, and get paid in USDC. Supports agent-to-agent subcontracting, competitive bidding, and on-chain reputation.",
+  "keywords": [
+    "openclaw",
+    "skill",
+    "usdc",
+    "agent",
+    "marketplace",
+    "escrow",
+    "polygon",
+    "ai-agents",
+    "defi",
+    "circle"
+  ],
   "license": "MIT",
   "author": "Tim Landsberger",
   "repository": {
     "type": "git",
     "url": "https://github.com/timlandsberger/claw-marketplace"
   },
+  "type": "module",
   "scripts": {
     "task:post": "node scripts/task-post.js",
     "task:list": "node scripts/task-list.js",
     "task:claim": "node scripts/task-claim.js",
+    "task:bid": "node scripts/task-bid.js",
+    "task:accept-bid": "node scripts/task-accept-bid.js",
+    "task:subtask": "node scripts/task-subtask.js",
     "task:submit": "node scripts/task-submit.js",
     "task:approve": "node scripts/task-approve.js",
     "task:dispute": "node scripts/task-dispute.js",
+    "task:stats": "node scripts/task-stats.js",
     "reputation": "node scripts/reputation.js",
-    "deploy": "node contracts/deploy.js",
-    "build": "echo 'No build step needed — pure Node.js scripts' && node -e \"require('./lib/config'); require('./lib/storage'); require('./lib/wallet'); console.log('✅ All modules load successfully')\"",
-    "test": "node scripts/task-post.js --title 'Test Task' --bounty 1.00 && node scripts/task-list.js && echo '✅ Tests passed'"
-  },
-  "dependencies": {
-    "ethers": "^6.13.0"
+    "deploy": "node scripts/deploy-escrow.js",
+    "compile": "npx hardhat compile",
+    "test": "npx hardhat test",
+    "seed": "node scripts/seed-demo.js"
   },
   "devDependencies": {
-    "@openzeppelin/contracts": "^5.1.0",
-    "solc": "^0.8.28"
+    "@nomicfoundation/hardhat-viem": "^3.0.2",
+    "@openzeppelin/contracts": "^5.4.0",
+    "chai": "^4.5.0",
+    "dotenv": "^17.2.4",
+    "hardhat": "^3.1.7",
+    "mocha": "^11.7.5",
+    "viem": "^2.45.1"
+  },
+  "dependencies": {
+    "ethers": "^6.16.0"
   },
   "engines": {
     "node": ">=18.0.0"

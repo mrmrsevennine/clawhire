@@ -1,11 +1,11 @@
 // USDC wallet helpers using ethers.js
 // Handles wallet loading, USDC transfers, and escrow interactions
 
-const { ethers } = require('ethers');
-const { config, requireConfig } = require('./config');
+import { ethers } from 'ethers';
+import { config, requireConfig, StatusNames } from './config.js';
 
 // Get provider
-function getProvider() {
+export function getProvider() {
   return new ethers.JsonRpcProvider(config.rpcUrl, {
     chainId: config.chainId,
     name: config.network,
@@ -13,40 +13,40 @@ function getProvider() {
 }
 
 // Get wallet (signer)
-function getWallet() {
+export function getWallet() {
   requireConfig('privateKey');
   const provider = getProvider();
   return new ethers.Wallet(config.privateKey, provider);
 }
 
 // Get USDC contract instance
-function getUsdcContract(signerOrProvider) {
+export function getUsdcContract(signerOrProvider) {
   return new ethers.Contract(config.usdcAddress, config.erc20Abi, signerOrProvider);
 }
 
 // Get Escrow contract instance
-function getEscrowContract(signerOrProvider) {
+export function getEscrowContract(signerOrProvider) {
   requireConfig('escrowAddress');
   return new ethers.Contract(config.escrowAddress, config.escrowAbi, signerOrProvider);
 }
 
 // Convert USDC amount to smallest unit (6 decimals)
-function parseUsdc(amount) {
+export function parseUsdc(amount) {
   return ethers.parseUnits(String(amount), config.usdcDecimals);
 }
 
 // Convert from smallest unit to readable USDC
-function formatUsdc(amount) {
+export function formatUsdc(amount) {
   return ethers.formatUnits(amount, config.usdcDecimals);
 }
 
 // Generate a deterministic task ID from a string
-function taskIdToBytes32(taskIdString) {
+export function taskIdToBytes32(taskIdString) {
   return ethers.id(taskIdString);
 }
 
 // Check USDC balance
-async function getUsdcBalance(address) {
+export async function getUsdcBalance(address) {
   const provider = getProvider();
   const usdc = getUsdcContract(provider);
   const balance = await usdc.balanceOf(address);
@@ -54,14 +54,14 @@ async function getUsdcBalance(address) {
 }
 
 // Check native token balance (POL/MATIC)
-async function getNativeBalance(address) {
+export async function getNativeBalance(address) {
   const provider = getProvider();
   const balance = await provider.getBalance(address);
   return ethers.formatEther(balance);
 }
 
 // Approve USDC spending for escrow contract
-async function approveUsdcForEscrow(amount) {
+export async function approveUsdcForEscrow(amount) {
   const wallet = getWallet();
   const usdc = getUsdcContract(wallet);
   const parsedAmount = parseUsdc(amount);
@@ -82,7 +82,7 @@ async function approveUsdcForEscrow(amount) {
 }
 
 // Direct USDC transfer (for off-chain mode)
-async function transferUsdc(to, amount) {
+export async function transferUsdc(to, amount) {
   const wallet = getWallet();
   const usdc = getUsdcContract(wallet);
   const parsedAmount = parseUsdc(amount);
@@ -98,7 +98,7 @@ async function transferUsdc(to, amount) {
 }
 
 // Create task on escrow contract
-async function createTaskOnChain(taskIdString, bountyAmount) {
+export async function createTaskOnChain(taskIdString, bountyAmount) {
   const wallet = getWallet();
   const escrow = getEscrowContract(wallet);
   const taskIdBytes = taskIdToBytes32(taskIdString);
@@ -118,8 +118,8 @@ async function createTaskOnChain(taskIdString, bountyAmount) {
   };
 }
 
-// Claim task on escrow
-async function claimTaskOnChain(taskIdString) {
+// Claim task on escrow (legacy direct claim)
+export async function claimTaskOnChain(taskIdString) {
   const wallet = getWallet();
   const escrow = getEscrowContract(wallet);
   const taskIdBytes = taskIdToBytes32(taskIdString);
@@ -129,8 +129,100 @@ async function claimTaskOnChain(taskIdString) {
   return { txHash: receipt.hash, taskId: taskIdString, worker: wallet.address };
 }
 
+// ===========================================
+// NEW: Bidding functions
+// ===========================================
+
+// Place a bid on a task
+export async function bidOnTaskOnChain(taskIdString, bidPrice, estimatedTimeSeconds) {
+  const wallet = getWallet();
+  const escrow = getEscrowContract(wallet);
+  const taskIdBytes = taskIdToBytes32(taskIdString);
+  const parsedPrice = parseUsdc(bidPrice);
+
+  const tx = await escrow.bidOnTask(taskIdBytes, parsedPrice, BigInt(estimatedTimeSeconds));
+  const receipt = await tx.wait();
+  return {
+    txHash: receipt.hash,
+    taskId: taskIdString,
+    bidder: wallet.address,
+    price: bidPrice,
+    estimatedTime: estimatedTimeSeconds,
+  };
+}
+
+// Accept a bid on your task
+export async function acceptBidOnChain(taskIdString, bidderAddress) {
+  const wallet = getWallet();
+  const escrow = getEscrowContract(wallet);
+  const taskIdBytes = taskIdToBytes32(taskIdString);
+
+  const tx = await escrow.acceptBid(taskIdBytes, bidderAddress);
+  const receipt = await tx.wait();
+  return {
+    txHash: receipt.hash,
+    taskId: taskIdString,
+    acceptedBidder: bidderAddress,
+  };
+}
+
+// Get all bids for a task
+export async function getTaskBidsOnChain(taskIdString) {
+  const provider = getProvider();
+  const escrow = getEscrowContract(provider);
+  const taskIdBytes = taskIdToBytes32(taskIdString);
+
+  const [bidders, bids] = await escrow.getTaskBids(taskIdBytes);
+  return bidders.map((bidder, i) => ({
+    bidder,
+    price: formatUsdc(bids[i].price),
+    estimatedTime: Number(bids[i].estimatedTime),
+    timestamp: new Date(Number(bids[i].timestamp) * 1000).toISOString(),
+    accepted: bids[i].accepted,
+  }));
+}
+
+// ===========================================
+// NEW: Subtask functions
+// ===========================================
+
+// Create a subtask (agent-to-agent subcontracting)
+export async function createSubtaskOnChain(parentTaskIdString, subtaskIdString, bountyAmount) {
+  const wallet = getWallet();
+  const escrow = getEscrowContract(wallet);
+  const parentTaskIdBytes = taskIdToBytes32(parentTaskIdString);
+  const subtaskIdBytes = taskIdToBytes32(subtaskIdString);
+  const parsedBounty = parseUsdc(bountyAmount);
+
+  // First approve USDC
+  await approveUsdcForEscrow(bountyAmount);
+
+  const tx = await escrow.createSubtask(parentTaskIdBytes, subtaskIdBytes, parsedBounty);
+  const receipt = await tx.wait();
+  return {
+    txHash: receipt.hash,
+    parentTaskId: parentTaskIdString,
+    subtaskId: subtaskIdString,
+    bounty: bountyAmount,
+  };
+}
+
+// Get subtasks for a parent task
+export async function getSubtasksOnChain(parentTaskIdString) {
+  const provider = getProvider();
+  const escrow = getEscrowContract(provider);
+  const parentTaskIdBytes = taskIdToBytes32(parentTaskIdString);
+
+  const subtaskIds = await escrow.getSubtasks(parentTaskIdBytes);
+  return subtaskIds;
+}
+
+// ===========================================
+// Deliverable & Approval functions
+// ===========================================
+
 // Submit deliverable on escrow
-async function submitDeliverableOnChain(taskIdString, deliverableHash) {
+export async function submitDeliverableOnChain(taskIdString, deliverableHash) {
   const wallet = getWallet();
   const escrow = getEscrowContract(wallet);
   const taskIdBytes = taskIdToBytes32(taskIdString);
@@ -141,8 +233,8 @@ async function submitDeliverableOnChain(taskIdString, deliverableHash) {
   return { txHash: receipt.hash, taskId: taskIdString, deliverableHash };
 }
 
-// Approve task on escrow (releases USDC)
-async function approveTaskOnChain(taskIdString) {
+// Approve task on escrow (releases USDC minus platform fee)
+export async function approveTaskOnChain(taskIdString) {
   const wallet = getWallet();
   const escrow = getEscrowContract(wallet);
   const taskIdBytes = taskIdToBytes32(taskIdString);
@@ -153,7 +245,7 @@ async function approveTaskOnChain(taskIdString) {
 }
 
 // Dispute task on escrow
-async function disputeTaskOnChain(taskIdString) {
+export async function disputeTaskOnChain(taskIdString) {
   const wallet = getWallet();
   const escrow = getEscrowContract(wallet);
   const taskIdBytes = taskIdToBytes32(taskIdString);
@@ -164,7 +256,7 @@ async function disputeTaskOnChain(taskIdString) {
 }
 
 // Refund task on escrow
-async function refundTaskOnChain(taskIdString) {
+export async function refundTaskOnChain(taskIdString) {
   const wallet = getWallet();
   const escrow = getEscrowContract(wallet);
   const taskIdBytes = taskIdToBytes32(taskIdString);
@@ -174,8 +266,23 @@ async function refundTaskOnChain(taskIdString) {
   return { txHash: receipt.hash, taskId: taskIdString };
 }
 
+// Cancel an open task
+export async function cancelTaskOnChain(taskIdString) {
+  const wallet = getWallet();
+  const escrow = getEscrowContract(wallet);
+  const taskIdBytes = taskIdToBytes32(taskIdString);
+
+  const tx = await escrow.cancelTask(taskIdBytes);
+  const receipt = await tx.wait();
+  return { txHash: receipt.hash, taskId: taskIdString };
+}
+
+// ===========================================
+// View functions
+// ===========================================
+
 // Get on-chain task data
-async function getOnChainTask(taskIdString) {
+export async function getOnChainTask(taskIdString) {
   const provider = getProvider();
   const escrow = getEscrowContract(provider);
   const taskIdBytes = taskIdToBytes32(taskIdString);
@@ -185,15 +292,36 @@ async function getOnChainTask(taskIdString) {
     poster: task.poster,
     worker: task.worker,
     bounty: formatUsdc(task.bounty),
-    status: ['Open', 'Claimed', 'Submitted', 'Approved', 'Disputed', 'Refunded'][Number(task.status)],
+    agreedPrice: formatUsdc(task.agreedPrice),
+    status: StatusNames[Number(task.status)],
+    statusCode: Number(task.status),
     deliverableHash: task.deliverableHash,
     createdAt: new Date(Number(task.createdAt) * 1000).toISOString(),
     claimedAt: Number(task.claimedAt) > 0 ? new Date(Number(task.claimedAt) * 1000).toISOString() : null,
     submittedAt: Number(task.submittedAt) > 0 ? new Date(Number(task.submittedAt) * 1000).toISOString() : null,
+    parentTaskId: task.parentTaskId,
+    bidCount: Number(task.bidCount),
   };
 }
 
-module.exports = {
+// Get platform statistics
+export async function getPlatformStats() {
+  const provider = getProvider();
+  const escrow = getEscrowContract(provider);
+
+  const stats = await escrow.getStats();
+  return {
+    tasksCreated: Number(stats[0]),
+    tasksCompleted: Number(stats[1]),
+    volumeUsdc: formatUsdc(stats[2]),
+    feesCollected: formatUsdc(stats[3]),
+    currentFeeBps: Number(stats[4]),
+    currentFeePercent: Number(stats[4]) / 100, // Convert bps to percentage
+  };
+}
+
+// Export all functions
+export default {
   getProvider,
   getWallet,
   getUsdcContract,
@@ -207,9 +335,16 @@ module.exports = {
   transferUsdc,
   createTaskOnChain,
   claimTaskOnChain,
+  bidOnTaskOnChain,
+  acceptBidOnChain,
+  getTaskBidsOnChain,
+  createSubtaskOnChain,
+  getSubtasksOnChain,
   submitDeliverableOnChain,
   approveTaskOnChain,
   disputeTaskOnChain,
   refundTaskOnChain,
+  cancelTaskOnChain,
   getOnChainTask,
+  getPlatformStats,
 };

@@ -7,10 +7,10 @@ export default function WalletButton() {
     return (
       <button
         onClick={disconnect}
-        className="brutal-btn px-3 py-2 text-xs bg-brutal-blue flex items-center gap-2"
+        className="px-3 py-2 text-sm rounded-lg bg-dark-800 border border-dark-700 flex items-center gap-3 hover:border-dark-600 transition-colors"
       >
-        <span className="font-mono font-bold">{truncatedAddress}</span>
-        <span className="font-bold">${balance} USDC</span>
+        <span className="font-mono text-dark-300">{truncatedAddress}</span>
+        <span className="font-semibold text-usdc-400">${balance}</span>
       </button>
     );
   }
@@ -18,9 +18,9 @@ export default function WalletButton() {
   return (
     <button
       onClick={connect}
-      className="brutal-btn px-3 py-2 text-xs sm:text-sm bg-brutal-yellow"
+      className="px-4 py-2 text-sm font-medium rounded-lg bg-dark-800 border border-dark-700 text-dark-200 hover:border-usdc-500/50 hover:text-usdc-400 transition-colors"
     >
-      🔗 CONNECT
+      Connect
     </button>
   );
 }
