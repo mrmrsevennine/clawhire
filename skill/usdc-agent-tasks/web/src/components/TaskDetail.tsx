@@ -33,6 +33,10 @@ export function TaskDetail() {
 
   const task = id ? getTaskById(id) : undefined;
 
+  const isWorker = walletAddress?.toLowerCase() === task?.workerFull?.toLowerCase();
+  const isPosterOfTask = walletAddress?.toLowerCase() === task?.posterFull?.toLowerCase();
+  const isConnected = !!walletAddress;
+
   if (!task) {
     return (
       <div className="max-w-4xl mx-auto px-4 py-16 text-center">
@@ -53,7 +57,6 @@ export function TaskDetail() {
 
   const currentStep = STATUS_ORDER[task.status] ?? 0;
   const hasBids = task.bids && task.bids.length > 0;
-  const isPoster = walletAddress?.toLowerCase() === task.posterFull?.toLowerCase();
 
   const handlePlaceBid = async () => {
     if (!bidPrice || !bidHours) return;
@@ -288,11 +291,11 @@ export function TaskDetail() {
                                 )}
                               </div>
                             </div>
-                            {isPoster && !bid.accepted && (
+                            {isPosterOfTask && !bid.accepted && (
                               <button
                                 onClick={() => handleAcceptBid(bid.bidderFull!)}
                                 disabled={isSubmitting}
-                                className="px-3 py-2 bg-slate-900 hover:bg-teal-500 disabled:opacity-50 text-slate-900 font-mono text-xs font-semibold rounded-lg transition-colors whitespace-nowrap"
+                                className="px-3 py-2 bg-slate-900 hover:bg-teal-600 disabled:opacity-50 text-white font-mono text-xs font-semibold rounded-lg transition-colors whitespace-nowrap"
                               >
                                 Accept Bid
                               </button>
@@ -307,7 +310,8 @@ export function TaskDetail() {
                 <p className="text-slate-400 text-sm mb-6">No bids yet. Be the first to bid!</p>
               )}
 
-              {/* Place Bid Form */}
+              {/* Place Bid Form — hidden from poster */}
+              {!isPosterOfTask && isConnected && (
               <div className="border-t border-slate-100 pt-6">
                 <h4 className="font-mono text-sm text-slate-900 mb-4">Place Your Bid</h4>
                 <div className="grid sm:grid-cols-2 gap-4 mb-4">
@@ -332,14 +336,24 @@ export function TaskDetail() {
                     />
                   </div>
                 </div>
+                {bidPrice && parseFloat(bidPrice) > task.bounty && (
+                  <p className="text-red-500 text-xs font-mono mb-2">⚠ Bid cannot exceed bounty (${task.bounty} USDC)</p>
+                )}
                 <button
                   onClick={handlePlaceBid}
-                  disabled={isSubmitting || !bidPrice || !bidHours}
-                  className="w-full px-6 py-3 bg-slate-900 hover:bg-teal-500 disabled:opacity-50 disabled:cursor-not-allowed text-slate-900 font-mono font-semibold rounded-lg transition-colors"
+                  disabled={isSubmitting || !bidPrice || !bidHours || parseFloat(bidPrice) > task.bounty || isPosterOfTask}
+                  className="w-full px-6 py-3 bg-slate-900 hover:bg-teal-600 disabled:opacity-50 disabled:cursor-not-allowed text-white font-mono font-semibold rounded-lg transition-colors"
                 >
                   {isSubmitting ? 'Submitting...' : 'Submit Bid'}
                 </button>
               </div>
+              )}
+
+              {!isConnected && (
+                <div className="border-t border-slate-100 pt-6">
+                  <p className="text-slate-400 text-sm text-center">Connect wallet to place a bid</p>
+                </div>
+              )}
             </div>
           )}
 
@@ -353,19 +367,27 @@ export function TaskDetail() {
             </div>
           )}
 
-          {/* Actions */}
+          {/* Actions — role-based visibility */}
           <div className="bg-white border border-slate-100 rounded-xl p-6">
-            {task.status === 'open' && !hasBids && (
+            {!isConnected && task.status !== 'approved' && task.status !== 'disputed' && (
+              <div className="p-4 bg-slate-50 border border-slate-200 rounded-lg text-center">
+                <span className="text-slate-500 font-mono text-sm">Connect wallet to interact with this task</span>
+              </div>
+            )}
+
+            {/* Open task: only non-posters can claim directly */}
+            {task.status === 'open' && !hasBids && isConnected && !isPosterOfTask && (
               <button
                 onClick={handleClaimTask}
                 disabled={isSubmitting}
-                className="w-full px-6 py-4 bg-status-claimed hover:bg-status-claimed/80 disabled:opacity-50 disabled:cursor-not-allowed text-slate-900 font-mono font-semibold rounded-lg transition-colors"
+                className="w-full px-6 py-4 bg-teal-500 hover:bg-teal-600 disabled:opacity-50 disabled:cursor-not-allowed text-white font-mono font-semibold rounded-lg transition-colors"
               >
                 {isSubmitting ? 'Claiming...' : 'Claim This Task (Direct)'}
               </button>
             )}
 
-            {task.status === 'claimed' && (
+            {/* Claimed: only the assigned WORKER can submit */}
+            {task.status === 'claimed' && isWorker && (
               <div className="space-y-4">
                 <input
                   type="text"
@@ -377,41 +399,68 @@ export function TaskDetail() {
                 <button
                   onClick={handleSubmitDeliverable}
                   disabled={isSubmitting || !deliverableInput.trim()}
-                  className="w-full px-6 py-4 bg-status-submitted hover:bg-status-submitted/80 disabled:opacity-50 disabled:cursor-not-allowed text-slate-900 font-mono font-semibold rounded-lg transition-colors"
+                  className="w-full px-6 py-4 bg-teal-500 hover:bg-teal-600 disabled:opacity-50 disabled:cursor-not-allowed text-white font-mono font-semibold rounded-lg transition-colors"
                 >
                   {isSubmitting ? 'Submitting...' : 'Submit Deliverable'}
                 </button>
               </div>
             )}
 
-            {task.status === 'submitted' && (
+            {task.status === 'claimed' && isPosterOfTask && (
+              <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg text-center">
+                <span className="text-blue-600 font-mono text-sm">Waiting for worker to submit deliverable...</span>
+              </div>
+            )}
+
+            {task.status === 'claimed' && isConnected && !isWorker && !isPosterOfTask && (
+              <div className="p-4 bg-slate-50 border border-slate-200 rounded-lg text-center">
+                <span className="text-slate-500 font-mono text-sm">This task is being worked on</span>
+              </div>
+            )}
+
+            {/* Submitted: only POSTER can approve or dispute */}
+            {task.status === 'submitted' && isPosterOfTask && (
               <div className="flex gap-4">
                 <button
                   onClick={handleApproveTask}
                   disabled={isSubmitting}
-                  className="flex-1 px-6 py-4 bg-status-approved hover:bg-status-approved/80 disabled:opacity-50 disabled:cursor-not-allowed text-slate-900 font-mono font-semibold rounded-lg transition-colors"
+                  className="flex-1 px-6 py-4 bg-emerald-500 hover:bg-emerald-600 disabled:opacity-50 disabled:cursor-not-allowed text-white font-mono font-semibold rounded-lg transition-colors"
                 >
                   {isSubmitting ? 'Processing...' : 'Approve & Pay'}
                 </button>
                 <button
                   onClick={handleDisputeTask}
                   disabled={isSubmitting}
-                  className="flex-1 px-6 py-4 bg-status-disputed hover:bg-status-disputed/80 disabled:opacity-50 disabled:cursor-not-allowed text-slate-900 font-mono font-semibold rounded-lg transition-colors"
+                  className="flex-1 px-6 py-4 bg-red-500 hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed text-white font-mono font-semibold rounded-lg transition-colors"
                 >
                   {isSubmitting ? 'Processing...' : 'Dispute'}
                 </button>
               </div>
             )}
 
+            {task.status === 'submitted' && isWorker && (
+              <div className="p-4 bg-amber-50 border border-amber-200 rounded-lg text-center">
+                <span className="text-amber-700 font-mono text-sm">Waiting for poster to review your deliverable...</span>
+                <p className="text-amber-600/70 text-xs mt-1">Auto-approved after 14 days if no response</p>
+              </div>
+            )}
+
+            {task.status === 'submitted' && isConnected && !isPosterOfTask && !isWorker && (
+              <div className="p-4 bg-slate-50 border border-slate-200 rounded-lg text-center">
+                <span className="text-slate-500 font-mono text-sm">Deliverable under review</span>
+              </div>
+            )}
+
             {task.status === 'approved' && (
-              <div className="p-4 bg-status-approved/10 border border-status-approved/30 rounded-lg text-center">
-                <span className="text-status-approved font-mono font-semibold">Task Completed - Payment Released</span>
+              <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-lg text-center">
+                <span className="text-emerald-600 font-mono font-semibold">✓ Task Completed — Payment Released</span>
               </div>
             )}
 
             {task.status === 'disputed' && (
-              <div className="p-4 bg-status-disputed/10 border border-status-disputed/30 rounded-lg text-center">
-                <span className="text-status-disputed font-mono font-semibold">Under Dispute - Awaiting Resolution</span>
+              <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-center">
+                <span className="text-red-600 font-mono font-semibold">⚠ Under Dispute — Awaiting Arbitration</span>
+                <p className="text-red-500/70 text-xs mt-1">Disputes are resolved by platform arbitrator with fair split</p>
               </div>
             )}
           </div>

@@ -21,6 +21,11 @@ export function PostTaskModal() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!title.trim() || !description.trim() || !bounty) return;
+    if (title.trim().length > 200) { toast.error('Title must be under 200 characters'); return; }
+    if (description.trim().length > 5000) { toast.error('Description must be under 5000 characters'); return; }
+    const bountyVal = parseFloat(bounty);
+    if (bountyVal < 1) { toast.error('Minimum bounty is $1 USDC'); return; }
+    if (bountyVal > 100000) { toast.error('Maximum bounty is $100,000 USDC'); return; }
     if (onChain && !isWalletConnected) { toast.error('Connect your wallet to post on-chain tasks'); return; }
 
     setIsSubmitting(true);

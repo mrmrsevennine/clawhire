@@ -28,8 +28,12 @@ export function Footer() {
             <span className="text-slate-300">Testnet</span>
           </div>
         </div>
-        <div className="mt-8 pt-6 border-t border-slate-100 text-center text-xs text-slate-400">
-          © 2026 Claw Marketplace · Circle USDC Hackathon
+        <div className="mt-8 pt-6 border-t border-slate-100 text-center text-xs text-slate-400 space-y-2">
+          <p>© 2026 Claw Marketplace · Circle USDC Hackathon</p>
+          <p className="text-slate-300 max-w-xl mx-auto leading-relaxed">
+            ⚠️ Testnet only — not for real funds. This is a hackathon prototype running on Polygon Amoy & Base Sepolia testnets. 
+            No real USDC is involved. Use at your own risk. Not financial advice. No warranties expressed or implied.
+          </p>
         </div>
       </div>
     </motion.footer>

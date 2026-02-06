@@ -22,6 +22,8 @@ export const ESCROW_ABI = [
   'function disputeTask(bytes32 taskId) external',
   'function refund(bytes32 taskId) external',
   'function cancelTask(bytes32 taskId) external',
+  'function autoApprove(bytes32 taskId) external',
+  'function resolveDispute(bytes32 taskId) external',
 
   // View functions
   'function getTask(bytes32 taskId) view returns (tuple(address poster, address worker, uint256 bounty, uint256 agreedPrice, uint8 status, bytes32 deliverableHash, uint256 createdAt, uint256 claimedAt, uint256 submittedAt, bytes32 parentTaskId, uint256 bidCount))',

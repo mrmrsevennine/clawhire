@@ -411,8 +411,8 @@ describe("TaskEscrow", function () {
       expect(task.status).to.equal(4); // Disputed
     });
 
-    it("Should allow refund after dispute", async function () {
-      const { escrowAsPoster, escrowAsWorker1, usdc, poster } = await deployFixture();
+    it("Should resolve dispute with fair split (owner arbitration)", async function () {
+      const { escrow, escrowAsPoster, escrowAsWorker1, usdc, poster, worker1 } = await deployFixture();
       const taskId = createTaskId("task-refund-1");
       const bounty = parseUnits("100", 6);
 
@@ -422,10 +422,17 @@ describe("TaskEscrow", function () {
       await escrowAsPoster.write.disputeTask([taskId]);
 
       const posterBalanceBefore = await usdc.read.balanceOf([poster.account.address]);
-      await escrowAsPoster.write.refund([taskId]);
-      const posterBalanceAfter = await usdc.read.balanceOf([poster.account.address]);
+      const workerBalanceBefore = await usdc.read.balanceOf([worker1.account.address]);
 
-      expect(posterBalanceAfter - posterBalanceBefore).to.equal(bounty);
+      // Owner (arbitrator) resolves dispute — 70/30 split
+      await escrow.write.resolveDispute([taskId]);
+
+      const posterBalanceAfter = await usdc.read.balanceOf([poster.account.address]);
+      const workerBalanceAfter = await usdc.read.balanceOf([worker1.account.address]);
+
+      // Poster gets 70% = 70 USDC, Worker gets 30% = 30 USDC
+      expect(posterBalanceAfter - posterBalanceBefore).to.equal(parseUnits("70", 6));
+      expect(workerBalanceAfter - workerBalanceBefore).to.equal(parseUnits("30", 6));
     });
   });
 

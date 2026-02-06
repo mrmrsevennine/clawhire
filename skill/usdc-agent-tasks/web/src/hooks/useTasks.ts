@@ -44,7 +44,7 @@ export function useTasks() {
     data: { title: string; description: string; bounty: number; tags: string[] },
     useOnChain = false
   ): Promise<Task | null> => {
-    const taskId = 'task-' + String(tasks.length + 1).padStart(3, '0');
+    const taskId = 'task-' + crypto.randomUUID().slice(0, 8);
     const posterAddr = wallet.address || '0xYourAddress';
 
     const newTask: Task = {
@@ -87,7 +87,21 @@ export function useTasks() {
   // Place a bid on a task
   const placeBid = useCallback(async (taskId: string, price: number, estimatedHours: number, useOnChain = false) => {
     const task = getTaskById(taskId);
-    if (!task) return;
+    if (!task) throw new Error('Task not found');
+
+    // Validation: bid must not exceed bounty
+    if (price > task.bounty) throw new Error(`Bid cannot exceed bounty ($${task.bounty} USDC)`);
+    if (price <= 0) throw new Error('Bid must be greater than 0');
+    if (estimatedHours <= 0) throw new Error('Estimated hours must be greater than 0');
+
+    // Validation: poster cannot bid on own task
+    if (wallet.address?.toLowerCase() === task.posterFull?.toLowerCase()) {
+      throw new Error('Cannot bid on your own task');
+    }
+
+    // Validation: cannot bid twice
+    const existingBid = task.bids?.find(b => b.bidderFull?.toLowerCase() === wallet.address?.toLowerCase());
+    if (existingBid) throw new Error('You have already placed a bid on this task');
 
     const bidderAddr = wallet.address || '0xYourAddress';
 
@@ -124,7 +138,12 @@ export function useTasks() {
   // Accept a bid
   const acceptBid = useCallback(async (taskId: string, bidderAddress: string, useOnChain = false) => {
     const task = getTaskById(taskId);
-    if (!task) return;
+    if (!task) throw new Error('Task not found');
+
+    // Validation: only poster can accept bids
+    if (wallet.address?.toLowerCase() !== task.posterFull?.toLowerCase()) {
+      throw new Error('Only the task poster can accept bids');
+    }
 
     if (useOnChain && wallet.connected) {
       setLoading(true);
@@ -157,6 +176,11 @@ export function useTasks() {
 
   // Direct claim (legacy)
   const claimTask = useCallback(async (taskId: string, useOnChain = false) => {
+    const taskToCheck = getTaskById(taskId);
+    if (taskToCheck && wallet.address?.toLowerCase() === taskToCheck.posterFull?.toLowerCase()) {
+      throw new Error('Cannot claim your own task');
+    }
+
     if (useOnChain && wallet.connected) {
       setLoading(true);
       setError(null);
@@ -182,6 +206,11 @@ export function useTasks() {
 
   // Submit deliverable
   const submitDeliverable = useCallback(async (taskId: string, deliverable: string, useOnChain = false) => {
+    const taskToCheck = getTaskById(taskId);
+    if (taskToCheck && wallet.address?.toLowerCase() !== taskToCheck.workerFull?.toLowerCase()) {
+      throw new Error('Only the assigned worker can submit deliverables');
+    }
+
     if (useOnChain && wallet.connected) {
       setLoading(true);
       setError(null);
@@ -205,6 +234,11 @@ export function useTasks() {
 
   // Approve task
   const approveTask = useCallback(async (taskId: string, useOnChain = false) => {
+    const taskToCheck = getTaskById(taskId);
+    if (taskToCheck && wallet.address?.toLowerCase() !== taskToCheck.posterFull?.toLowerCase()) {
+      throw new Error('Only the task poster can approve deliverables');
+    }
+
     if (useOnChain && wallet.connected) {
       setLoading(true);
       setError(null);
@@ -227,6 +261,11 @@ export function useTasks() {
 
   // Dispute task
   const disputeTask = useCallback(async (taskId: string, useOnChain = false) => {
+    const taskToCheck = getTaskById(taskId);
+    if (taskToCheck && wallet.address?.toLowerCase() !== taskToCheck.posterFull?.toLowerCase()) {
+      throw new Error('Only the task poster can file disputes');
+    }
+
     if (useOnChain && wallet.connected) {
       setLoading(true);
       setError(null);

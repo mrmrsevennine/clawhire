@@ -161,6 +161,12 @@ contract TaskEscrow is ReentrancyGuard, Ownable {
     error FeeTooHigh();
     error InsufficientBalance();
     error NotParentTaskWorker();
+    error BidExceedsBounty();
+    error AutoApproveNotReady();
+    error TaskNotSubmittedOrClaimed();
+
+    // Auto-approval: if poster doesn't act within this window after submission, worker can self-release
+    uint256 public autoApproveWindow = 14 days;
 
     constructor(address _usdc, address _feeRecipient) Ownable(msg.sender) {
         require(_usdc != address(0), "Invalid USDC address");
@@ -258,6 +264,7 @@ contract TaskEscrow is ReentrancyGuard, Ownable {
         if (task.status != Status.Open) revert TaskNotOpen();
         if (msg.sender == task.poster) revert PosterCannotClaimOwnTask();
         if (price == 0) revert InvalidBidPrice();
+        if (price > task.bounty) revert BidExceedsBounty(); // Bids must be <= bounty (poster deposited bounty)
         if (taskBids[taskId][msg.sender].bidder != address(0)) revert BidAlreadyPlaced();
 
         taskBids[taskId][msg.sender] = Bid({
@@ -374,6 +381,34 @@ contract TaskEscrow is ReentrancyGuard, Ownable {
         emit TaskApproved(taskId, task.worker, workerPayout, fee);
     }
 
+    /**
+     * @notice Auto-approve: if poster doesn't act within autoApproveWindow after submission, worker can release payment
+     * @dev Prevents funds from being locked forever if poster disappears
+     * @param taskId Task to auto-approve
+     */
+    function autoApprove(bytes32 taskId) external nonReentrant {
+        Task storage task = tasks[taskId];
+        if (task.status != Status.Submitted) revert TaskNotSubmitted();
+        if (block.timestamp < task.submittedAt + autoApproveWindow) revert AutoApproveNotReady();
+
+        task.status = Status.Approved;
+
+        uint256 fee = (task.agreedPrice * platformFeeBps) / BPS_DENOMINATOR;
+        uint256 workerPayout = task.agreedPrice - fee;
+
+        if (fee > 0) {
+            usdc.safeTransfer(feeRecipient, fee);
+            totalFeesCollected += fee;
+        }
+
+        usdc.safeTransfer(task.worker, workerPayout);
+
+        totalTasksCompleted++;
+        totalVolumeUsdc += task.agreedPrice;
+
+        emit TaskApproved(taskId, task.worker, workerPayout, fee);
+    }
+
     // =============================================================
     //                    DISPUTE & REFUND
     // =============================================================
@@ -393,33 +428,44 @@ contract TaskEscrow is ReentrancyGuard, Ownable {
     }
 
     /**
-     * @notice Refund the poster (if no claim after timeout, or after dispute)
+     * @notice Refund the poster (if no claim after timeout)
      * @param taskId Task to refund
      */
     function refund(bytes32 taskId) external nonReentrant {
         Task storage task = tasks[taskId];
         if (msg.sender != task.poster) revert OnlyPosterCanPerform();
 
-        bool canRefund = false;
-        uint256 refundAmount = task.agreedPrice;
-
-        // Refund if open and claim timeout expired
-        if (task.status == Status.Open && block.timestamp > task.createdAt + claimTimeout) {
-            canRefund = true;
-            refundAmount = task.bounty; // Full bounty since no bid was accepted
-        }
-
-        // Refund if disputed
-        if (task.status == Status.Disputed) {
-            canRefund = true;
-        }
-
-        if (!canRefund) revert CannotRefundAtThisTime();
+        // Only allow full refund for open tasks that timed out
+        if (task.status != Status.Open) revert CannotRefundAtThisTime();
+        if (block.timestamp <= task.createdAt + claimTimeout) revert CannotRefundAtThisTime();
 
         task.status = Status.Refunded;
-        usdc.safeTransfer(task.poster, refundAmount);
+        usdc.safeTransfer(task.poster, task.bounty);
 
-        emit TaskRefunded(taskId, task.poster, refundAmount);
+        emit TaskRefunded(taskId, task.poster, task.bounty);
+    }
+
+    /**
+     * @notice Resolve a dispute with a fair split (poster gets 70%, worker gets 30%)
+     * @dev Only callable by contract owner as neutral arbitrator
+     * @param taskId Task to resolve
+     */
+    function resolveDispute(bytes32 taskId) external nonReentrant onlyOwner {
+        Task storage task = tasks[taskId];
+        if (task.status != Status.Disputed) revert CannotRefundAtThisTime();
+
+        task.status = Status.Refunded;
+
+        // Fair split: 70% to poster, 30% to worker (worker did some work)
+        uint256 posterShare = (task.agreedPrice * 7000) / BPS_DENOMINATOR;
+        uint256 workerShare = task.agreedPrice - posterShare;
+
+        usdc.safeTransfer(task.poster, posterShare);
+        if (workerShare > 0) {
+            usdc.safeTransfer(task.worker, workerShare);
+        }
+
+        emit TaskRefunded(taskId, task.poster, posterShare);
     }
 
     /**
@@ -544,5 +590,13 @@ contract TaskEscrow is ReentrancyGuard, Ownable {
      */
     function setDisputeWindow(uint256 newWindow) external onlyOwner {
         disputeWindow = newWindow;
+    }
+
+    /**
+     * @notice Update auto-approve window (owner only)
+     * @param newWindow New window in seconds
+     */
+    function setAutoApproveWindow(uint256 newWindow) external onlyOwner {
+        autoApproveWindow = newWindow;
     }
 }
