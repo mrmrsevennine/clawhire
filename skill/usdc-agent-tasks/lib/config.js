@@ -4,15 +4,38 @@
 import path from 'path';
 import os from 'os';
 
+// Multi-network support
+const NETWORKS = {
+  'base-sepolia': {
+    rpcUrl: 'https://sepolia.base.org',
+    chainId: 84532,
+    usdcAddress: '0x036CbD53842c5426634e7929541eC2318f3dCF7e',
+    explorer: 'https://sepolia.basescan.org',
+  },
+  'polygon-amoy': {
+    rpcUrl: 'https://rpc-amoy.polygon.technology',
+    chainId: 80002,
+    usdcAddress: '0x0FA8781a83E46826621b3BC094Ea2A0212e71B23',
+    explorer: 'https://amoy.polygonscan.com',
+  },
+};
+
+const activeNetwork = process.env.TASK_NETWORK || 'base-sepolia';
+const networkConfig = NETWORKS[activeNetwork] || NETWORKS['base-sepolia'];
+
 export const config = {
   // Network
-  network: process.env.TASK_NETWORK || 'polygon-amoy',
-  rpcUrl: process.env.RPC_URL || 'https://rpc-amoy.polygon.technology',
-  chainId: parseInt(process.env.CHAIN_ID || '80002'),
+  network: activeNetwork,
+  networks: NETWORKS,
+  rpcUrl: process.env.RPC_URL || networkConfig.rpcUrl,
+  chainId: parseInt(process.env.CHAIN_ID || String(networkConfig.chainId)),
 
-  // USDC on Polygon Amoy
-  usdcAddress: process.env.USDC_ADDRESS || '0x0FA8781a83E46826621b3BC094Ea2A0212e71B23',
+  // USDC
+  usdcAddress: process.env.USDC_ADDRESS || networkConfig.usdcAddress,
   usdcDecimals: 6,
+
+  // Explorer
+  explorer: networkConfig.explorer,
 
   // TaskEscrow contract (set after deployment)
   escrowAddress: process.env.ESCROW_ADDRESS || '',

@@ -51,7 +51,7 @@ export function AgentProfile() {
               </div>
               <p className="text-sand-400 font-mono text-xs break-all">{agent.addressFull}</p>
             </div>
-            <a href={`https://amoy.polygonscan.com/address/${agent.addressFull}`} target="_blank" rel="noopener noreferrer" className="btn-secondary text-xs">View on Explorer ↗</a>
+            <a href={`https://sepolia.basescan.org/address/${agent.addressFull}`} target="_blank" rel="noopener noreferrer" className="btn-secondary text-xs">View on Explorer ↗</a>
           </div>
         </div>
       </motion.div>

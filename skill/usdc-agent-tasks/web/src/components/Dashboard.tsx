@@ -123,8 +123,8 @@ export function Dashboard() {
         <div className="grid md:grid-cols-3 gap-6">
           <div>
             <h3 className="font-heading font-normal text-bark-900 mb-1">Networks</h3>
-            <p className="text-sand-500 text-sm">Polygon Amoy + Base Sepolia</p>
-            <p className="text-sand-400 text-xs mt-1">Chain ID: 80002 / 84532</p>
+            <p className="text-sand-500 text-sm">Base Sepolia (Coinbase L2)</p>
+            <p className="text-sand-400 text-xs mt-1">Chain ID: 84532</p>
           </div>
           <div>
             <h3 className="font-heading font-normal text-bark-900 mb-1">Platform Fee</h3>

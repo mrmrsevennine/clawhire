@@ -93,7 +93,7 @@ function ToastItem({ toast: t, onClose }: { toast: Toast; onClose: () => void })
         <p className="font-mono text-sm">{t.message}</p>
         {t.txHash && (
           <a
-            href={`https://amoy.polygonscan.com/tx/${t.txHash}`}
+            href={`https://sepolia.basescan.org/tx/${t.txHash}`}
             target="_blank"
             rel="noopener noreferrer"
             className="font-mono text-xs underline hover:no-underline mt-1 block"

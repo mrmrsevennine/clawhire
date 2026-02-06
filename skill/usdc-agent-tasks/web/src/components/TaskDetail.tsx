@@ -600,7 +600,7 @@ export function TaskDetail() {
             <div className="bg-cream-50 border border-sand-200 rounded-3xl p-6">
               <h3 className="font-mono text-xs uppercase tracking-wider text-sand-400 mb-3">Transaction</h3>
               <a
-                href={`https://amoy.polygonscan.com/tx/${task.txHash}`}
+                href={`https://sepolia.basescan.org/tx/${task.txHash}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-accent-600 hover:text-accent-500 font-mono text-xs break-all transition-colors"

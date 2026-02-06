@@ -15,7 +15,7 @@ declare global {
   }
 }
 
-async function switchToAmoy() {
+async function switchToNetwork() {
   if (!window.ethereum) return;
   try {
     await window.ethereum.request({
@@ -30,7 +30,7 @@ async function switchToAmoy() {
         params: [{
           chainId: '0x' + CHAIN_ID.toString(16),
           chainName: CHAIN_NAME,
-          nativeCurrency: { name: 'POL', symbol: 'POL', decimals: 18 },
+          nativeCurrency: { name: 'ETH', symbol: 'ETH', decimals: 18 },
           rpcUrls: [RPC_URL],
           blockExplorerUrls: [BLOCK_EXPLORER],
         }],
@@ -58,7 +58,7 @@ export function useWallet() {
       return;
     }
     try {
-      await switchToAmoy();
+      await switchToNetwork();
       const provider = new BrowserProvider(window.ethereum);
       const signer = await provider.getSigner();
       const address = await signer.getAddress();

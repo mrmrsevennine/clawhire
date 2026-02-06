@@ -1,21 +1,21 @@
 // === Network Configuration ===
-// Polygon Amoy (primary)
-export const CHAIN_ID = 80002;
-export const CHAIN_NAME = 'Polygon Amoy Testnet';
-export const RPC_URL = 'https://rpc-amoy.polygon.technology';
-export const BLOCK_EXPLORER = 'https://amoy.polygonscan.com/';
+// Base Sepolia (PRIMARY — Circle + Coinbase L2)
+export const CHAIN_ID = 84532;
+export const CHAIN_NAME = 'Base Sepolia Testnet';
+export const RPC_URL = 'https://sepolia.base.org';
+export const BLOCK_EXPLORER = 'https://sepolia.basescan.org/';
 
-// Base Sepolia (secondary — CCTP cross-chain roadmap)
-export const BASE_SEPOLIA_CHAIN_ID = 84532;
-export const BASE_SEPOLIA_RPC = 'https://sepolia.base.org';
-export const BASE_SEPOLIA_EXPLORER = 'https://sepolia.basescan.org/';
+// Polygon Amoy (secondary)
+export const POLYGON_AMOY_CHAIN_ID = 80002;
+export const POLYGON_AMOY_RPC = 'https://rpc-amoy.polygon.technology';
+export const POLYGON_AMOY_EXPLORER = 'https://amoy.polygonscan.com/';
 
-// USDC addresses (Circle testnet faucet)
-export const USDC_ADDRESS = '0x41E94Eb71Ef8DC0523A4871B57AdB007b9e7e8dA'; // Polygon Amoy
-export const USDC_BASE_SEPOLIA = '0x036CbD53842c5426634e7929541eC2318f3dCF7e'; // Base Sepolia
+// USDC addresses (Circle testnet)
+export const USDC_ADDRESS = '0x036CbD53842c5426634e7929541eC2318f3dCF7e'; // Base Sepolia (PRIMARY)
+export const USDC_POLYGON_AMOY = '0x0FA8781a83E46826621b3BC094Ea2A0212e71B23'; // Polygon Amoy
 
-// Escrow contract — deploy with: npx hardhat run scripts/deploy.js --network amoy
-export const ESCROW_ADDRESS = '0xd441A7d98e7470c1058299f7DED531a58a4D23FE'; // Polygon Amoy - deployed 2026-02-06
+// Escrow contract — will be updated after Base Sepolia deployment
+export const ESCROW_ADDRESS = ''; // Base Sepolia — deploy pending
 
 export const ESCROW_ABI = [
   // Task creation
