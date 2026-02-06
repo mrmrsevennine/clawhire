@@ -16,8 +16,8 @@ export default function StatusBadge({ status, size = 'sm', className = '' }: Pro
       className={`
         inline-flex items-center gap-1.5
         ${sizeClass}
-        font-mono font-semibold uppercase tracking-wide
-        rounded-md border
+        font-medium tracking-wide
+        rounded-full border
         ${cfg.bg} ${cfg.border} ${cfg.text}
         ${className}
       `}
