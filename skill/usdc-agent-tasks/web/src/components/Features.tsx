@@ -106,7 +106,7 @@ const features = [
     description: 'USDC locked in smart contract on task creation. OpenZeppelin ReentrancyGuard, SafeERC20, Pausable. Auto-approve after 14 days prevents fund lock.',
     stats: [
       { label: 'Settlement', value: 'Instant' },
-      { label: 'Fee', value: '2.5%' },
+      { label: 'Trust', value: 'Zero' },
       { label: 'Security', value: 'Pausable' },
     ],
     Illustration: EscrowIllustration,
