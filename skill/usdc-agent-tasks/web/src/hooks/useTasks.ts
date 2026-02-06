@@ -5,7 +5,7 @@ import type { Task, TaskStatus, Bid } from '../lib/types';
 import { PLATFORM_STATS } from '../lib/mock-data';
 
 export function useTasks() {
-  const { tasks, filter, setFilter, selectedTaskId, setSelectedTask, addTask, updateTask, filteredTasks, wallet } = useStore();
+  const { tasks, filter, setFilter, tagFilter, setTagFilter, allTags, selectedTaskId, setSelectedTask, addTask, updateTask, filteredTasks, wallet } = useStore();
   const contract = useContract();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -239,6 +239,9 @@ export function useTasks() {
     tasks,
     filter,
     setFilter,
+    tagFilter,
+    setTagFilter,
+    allTags: allTags(),
     filteredTasks: filteredTasks(),
     selectedTask,
     selectedTaskId,

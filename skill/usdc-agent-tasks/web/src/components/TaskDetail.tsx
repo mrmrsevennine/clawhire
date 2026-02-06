@@ -462,34 +462,86 @@ export function TaskDetail() {
             </div>
           )}
 
-          {/* Subtask Info */}
+          {/* Parent Task Info (for subtasks) */}
           {task.parentTaskId && (
-            <div className="bg-dark-800/50 backdrop-blur-sm border border-dark-700 rounded-xl p-6">
-              <h3 className="font-mono text-xs uppercase tracking-wider text-dark-500 mb-3">Parent Task</h3>
-              <button
-                onClick={() => navigate(`/task/${task.parentTaskId}`)}
-                className="text-usdc-400 hover:text-usdc-300 font-mono text-sm transition-colors"
-              >
-                View Parent Task →
-              </button>
+            <div className="bg-gradient-to-br from-purple-900/20 to-dark-800/50 backdrop-blur-sm border border-purple-700/30 rounded-xl p-6">
+              <div className="flex items-center gap-2 mb-3">
+                <span className="text-lg">⬆️</span>
+                <h3 className="font-mono text-xs uppercase tracking-wider text-purple-400">Part of Supply Chain</h3>
+              </div>
+              <p className="text-dark-400 text-xs mb-3">
+                This is a subtask created by an agent working on a larger project.
+              </p>
+              {(() => {
+                const parent = getTaskById(task.parentTaskId!);
+                return (
+                  <button
+                    onClick={() => navigate(`/task/${task.parentTaskId}`)}
+                    className="block w-full text-left p-3 bg-dark-900/50 hover:bg-dark-900/80 border border-dark-700 hover:border-purple-600/50 rounded-lg transition-all group"
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="font-mono text-sm text-white group-hover:text-purple-400 transition-colors">
+                        {parent?.title || task.parentTaskId}
+                      </span>
+                      <span className="text-dark-500 group-hover:text-purple-400 transition-colors">→</span>
+                    </div>
+                    {parent && (
+                      <div className="flex items-center gap-2 mt-2 text-xs text-dark-500">
+                        <span className="text-usdc-400 font-mono">${parent.agreedPrice || parent.bounty}</span>
+                        <span>by {parent.poster}</span>
+                      </div>
+                    )}
+                  </button>
+                );
+              })()}
             </div>
           )}
 
           {task.subtasks && task.subtasks.length > 0 && (
-            <div className="bg-dark-800/50 backdrop-blur-sm border border-dark-700 rounded-xl p-6">
-              <h3 className="font-mono text-xs uppercase tracking-wider text-dark-500 mb-3">
-                Subtasks ({task.subtasks.length})
-              </h3>
-              <div className="space-y-2">
-                {task.subtasks.map((subtaskId) => (
-                  <button
-                    key={subtaskId}
-                    onClick={() => navigate(`/task/${subtaskId}`)}
-                    className="block w-full text-left text-usdc-400 hover:text-usdc-300 font-mono text-sm transition-colors"
-                  >
-                    {subtaskId} →
-                  </button>
-                ))}
+            <div className="bg-gradient-to-br from-blue-900/20 to-dark-800/50 backdrop-blur-sm border border-blue-700/30 rounded-xl p-6">
+              <div className="flex items-center gap-2 mb-4">
+                <span className="text-lg">🔗</span>
+                <h3 className="font-mono text-xs uppercase tracking-wider text-blue-400">
+                  Agent Supply Chain ({task.subtasks.length} subtasks)
+                </h3>
+              </div>
+              <p className="text-dark-400 text-xs mb-4">
+                This task has been broken down into specialized subtasks assigned to other agents.
+              </p>
+              <div className="space-y-3">
+                {task.subtasks.map((subtaskId) => {
+                  const subtask = getTaskById(subtaskId);
+                  return (
+                    <button
+                      key={subtaskId}
+                      onClick={() => navigate(`/task/${subtaskId}`)}
+                      className="block w-full text-left p-3 bg-dark-900/50 hover:bg-dark-900/80 border border-dark-700 hover:border-blue-600/50 rounded-lg transition-all group"
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className="font-mono text-sm text-white group-hover:text-blue-400 transition-colors">
+                          {subtask?.title || subtaskId}
+                        </span>
+                        <span className="text-dark-500 group-hover:text-blue-400 transition-colors">→</span>
+                      </div>
+                      {subtask && (
+                        <div className="flex items-center gap-3 mt-2 text-xs">
+                          <span className={`px-2 py-0.5 rounded ${
+                            subtask.status === 'approved' ? 'bg-status-approved/20 text-status-approved' :
+                            subtask.status === 'submitted' ? 'bg-status-submitted/20 text-status-submitted' :
+                            subtask.status === 'claimed' ? 'bg-status-claimed/20 text-status-claimed' :
+                            'bg-dark-700 text-dark-400'
+                          }`}>
+                            {subtask.status}
+                          </span>
+                          <span className="text-usdc-400 font-mono">${subtask.agreedPrice || subtask.bounty}</span>
+                          {subtask.worker && (
+                            <span className="text-dark-500">→ {subtask.worker}</span>
+                          )}
+                        </div>
+                      )}
+                    </button>
+                  );
+                })}
               </div>
             </div>
           )}

@@ -2,9 +2,9 @@
 // Claim a task as a worker
 // Usage: node scripts/task-claim.js --task-id <id> [--onchain]
 
-const { parseArgs } = require('util');
-const { getTask, saveTask, updateReputation } = require('../lib/storage');
-const { getWallet, claimTaskOnChain } = require('../lib/wallet');
+import { parseArgs } from 'util';
+import { getTask, saveTask, updateReputation } from '../lib/storage.js';
+import { getWallet, claimTaskOnChain } from '../lib/wallet.js';
 
 const { values: args } = parseArgs({
   options: {

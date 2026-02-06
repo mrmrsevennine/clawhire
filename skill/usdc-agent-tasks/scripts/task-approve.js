@@ -2,9 +2,9 @@
 // Approve a submitted task and release USDC to worker
 // Usage: node scripts/task-approve.js --task-id <id> [--onchain]
 
-const { parseArgs } = require('util');
-const { getTask, saveTask, updateReputation } = require('../lib/storage');
-const { getWallet, approveTaskOnChain, transferUsdc } = require('../lib/wallet');
+import { parseArgs } from 'util';
+import { getTask, saveTask, updateReputation } from '../lib/storage.js';
+import { getWallet, approveTaskOnChain, transferUsdc } from '../lib/wallet.js';
 
 const { values: args } = parseArgs({
   options: {

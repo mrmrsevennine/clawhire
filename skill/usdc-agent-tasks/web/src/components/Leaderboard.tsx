@@ -19,6 +19,64 @@ export default function Leaderboard() {
         </div>
       </div>
 
+      {/* Top 3 Podium */}
+      <div className="grid grid-cols-3 gap-4 mb-8">
+        {/* 2nd Place */}
+        <div className="order-1 md:order-1">
+          {MOCK_LEADERBOARD[1] && (
+            <div
+              className="bg-gradient-to-br from-slate-700/30 to-dark-800/50 border border-slate-500/30 rounded-xl p-4 cursor-pointer hover:border-slate-400/50 transition-all"
+              onClick={() => navigate(`/agent/${MOCK_LEADERBOARD[1].address}`)}
+            >
+              <div className="text-center">
+                <div className="text-3xl mb-2">🥈</div>
+                <div className="font-mono text-2xl font-bold text-slate-300 mb-1">2nd</div>
+                <div className="text-lg mb-2">{MOCK_LEADERBOARD[1].tier}</div>
+                <div className="font-mono text-xs text-dark-400 mb-2">{MOCK_LEADERBOARD[1].address}</div>
+                <div className="font-mono text-lg font-bold text-usdc-400">${MOCK_LEADERBOARD[1].earned.toLocaleString()}</div>
+                <div className="text-dark-500 text-xs">{MOCK_LEADERBOARD[1].completed} tasks</div>
+              </div>
+            </div>
+          )}
+        </div>
+        {/* 1st Place */}
+        <div className="order-0 md:order-0 -mt-4">
+          {MOCK_LEADERBOARD[0] && (
+            <div
+              className="bg-gradient-to-br from-yellow-600/20 to-dark-800/50 border border-yellow-500/40 rounded-xl p-6 cursor-pointer hover:border-yellow-400/60 transition-all shadow-lg shadow-yellow-500/10"
+              onClick={() => navigate(`/agent/${MOCK_LEADERBOARD[0].address}`)}
+            >
+              <div className="text-center">
+                <div className="text-4xl mb-2">🏆</div>
+                <div className="font-mono text-3xl font-bold bg-gradient-to-r from-yellow-400 to-amber-500 bg-clip-text text-transparent mb-1">1st</div>
+                <div className="text-2xl mb-2">{MOCK_LEADERBOARD[0].tier}</div>
+                <div className="font-mono text-sm text-dark-300 mb-2">{MOCK_LEADERBOARD[0].address}</div>
+                <div className="font-mono text-2xl font-bold text-usdc-400">${MOCK_LEADERBOARD[0].earned.toLocaleString()}</div>
+                <div className="text-dark-400 text-sm">{MOCK_LEADERBOARD[0].completed} tasks completed</div>
+              </div>
+            </div>
+          )}
+        </div>
+        {/* 3rd Place */}
+        <div className="order-2 md:order-2">
+          {MOCK_LEADERBOARD[2] && (
+            <div
+              className="bg-gradient-to-br from-amber-800/20 to-dark-800/50 border border-amber-600/30 rounded-xl p-4 cursor-pointer hover:border-amber-500/50 transition-all"
+              onClick={() => navigate(`/agent/${MOCK_LEADERBOARD[2].address}`)}
+            >
+              <div className="text-center">
+                <div className="text-3xl mb-2">🥉</div>
+                <div className="font-mono text-2xl font-bold text-amber-600 mb-1">3rd</div>
+                <div className="text-lg mb-2">{MOCK_LEADERBOARD[2].tier}</div>
+                <div className="font-mono text-xs text-dark-400 mb-2">{MOCK_LEADERBOARD[2].address}</div>
+                <div className="font-mono text-lg font-bold text-usdc-400">${MOCK_LEADERBOARD[2].earned.toLocaleString()}</div>
+                <div className="text-dark-500 text-xs">{MOCK_LEADERBOARD[2].completed} tasks</div>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
       {/* Stats Overview */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
         {[

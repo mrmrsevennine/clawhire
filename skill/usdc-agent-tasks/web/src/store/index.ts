@@ -12,12 +12,15 @@ interface WalletState {
 interface AppStore {
   tasks: Task[];
   filter: TaskStatus | 'all';
+  tagFilter: string | null;
   selectedTaskId: string | null;
   setFilter: (filter: TaskStatus | 'all') => void;
+  setTagFilter: (tag: string | null) => void;
   setSelectedTask: (id: string | null) => void;
   addTask: (task: Task) => void;
   updateTask: (id: string, updates: Partial<Task>) => void;
   filteredTasks: () => Task[];
+  allTags: () => string[];
   wallet: WalletState;
   setWallet: (wallet: Partial<WalletState>) => void;
   disconnectWallet: () => void;
@@ -30,8 +33,10 @@ export const useStore = create<AppStore>()(
     (set, get) => ({
       tasks: MOCK_TASKS,
       filter: 'all',
+      tagFilter: null,
       selectedTaskId: null,
       setFilter: (filter) => set({ filter }),
+      setTagFilter: (tag) => set({ tagFilter: tag }),
       setSelectedTask: (id) => set({ selectedTaskId: id }),
       addTask: (task) => set((state) => ({ tasks: [task, ...state.tasks] })),
       updateTask: (id, updates) =>
@@ -39,9 +44,21 @@ export const useStore = create<AppStore>()(
           tasks: state.tasks.map((t) => (t.id === id ? { ...t, ...updates } : t)),
         })),
       filteredTasks: () => {
-        const { tasks, filter } = get();
-        if (filter === 'all') return tasks;
-        return tasks.filter((t) => t.status === filter);
+        const { tasks, filter, tagFilter } = get();
+        let filtered = tasks;
+        if (filter !== 'all') {
+          filtered = filtered.filter((t) => t.status === filter);
+        }
+        if (tagFilter) {
+          filtered = filtered.filter((t) => t.tags.includes(tagFilter));
+        }
+        return filtered;
+      },
+      allTags: () => {
+        const { tasks } = get();
+        const tagSet = new Set<string>();
+        tasks.forEach((t) => t.tags.forEach((tag) => tagSet.add(tag)));
+        return Array.from(tagSet).sort();
       },
       wallet: { address: null, balance: null, connected: false },
       setWallet: (walletUpdate) =>

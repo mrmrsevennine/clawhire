@@ -2,9 +2,9 @@
 // Dispute a submitted task
 // Usage: node scripts/task-dispute.js --task-id <id> --reason "reason" [--onchain]
 
-const { parseArgs } = require('util');
-const { getTask, saveTask, updateReputation } = require('../lib/storage');
-const { disputeTaskOnChain } = require('../lib/wallet');
+import { parseArgs } from 'util';
+import { getTask, saveTask, updateReputation } from '../lib/storage.js';
+import { disputeTaskOnChain } from '../lib/wallet.js';
 
 const { values: args } = parseArgs({
   options: {

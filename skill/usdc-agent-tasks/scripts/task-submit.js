@@ -2,10 +2,10 @@
 // Submit a deliverable for a claimed task
 // Usage: node scripts/task-submit.js --task-id <id> --deliverable "URL or description" [--onchain]
 
-const { parseArgs } = require('util');
-const crypto = require('crypto');
-const { getTask, saveTask } = require('../lib/storage');
-const { getWallet, submitDeliverableOnChain } = require('../lib/wallet');
+import { parseArgs } from 'util';
+import crypto from 'crypto';
+import { getTask, saveTask } from '../lib/storage.js';
+import { getWallet, submitDeliverableOnChain } from '../lib/wallet.js';
 
 const { values: args } = parseArgs({
   options: {

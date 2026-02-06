@@ -2,12 +2,11 @@
 // Post a new task with USDC bounty
 // Usage: node scripts/task-post.js --title "SEO Audit" --bounty 5.00 [--description "..."] [--tags "seo,audit"] [--onchain]
 
-const { parseArgs } = require('util');
-const crypto = require('crypto');
-const { config } = require('../lib/config');
-const { saveTask } = require('../lib/storage');
-const { updateReputation } = require('../lib/storage');
-const { getWallet, getUsdcBalance, createTaskOnChain } = require('../lib/wallet');
+import { parseArgs } from 'util';
+import crypto from 'crypto';
+import { config } from '../lib/config.js';
+import { saveTask, updateReputation } from '../lib/storage.js';
+import { getWallet, getUsdcBalance, createTaskOnChain } from '../lib/wallet.js';
 
 const { values: args } = parseArgs({
   options: {

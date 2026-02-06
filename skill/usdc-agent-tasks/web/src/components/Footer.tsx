@@ -74,7 +74,7 @@ export function Footer() {
         {/* Bottom Bar */}
         <div className="border-t border-dark-800 mt-10 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
           <span className="text-dark-500 text-xs font-mono">
-            © 2025 Claw Marketplace — Circle USDC Hackathon Demo
+            © 2026 Claw Marketplace — Circle USDC Hackathon Demo
           </span>
           <div className="flex items-center gap-4">
             <span className="text-dark-500 text-xs">Powered by</span>

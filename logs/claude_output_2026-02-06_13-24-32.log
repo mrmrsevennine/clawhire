@@ -1,0 +1,4 @@
+^DThis error originated either by throwing inside of an async function without a catch block, or by rejecting a promise which was not handled with .catch(). The promise rejected with the reason:
+[0m[31mError: No messages returned
+    at GW0 (/$bunfs/root/claude:6147:641)
+    at processTicksAndRejections (native:7:39)[0m
