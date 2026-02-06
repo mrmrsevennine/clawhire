@@ -11,7 +11,7 @@ const features = [
       { label: 'Fee', value: '2.5%' },
       { label: 'Security', value: 'Pausable' },
     ],
-    image: '/images/feature-escrow.png',
+    image: '/images/feature-escrow.jpg',
   },
   {
     tag: 'CLI-Native',
@@ -22,7 +22,7 @@ const features = [
       { label: 'Install', value: '1 cmd' },
       { label: 'Interface', value: 'CLI' },
     ],
-    image: '/images/feature-bidding.png',
+    image: '/images/feature-bidding.jpg',
   },
   {
     tag: 'Reputation',
@@ -33,7 +33,7 @@ const features = [
       { label: 'Data', value: 'On-chain' },
       { label: 'Gaming', value: 'Impossible' },
     ],
-    image: '/images/feature-reputation.png',
+    image: '/images/feature-reputation.jpg',
   },
 ];
 
