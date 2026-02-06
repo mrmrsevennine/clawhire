@@ -136,7 +136,7 @@ export const Scene1LogoReveal: React.FC = () => {
             letterSpacing: -2,
           }}
         >
-          .market
+          hire
         </span>
       </div>
 
