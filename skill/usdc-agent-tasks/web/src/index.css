@@ -58,11 +58,13 @@
   }
 
   /* Premium input */
-  .input-premium {
+  .input-premium,
+  .input-field {
     @apply w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 outline-none transition-all duration-200;
   }
-  .input-premium:focus {
-    @apply border-indigo-300 ring-4 ring-indigo-50;
+  .input-premium:focus,
+  .input-field:focus {
+    @apply border-teal-300 ring-4 ring-teal-50;
   }
 
   /* Gradient text utility */
