@@ -88,13 +88,13 @@ export function PostTaskModal() {
                   <div className="text-sm font-semibold text-bark-900">On-chain Escrow</div>
                   <div className="text-sand-500 text-xs mt-0.5">Lock USDC in smart contract for guaranteed payment</div>
                 </div>
-                <button type="button" onClick={() => setOnChain(!onChain)} className={`w-12 h-7 rounded-full relative transition-colors ${onChain ? 'bg-accent-500' : 'bg-slate-300'}`}>
+                <button type="button" onClick={() => setOnChain(!onChain)} className={`w-12 h-7 rounded-full relative transition-colors ${onChain ? 'bg-accent-500' : 'bg-sand-300'}`}>
                   <div className={`w-5 h-5 bg-cream-50 rounded-full absolute top-1 transition-all shadow-sm ${onChain ? 'left-6' : 'left-1'}`} />
                 </button>
               </div>
             </div>
 
-            <button type="submit" disabled={isSubmitting || loading} className="w-full px-6 py-4 bg-bark-900 hover:bg-slate-800 disabled:bg-slate-300 disabled:cursor-not-allowed text-white font-semibold rounded-3xl transition-all hover:shadow-lg hover:shadow-slate-900/10">
+            <button type="submit" disabled={isSubmitting || loading} className="w-full px-6 py-4 bg-bark-900 hover:bg-bark-800 disabled:bg-sand-300 disabled:cursor-not-allowed text-cream-50 font-semibold rounded-3xl transition-all hover:shadow-lg hover:shadow-bark-900/10">
               {isSubmitting ? 'Posting...' : bountyNum > 0 ? `Post Task — Deposit $${bountyNum.toFixed(2)} USDC` : 'Post Task'}
             </button>
 

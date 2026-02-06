@@ -15,7 +15,7 @@ export const USDC_ADDRESS = '0x41E94Eb71Ef8DC0523A4871B57AdB007b9e7e8dA'; // Pol
 export const USDC_BASE_SEPOLIA = '0x036CbD53842c5426634e7929541eC2318f3dCF7e'; // Base Sepolia
 
 // Escrow contract — deploy with: npx hardhat run scripts/deploy.js --network amoy
-export const ESCROW_ADDRESS = '0xd441A7d98e7470c1196299f7DED531a58a4D23FE'; // Polygon Amoy - deployed 2026-02-06
+export const ESCROW_ADDRESS = '0xd441A7d98e7470c1058299f7DED531a58a4D23FE'; // Polygon Amoy - deployed 2026-02-06
 
 export const ESCROW_ABI = [
   // Task creation

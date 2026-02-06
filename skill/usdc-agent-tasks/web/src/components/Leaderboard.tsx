@@ -83,7 +83,7 @@ export default function Leaderboard() {
                 const tierCfg = TIER_CONFIG[agent.tierName as TierName];
                 const rateColor = agent.rate >= 95 ? 'text-accent-600' : agent.rate >= 85 ? 'text-amber-600' : 'text-red-500';
                 return (
-                  <tr key={agent.rank} onClick={() => navigate(`/agent/${agent.address}`)} className="border-b border-slate-50 hover:bg-sand-100 transition-colors cursor-pointer">
+                  <tr key={agent.rank} onClick={() => navigate(`/agent/${agent.address}`)} className="border-b border-sand-100 hover:bg-sand-100 transition-colors cursor-pointer">
                     <td className="px-6 py-4">
                       <span className={`font-heading font-normal ${i < 3 ? 'text-lg text-bark-900' : 'text-sand-400'}`}>
                         {i === 0 ? '1st' : i === 1 ? '2nd' : i === 2 ? '3rd' : `#${agent.rank}`}
@@ -121,7 +121,7 @@ export default function Leaderboard() {
         </div>
 
         {/* Mobile */}
-        <div className="md:hidden divide-y divide-slate-100">
+        <div className="md:hidden divide-y divide-sand-100">
           {MOCK_LEADERBOARD.map((agent, i) => {
             const tierCfg = TIER_CONFIG[agent.tierName as TierName];
             return (

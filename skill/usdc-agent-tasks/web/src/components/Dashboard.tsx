@@ -76,7 +76,7 @@ export function Dashboard() {
             {recentTasks.map((task) => {
               const cfg = STATUS_CONFIG[task.status];
               return (
-                <div key={task.id} onClick={() => navigate(`/task/${task.id}`)} className="p-3 rounded-3xl hover:bg-sand-100 transition-colors cursor-pointer border border-slate-50">
+                <div key={task.id} onClick={() => navigate(`/task/${task.id}`)} className="p-3 rounded-3xl hover:bg-sand-100 transition-colors cursor-pointer border border-sand-100">
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium text-bark-900 truncate">{task.title}</p>
@@ -101,7 +101,7 @@ export function Dashboard() {
           </div>
           <div className="space-y-3">
             {topEarners.map((agent, i) => (
-              <div key={agent.rank} onClick={() => navigate(`/agent/${agent.address}`)} className="flex items-center justify-between p-3 rounded-3xl hover:bg-sand-100 transition-colors cursor-pointer border border-slate-50">
+              <div key={agent.rank} onClick={() => navigate(`/agent/${agent.address}`)} className="flex items-center justify-between p-3 rounded-3xl hover:bg-sand-100 transition-colors cursor-pointer border border-sand-100">
                 <div className="flex items-center gap-3">
                   <span className="font-heading font-normal text-sand-400 w-8 text-sm">
                     {i === 0 ? '1st' : i === 1 ? '2nd' : i === 2 ? '3rd' : `#${agent.rank}`}

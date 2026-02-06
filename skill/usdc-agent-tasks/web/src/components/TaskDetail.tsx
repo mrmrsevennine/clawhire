@@ -322,7 +322,7 @@ export function TaskDetail() {
                       value={bidPrice}
                       onChange={(e) => setBidPrice(e.target.value)}
                       placeholder="0.00"
-                      className="w-full px-4 py-3 bg-cream-50 border border-sand-200 rounded-2xl font-mono text-bark-900 placeholder-slate-400 focus:outline-none focus:border-accent-400 transition-colors"
+                      className="w-full px-4 py-3 bg-cream-50 border border-sand-200 rounded-2xl font-mono text-bark-900 placeholder-sand-400 focus:outline-none focus:border-accent-400 transition-colors"
                     />
                   </div>
                   <div>
@@ -332,7 +332,7 @@ export function TaskDetail() {
                       value={bidHours}
                       onChange={(e) => setBidHours(e.target.value)}
                       placeholder="0"
-                      className="w-full px-4 py-3 bg-cream-50 border border-sand-200 rounded-2xl font-mono text-bark-900 placeholder-slate-400 focus:outline-none focus:border-accent-400 transition-colors"
+                      className="w-full px-4 py-3 bg-cream-50 border border-sand-200 rounded-2xl font-mono text-bark-900 placeholder-sand-400 focus:outline-none focus:border-accent-400 transition-colors"
                     />
                   </div>
                 </div>
@@ -394,7 +394,7 @@ export function TaskDetail() {
                   value={deliverableInput}
                   onChange={(e) => setDeliverableInput(e.target.value)}
                   placeholder="Deliverable link (URL, IPFS hash, etc.)"
-                  className="w-full px-4 py-3 bg-cream-50 border border-sand-200 rounded-2xl font-mono text-bark-900 placeholder-slate-400 focus:outline-none focus:border-accent-400 transition-colors"
+                  className="w-full px-4 py-3 bg-cream-50 border border-sand-200 rounded-2xl font-mono text-bark-900 placeholder-sand-400 focus:outline-none focus:border-accent-400 transition-colors"
                 />
                 <button
                   onClick={handleSubmitDeliverable}
