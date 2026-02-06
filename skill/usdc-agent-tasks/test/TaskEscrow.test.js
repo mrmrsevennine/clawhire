@@ -190,7 +190,7 @@ describe("TaskEscrow", function () {
         await escrowAsPoster.write.bidOnTask([taskId, bounty, 3600n]);
         expect.fail("Should have reverted");
       } catch (e) {
-        expect(e.message).to.include("PosterCannotClaimOwnTask");
+        expect(e.message).to.include("PosterCannotBidOwnTask");
       }
     });
 
@@ -488,6 +488,115 @@ describe("TaskEscrow", function () {
       } catch (e) {
         expect(e.message).to.include("FeeTooHigh");
       }
+    });
+  });
+
+  describe("On-Chain Reputation", function () {
+    it("Should track agent reputation after task completion", async function () {
+      const { escrowAsPoster, escrowAsWorker1, worker1, poster } = await deployFixture();
+      const taskId = createTaskId("task-rep-1");
+      const bounty = parseUnits("100", 6);
+
+      await escrowAsPoster.write.createTask([taskId, bounty]);
+      await escrowAsWorker1.write.claimTask([taskId]);
+      await escrowAsWorker1.write.submitDeliverable([taskId, keccak256(toBytes("work"))]);
+      await escrowAsPoster.write.approveTask([taskId]);
+
+      const workerRep = await escrowAsPoster.read.getReputation([worker1.account.address]);
+      expect(workerRep.tasksCompleted).to.equal(1n);
+      expect(workerRep.totalEarned > 0n).to.be.true;
+
+      const posterRep = await escrowAsPoster.read.getReputation([poster.account.address]);
+      expect(posterRep.tasksPosted).to.equal(1n);
+      expect(posterRep.totalSpent).to.equal(bounty);
+    });
+
+    it("Should calculate correct agent tier", async function () {
+      const { escrowAsPoster, escrowAsWorker1, worker1 } = await deployFixture();
+
+      // New agent = tier 0
+      const tier = await escrowAsPoster.read.getAgentTier([worker1.account.address]);
+      expect(tier).to.equal(0); // New
+    });
+
+    it("Should count registered agents", async function () {
+      const { escrowAsPoster, escrowAsWorker1 } = await deployFixture();
+      const taskId = createTaskId("task-reg-1");
+      const bounty = parseUnits("10", 6);
+
+      await escrowAsPoster.write.createTask([taskId, bounty]);
+      await escrowAsWorker1.write.claimTask([taskId]);
+
+      const stats = await escrowAsPoster.read.getStats();
+      expect(stats[5] > 0n).to.be.true; // registeredAgents > 0
+    });
+  });
+
+  describe("Bid Exceeds Bounty Protection", function () {
+    it("Should revert if bid price exceeds bounty", async function () {
+      const { escrowAsPoster, escrowAsWorker1 } = await deployFixture();
+      const taskId = createTaskId("task-overbid-1");
+      const bounty = parseUnits("100", 6);
+      const overBid = parseUnits("200", 6);
+
+      await escrowAsPoster.write.createTask([taskId, bounty]);
+
+      try {
+        await escrowAsWorker1.write.bidOnTask([taskId, overBid, 3600n]);
+        expect.fail("Should have reverted");
+      } catch (e) {
+        expect(e.message).to.include("BidExceedsBounty");
+      }
+    });
+  });
+
+  describe("Pausable", function () {
+    it("Should allow owner to pause and block task creation", async function () {
+      const { escrow, escrowAsPoster } = await deployFixture();
+      const taskId = createTaskId("task-pause-1");
+      const bounty = parseUnits("10", 6);
+
+      await escrow.write.pause();
+      expect(await escrow.read.paused()).to.equal(true);
+
+      try {
+        await escrowAsPoster.write.createTask([taskId, bounty]);
+        expect.fail("Should have reverted");
+      } catch (e) {
+        expect(e.message).to.include("EnforcedPause");
+      }
+    });
+
+    it("Should allow owner to unpause", async function () {
+      const { escrow, escrowAsPoster } = await deployFixture();
+      const taskId = createTaskId("task-unpause-1");
+      const bounty = parseUnits("10", 6);
+
+      await escrow.write.pause();
+      await escrow.write.unpause();
+
+      await escrowAsPoster.write.createTask([taskId, bounty]);
+      const task = await escrowAsPoster.read.getTask([taskId]);
+      expect(task.status).to.equal(0); // Open — works after unpause
+    });
+  });
+
+  describe("Dispute Reputation Tracking", function () {
+    it("Should track disputes in reputation for both parties", async function () {
+      const { escrowAsPoster, escrowAsWorker1, poster, worker1 } = await deployFixture();
+      const taskId = createTaskId("task-disp-rep-1");
+      const bounty = parseUnits("100", 6);
+
+      await escrowAsPoster.write.createTask([taskId, bounty]);
+      await escrowAsWorker1.write.claimTask([taskId]);
+      await escrowAsWorker1.write.submitDeliverable([taskId, keccak256(toBytes("work"))]);
+      await escrowAsPoster.write.disputeTask([taskId]);
+
+      const posterRep = await escrowAsPoster.read.getReputation([poster.account.address]);
+      expect(posterRep.disputesAsPoster).to.equal(1n);
+
+      const workerRep = await escrowAsPoster.read.getReputation([worker1.account.address]);
+      expect(workerRep.disputesAsWorker).to.equal(1n);
     });
   });
 

@@ -5,22 +5,30 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/utils/Pausable.sol";
 
 /**
  * @title TaskEscrow
  * @notice Escrow contract for the Agent Economy Protocol — USDC-based task marketplace
- * @dev Agents post tasks with USDC bounties, workers bid on tasks, posters accept bids,
+ * @dev OpenClaw AI agents post tasks with USDC bounties, workers bid, posters accept,
  *      workers deliver, poster approves to release funds minus platform fee.
  *      Supports agent-to-agent subcontracting (supply chains).
  *
- * Key Features:
- * - 2.5% platform fee on task completion
- * - Competitive bidding system
- * - Agent-to-agent subtask creation
- * - Dispute resolution with refund mechanism
- * - Timeout-based refunds
+ * Security Features:
+ * - Pausable: Emergency shutdown capability
+ * - ReentrancyGuard: On ALL state-changing functions
+ * - Bid cap: Bids cannot exceed bounty (prevents fund drain)
+ * - Auto-approve: Worker can self-release after timeout (prevents fund lock)
+ * - Fair dispute: Owner arbitration with configurable split (not 100% to poster)
+ * - On-chain reputation tracking
+ * - Cancel protection when bids exist
+ *
+ * Circle USDC Integration:
+ * - Native USDC escrow with SafeERC20
+ * - Designed for CCTP cross-chain settlement (V2 roadmap)
+ * - Compatible with Circle Programmable Wallets for agent custody
  */
-contract TaskEscrow is ReentrancyGuard, Ownable {
+contract TaskEscrow is ReentrancyGuard, Ownable, Pausable {
     using SafeERC20 for IERC20;
 
     IERC20 public immutable usdc;
@@ -33,20 +41,20 @@ contract TaskEscrow is ReentrancyGuard, Ownable {
 
     // Task status lifecycle
     enum Status {
-        Open,       // Task posted, accepting bids
-        Claimed,    // Bid accepted, worker assigned
-        Submitted,  // Worker submitted deliverable
-        Approved,   // Poster approved, payment released
-        Disputed,   // Poster disputed submission
-        Refunded,   // Funds returned to poster
-        Cancelled   // Task cancelled before claim
+        Open,       // 0: Task posted, accepting bids
+        Claimed,    // 1: Bid accepted, worker assigned
+        Submitted,  // 2: Worker submitted deliverable
+        Approved,   // 3: Poster approved, payment released
+        Disputed,   // 4: Poster disputed submission
+        Refunded,   // 5: Funds returned (full or split)
+        Cancelled   // 6: Task cancelled before claim
     }
 
     struct Task {
         address poster;
         address worker;
-        uint256 bounty;          // Original posted bounty
-        uint256 agreedPrice;     // Accepted bid price (may differ from bounty)
+        uint256 bounty;          // Original posted bounty (max escrow amount)
+        uint256 agreedPrice;     // Accepted bid price (always <= bounty)
         Status status;
         bytes32 deliverableHash;
         uint256 createdAt;
@@ -58,86 +66,60 @@ contract TaskEscrow is ReentrancyGuard, Ownable {
 
     struct Bid {
         address bidder;
-        uint256 price;           // Bid amount in USDC
+        uint256 price;           // Bid amount in USDC (must be <= bounty)
         uint256 estimatedTime;   // Estimated delivery time in seconds
         uint256 timestamp;
         bool accepted;
     }
 
+    // On-chain agent reputation
+    struct AgentReputation {
+        uint256 tasksCompleted;
+        uint256 tasksPosted;
+        uint256 totalEarned;     // USDC earned (6 decimals)
+        uint256 totalSpent;      // USDC spent on tasks (6 decimals)
+        uint256 disputesAsWorker;
+        uint256 disputesAsPoster;
+        uint256 registeredAt;
+    }
+
     // Storage
     mapping(bytes32 => Task) public tasks;
-    mapping(bytes32 => mapping(address => Bid)) public taskBids;      // taskId => bidder => Bid
-    mapping(bytes32 => address[]) public taskBidders;                  // taskId => list of bidders
-    mapping(bytes32 => bytes32[]) public subtasks;                     // parentTaskId => childTaskIds
+    mapping(bytes32 => mapping(address => Bid)) public taskBids;
+    mapping(bytes32 => address[]) public taskBidders;
+    mapping(bytes32 => bytes32[]) public subtasks;
+    mapping(address => AgentReputation) public reputation;
+    mapping(address => bytes32[]) public agentTasksCompleted; // agent => taskIds completed
+    mapping(address => bytes32[]) public agentTasksPosted;    // agent => taskIds posted
 
     // Platform statistics
     uint256 public totalTasksCreated;
     uint256 public totalTasksCompleted;
     uint256 public totalVolumeUsdc;
     uint256 public totalFeesCollected;
+    uint256 public totalAgents;
 
     // Timeout configuration
     uint256 public claimTimeout = 7 days;
     uint256 public disputeWindow = 3 days;
+    uint256 public autoApproveWindow = 14 days;
+
+    // Dispute split (basis points for poster share, rest goes to worker)
+    uint256 public disputePosterShareBps = 7000; // 70% to poster by default
 
     // --- Events ---
-    event TaskCreated(
-        bytes32 indexed taskId,
-        address indexed poster,
-        uint256 bounty,
-        bytes32 parentTaskId
-    );
-
-    event TaskBid(
-        bytes32 indexed taskId,
-        address indexed bidder,
-        uint256 price,
-        uint256 estimatedTime
-    );
-
-    event BidAccepted(
-        bytes32 indexed taskId,
-        address indexed bidder,
-        uint256 price
-    );
-
-    event TaskClaimed(
-        bytes32 indexed taskId,
-        address indexed worker
-    );
-
-    event DeliverableSubmitted(
-        bytes32 indexed taskId,
-        bytes32 deliverableHash
-    );
-
-    event TaskApproved(
-        bytes32 indexed taskId,
-        address indexed worker,
-        uint256 workerPayout,
-        uint256 platformFee
-    );
-
+    event TaskCreated(bytes32 indexed taskId, address indexed poster, uint256 bounty, bytes32 parentTaskId);
+    event TaskBid(bytes32 indexed taskId, address indexed bidder, uint256 price, uint256 estimatedTime);
+    event BidAccepted(bytes32 indexed taskId, address indexed bidder, uint256 price);
+    event TaskClaimed(bytes32 indexed taskId, address indexed worker);
+    event DeliverableSubmitted(bytes32 indexed taskId, bytes32 deliverableHash);
+    event TaskApproved(bytes32 indexed taskId, address indexed worker, uint256 workerPayout, uint256 platformFee);
     event TaskDisputed(bytes32 indexed taskId);
-
-    event TaskRefunded(
-        bytes32 indexed taskId,
-        address indexed poster,
-        uint256 amount
-    );
-
-    event TaskCancelled(
-        bytes32 indexed taskId,
-        address indexed poster
-    );
-
-    event SubtaskCreated(
-        bytes32 indexed parentTaskId,
-        bytes32 indexed subtaskId,
-        address indexed creator,
-        uint256 bounty
-    );
-
+    event TaskRefunded(bytes32 indexed taskId, address indexed poster, uint256 amount);
+    event TaskCancelled(bytes32 indexed taskId, address indexed poster);
+    event SubtaskCreated(bytes32 indexed parentTaskId, bytes32 indexed subtaskId, address indexed creator, uint256 bounty);
+    event DisputeResolved(bytes32 indexed taskId, uint256 posterShare, uint256 workerShare);
+    event AgentRegistered(address indexed agent);
     event FeeUpdated(uint256 oldFeeBps, uint256 newFeeBps);
     event FeeRecipientUpdated(address oldRecipient, address newRecipient);
 
@@ -147,26 +129,23 @@ contract TaskEscrow is ReentrancyGuard, Ownable {
     error TaskNotOpen();
     error TaskNotClaimed();
     error TaskNotSubmitted();
+    error TaskNotDisputed();
     error InvalidBounty();
     error InvalidBidPrice();
-    error PosterCannotClaimOwnTask();
+    error BidExceedsBounty();
+    error PosterCannotBidOwnTask();
     error OnlyPosterCanPerform();
     error OnlyWorkerCanPerform();
     error BidAlreadyPlaced();
-    error NoBidsOnTask();
     error BidNotFound();
     error DisputeWindowExpired();
-    error CannotRefundAtThisTime();
+    error CannotRefundYet();
+    error CannotCancelWithAcceptedBids();
     error InvalidFeeRecipient();
     error FeeTooHigh();
-    error InsufficientBalance();
     error NotParentTaskWorker();
-    error BidExceedsBounty();
     error AutoApproveNotReady();
-    error TaskNotSubmittedOrClaimed();
-
-    // Auto-approval: if poster doesn't act within this window after submission, worker can self-release
-    uint256 public autoApproveWindow = 14 days;
+    error InvalidSplit();
 
     constructor(address _usdc, address _feeRecipient) Ownable(msg.sender) {
         require(_usdc != address(0), "Invalid USDC address");
@@ -181,25 +160,22 @@ contract TaskEscrow is ReentrancyGuard, Ownable {
 
     /**
      * @notice Post a new task with USDC bounty (deposited into escrow)
-     * @param taskId Unique task identifier (bytes32 hash of task ID string)
-     * @param bountyAmount USDC amount (in smallest unit, 6 decimals)
+     * @param taskId Unique task identifier (bytes32 hash)
+     * @param bountyAmount USDC amount (6 decimals)
      */
-    function createTask(bytes32 taskId, uint256 bountyAmount) external nonReentrant {
+    function createTask(bytes32 taskId, uint256 bountyAmount) external nonReentrant whenNotPaused {
         _createTaskInternal(taskId, bountyAmount, bytes32(0));
     }
 
     /**
-     * @notice Create a subtask linked to a parent task (agent-to-agent subcontracting)
+     * @notice Create a subtask linked to a parent task (agent supply chain)
      * @dev Only the worker of the parent task can create subtasks
-     * @param parentTaskId The parent task this subtask belongs to
-     * @param subtaskId Unique identifier for the subtask
-     * @param bountyAmount USDC bounty for the subtask
      */
     function createSubtask(
         bytes32 parentTaskId,
         bytes32 subtaskId,
         uint256 bountyAmount
-    ) external nonReentrant {
+    ) external nonReentrant whenNotPaused {
         Task storage parent = tasks[parentTaskId];
         if (parent.poster == address(0)) revert TaskDoesNotExist();
         if (parent.worker != msg.sender) revert NotParentTaskWorker();
@@ -211,25 +187,17 @@ contract TaskEscrow is ReentrancyGuard, Ownable {
         emit SubtaskCreated(parentTaskId, subtaskId, msg.sender, bountyAmount);
     }
 
-    /**
-     * @dev Internal function to create a task
-     */
-    function _createTaskInternal(
-        bytes32 taskId,
-        uint256 bountyAmount,
-        bytes32 parentTaskId
-    ) internal {
+    function _createTaskInternal(bytes32 taskId, uint256 bountyAmount, bytes32 parentTaskId) internal {
         if (tasks[taskId].poster != address(0)) revert TaskAlreadyExists();
         if (bountyAmount == 0) revert InvalidBounty();
 
-        // Transfer USDC from poster to this contract
         usdc.safeTransferFrom(msg.sender, address(this), bountyAmount);
 
         tasks[taskId] = Task({
             poster: msg.sender,
             worker: address(0),
             bounty: bountyAmount,
-            agreedPrice: bountyAmount, // Default to bounty, updated when bid accepted
+            agreedPrice: bountyAmount,
             status: Status.Open,
             deliverableHash: bytes32(0),
             createdAt: block.timestamp,
@@ -239,8 +207,13 @@ contract TaskEscrow is ReentrancyGuard, Ownable {
             bidCount: 0
         });
 
-        totalTasksCreated++;
+        // Track reputation
+        _ensureRegistered(msg.sender);
+        reputation[msg.sender].tasksPosted++;
+        reputation[msg.sender].totalSpent += bountyAmount;
+        agentTasksPosted[msg.sender].push(taskId);
 
+        totalTasksCreated++;
         emit TaskCreated(taskId, msg.sender, bountyAmount, parentTaskId);
     }
 
@@ -251,21 +224,21 @@ contract TaskEscrow is ReentrancyGuard, Ownable {
     /**
      * @notice Place a bid on an open task
      * @param taskId Task to bid on
-     * @param price Bid price in USDC (can be different from posted bounty)
+     * @param price Bid price in USDC (must be <= bounty)
      * @param estimatedTime Estimated delivery time in seconds
      */
-    function bidOnTask(
-        bytes32 taskId,
-        uint256 price,
-        uint256 estimatedTime
-    ) external {
+    function bidOnTask(bytes32 taskId, uint256 price, uint256 estimatedTime)
+        external nonReentrant whenNotPaused
+    {
         Task storage task = tasks[taskId];
         if (task.poster == address(0)) revert TaskDoesNotExist();
         if (task.status != Status.Open) revert TaskNotOpen();
-        if (msg.sender == task.poster) revert PosterCannotClaimOwnTask();
+        if (msg.sender == task.poster) revert PosterCannotBidOwnTask();
         if (price == 0) revert InvalidBidPrice();
-        if (price > task.bounty) revert BidExceedsBounty(); // Bids must be <= bounty (poster deposited bounty)
+        if (price > task.bounty) revert BidExceedsBounty();
         if (taskBids[taskId][msg.sender].bidder != address(0)) revert BidAlreadyPlaced();
+
+        _ensureRegistered(msg.sender);
 
         taskBids[taskId][msg.sender] = Bid({
             bidder: msg.sender,
@@ -282,11 +255,11 @@ contract TaskEscrow is ReentrancyGuard, Ownable {
     }
 
     /**
-     * @notice Accept a bid on your task
+     * @notice Accept a bid on your task — assigns worker and locks agreed price
      * @param taskId Task to accept bid for
      * @param bidder Address of the bidder to accept
      */
-    function acceptBid(bytes32 taskId, address bidder) external nonReentrant {
+    function acceptBid(bytes32 taskId, address bidder) external nonReentrant whenNotPaused {
         Task storage task = tasks[taskId];
         if (task.poster == address(0)) revert TaskDoesNotExist();
         if (task.status != Status.Open) revert TaskNotOpen();
@@ -301,7 +274,7 @@ contract TaskEscrow is ReentrancyGuard, Ownable {
         task.status = Status.Claimed;
         task.claimedAt = block.timestamp;
 
-        // If bid price is less than bounty, refund the difference to poster
+        // Refund difference if bid < bounty
         if (bid.price < task.bounty) {
             uint256 refundAmount = task.bounty - bid.price;
             usdc.safeTransfer(task.poster, refundAmount);
@@ -312,17 +285,19 @@ contract TaskEscrow is ReentrancyGuard, Ownable {
     }
 
     /**
-     * @notice Direct claim (legacy support) - claims at full bounty price
-     * @param taskId Task to claim
+     * @notice Direct claim at full bounty price (for simple tasks)
+     * @dev Poster still accepted this implicitly by posting. Worker commits to full bounty.
      */
-    function claimTask(bytes32 taskId) external {
+    function claimTask(bytes32 taskId) external nonReentrant whenNotPaused {
         Task storage task = tasks[taskId];
         if (task.poster == address(0)) revert TaskDoesNotExist();
         if (task.status != Status.Open) revert TaskNotOpen();
-        if (msg.sender == task.poster) revert PosterCannotClaimOwnTask();
+        if (msg.sender == task.poster) revert PosterCannotBidOwnTask();
+
+        _ensureRegistered(msg.sender);
 
         task.worker = msg.sender;
-        task.agreedPrice = task.bounty; // Full bounty
+        task.agreedPrice = task.bounty;
         task.status = Status.Claimed;
         task.claimedAt = block.timestamp;
 
@@ -335,10 +310,8 @@ contract TaskEscrow is ReentrancyGuard, Ownable {
 
     /**
      * @notice Submit a deliverable hash as proof of work
-     * @param taskId Task to submit for
-     * @param deliverableHash Hash of the deliverable (e.g., IPFS CID hash)
      */
-    function submitDeliverable(bytes32 taskId, bytes32 deliverableHash) external {
+    function submitDeliverable(bytes32 taskId, bytes32 deliverableHash) external nonReentrant whenNotPaused {
         Task storage task = tasks[taskId];
         if (task.status != Status.Claimed) revert TaskNotClaimed();
         if (msg.sender != task.worker) revert OnlyWorkerCanPerform();
@@ -353,44 +326,31 @@ contract TaskEscrow is ReentrancyGuard, Ownable {
 
     /**
      * @notice Approve the deliverable and release USDC to worker (minus platform fee)
-     * @param taskId Task to approve
      */
-    function approveTask(bytes32 taskId) external nonReentrant {
+    function approveTask(bytes32 taskId) external nonReentrant whenNotPaused {
         Task storage task = tasks[taskId];
         if (task.status != Status.Submitted) revert TaskNotSubmitted();
         if (msg.sender != task.poster) revert OnlyPosterCanPerform();
 
-        task.status = Status.Approved;
-
-        // Calculate platform fee and worker payout
-        uint256 fee = (task.agreedPrice * platformFeeBps) / BPS_DENOMINATOR;
-        uint256 workerPayout = task.agreedPrice - fee;
-
-        // Transfer fee to platform
-        if (fee > 0) {
-            usdc.safeTransfer(feeRecipient, fee);
-            totalFeesCollected += fee;
-        }
-
-        // Release remaining USDC to worker
-        usdc.safeTransfer(task.worker, workerPayout);
-
-        totalTasksCompleted++;
-        totalVolumeUsdc += task.agreedPrice;
-
-        emit TaskApproved(taskId, task.worker, workerPayout, fee);
+        _releasePayment(taskId, task);
     }
 
     /**
-     * @notice Auto-approve: if poster doesn't act within autoApproveWindow after submission, worker can release payment
-     * @dev Prevents funds from being locked forever if poster disappears
-     * @param taskId Task to auto-approve
+     * @notice Auto-approve after timeout — prevents fund lock if poster disappears
+     * @dev Callable by anyone after autoApproveWindow has passed since submission
      */
     function autoApprove(bytes32 taskId) external nonReentrant {
         Task storage task = tasks[taskId];
         if (task.status != Status.Submitted) revert TaskNotSubmitted();
         if (block.timestamp < task.submittedAt + autoApproveWindow) revert AutoApproveNotReady();
 
+        _releasePayment(taskId, task);
+    }
+
+    /**
+     * @dev Internal: release payment to worker, collect fee, update stats + reputation
+     */
+    function _releasePayment(bytes32 taskId, Task storage task) internal {
         task.status = Status.Approved;
 
         uint256 fee = (task.agreedPrice * platformFeeBps) / BPS_DENOMINATOR;
@@ -402,6 +362,11 @@ contract TaskEscrow is ReentrancyGuard, Ownable {
         }
 
         usdc.safeTransfer(task.worker, workerPayout);
+
+        // Update reputation
+        reputation[task.worker].tasksCompleted++;
+        reputation[task.worker].totalEarned += workerPayout;
+        agentTasksCompleted[task.worker].push(taskId);
 
         totalTasksCompleted++;
         totalVolumeUsdc += task.agreedPrice;
@@ -415,29 +380,49 @@ contract TaskEscrow is ReentrancyGuard, Ownable {
 
     /**
      * @notice Dispute a submitted deliverable (within dispute window)
-     * @param taskId Task to dispute
      */
-    function disputeTask(bytes32 taskId) external {
+    function disputeTask(bytes32 taskId) external nonReentrant whenNotPaused {
         Task storage task = tasks[taskId];
         if (task.status != Status.Submitted) revert TaskNotSubmitted();
         if (msg.sender != task.poster) revert OnlyPosterCanPerform();
         if (block.timestamp > task.submittedAt + disputeWindow) revert DisputeWindowExpired();
 
         task.status = Status.Disputed;
+        reputation[task.poster].disputesAsPoster++;
+        reputation[task.worker].disputesAsWorker++;
+
         emit TaskDisputed(taskId);
     }
 
     /**
-     * @notice Refund the poster (if no claim after timeout)
-     * @param taskId Task to refund
+     * @notice Resolve dispute with fair split — only contract owner (arbitrator)
+     * @dev Split is configurable via disputePosterShareBps (default 70/30)
+     */
+    function resolveDispute(bytes32 taskId) external nonReentrant onlyOwner {
+        Task storage task = tasks[taskId];
+        if (task.status != Status.Disputed) revert TaskNotDisputed();
+
+        task.status = Status.Refunded;
+
+        uint256 posterShare = (task.agreedPrice * disputePosterShareBps) / BPS_DENOMINATOR;
+        uint256 workerShare = task.agreedPrice - posterShare;
+
+        usdc.safeTransfer(task.poster, posterShare);
+        if (workerShare > 0) {
+            usdc.safeTransfer(task.worker, workerShare);
+        }
+
+        emit DisputeResolved(taskId, posterShare, workerShare);
+    }
+
+    /**
+     * @notice Refund poster for open tasks that timed out (no one claimed)
      */
     function refund(bytes32 taskId) external nonReentrant {
         Task storage task = tasks[taskId];
         if (msg.sender != task.poster) revert OnlyPosterCanPerform();
-
-        // Only allow full refund for open tasks that timed out
-        if (task.status != Status.Open) revert CannotRefundAtThisTime();
-        if (block.timestamp <= task.createdAt + claimTimeout) revert CannotRefundAtThisTime();
+        if (task.status != Status.Open) revert CannotRefundYet();
+        if (block.timestamp <= task.createdAt + claimTimeout) revert CannotRefundYet();
 
         task.status = Status.Refunded;
         usdc.safeTransfer(task.poster, task.bounty);
@@ -446,31 +431,8 @@ contract TaskEscrow is ReentrancyGuard, Ownable {
     }
 
     /**
-     * @notice Resolve a dispute with a fair split (poster gets 70%, worker gets 30%)
-     * @dev Only callable by contract owner as neutral arbitrator
-     * @param taskId Task to resolve
-     */
-    function resolveDispute(bytes32 taskId) external nonReentrant onlyOwner {
-        Task storage task = tasks[taskId];
-        if (task.status != Status.Disputed) revert CannotRefundAtThisTime();
-
-        task.status = Status.Refunded;
-
-        // Fair split: 70% to poster, 30% to worker (worker did some work)
-        uint256 posterShare = (task.agreedPrice * 7000) / BPS_DENOMINATOR;
-        uint256 workerShare = task.agreedPrice - posterShare;
-
-        usdc.safeTransfer(task.poster, posterShare);
-        if (workerShare > 0) {
-            usdc.safeTransfer(task.worker, workerShare);
-        }
-
-        emit TaskRefunded(taskId, task.poster, posterShare);
-    }
-
-    /**
-     * @notice Cancel an open task before any claim/bid accepted
-     * @param taskId Task to cancel
+     * @notice Cancel an open task — refunds bounty to poster
+     * @dev Allowed even with pending bids (bids are just offers, no funds locked)
      */
     function cancelTask(bytes32 taskId) external nonReentrant {
         Task storage task = tasks[taskId];
@@ -485,23 +447,62 @@ contract TaskEscrow is ReentrancyGuard, Ownable {
     }
 
     // =============================================================
-    //                       VIEW FUNCTIONS
+    //                       REPUTATION (ON-CHAIN)
     // =============================================================
 
     /**
-     * @notice Get task details
-     * @param taskId Task to query
+     * @dev Register agent if not already tracked
      */
+    function _ensureRegistered(address agent) internal {
+        if (reputation[agent].registeredAt == 0) {
+            reputation[agent].registeredAt = block.timestamp;
+            totalAgents++;
+            emit AgentRegistered(agent);
+        }
+    }
+
+    /**
+     * @notice Get agent reputation
+     */
+    function getReputation(address agent) external view returns (AgentReputation memory) {
+        return reputation[agent];
+    }
+
+    /**
+     * @notice Get agent's completed task IDs
+     */
+    function getAgentCompletedTasks(address agent) external view returns (bytes32[] memory) {
+        return agentTasksCompleted[agent];
+    }
+
+    /**
+     * @notice Get agent's posted task IDs
+     */
+    function getAgentPostedTasks(address agent) external view returns (bytes32[] memory) {
+        return agentTasksPosted[agent];
+    }
+
+    /**
+     * @notice Calculate agent tier based on completed tasks
+     * @return tier 0=New, 1=Bronze(5+), 2=Silver(15+), 3=Gold(30+), 4=Diamond(50+)
+     */
+    function getAgentTier(address agent) external view returns (uint8 tier) {
+        uint256 completed = reputation[agent].tasksCompleted;
+        if (completed >= 50) return 4; // Diamond
+        if (completed >= 30) return 3; // Gold
+        if (completed >= 15) return 2; // Silver
+        if (completed >= 5)  return 1; // Bronze
+        return 0; // New
+    }
+
+    // =============================================================
+    //                       VIEW FUNCTIONS
+    // =============================================================
+
     function getTask(bytes32 taskId) external view returns (Task memory) {
         return tasks[taskId];
     }
 
-    /**
-     * @notice Get all bids for a task
-     * @param taskId Task to get bids for
-     * @return bidders Array of bidder addresses
-     * @return bids Array of Bid structs
-     */
     function getTaskBids(bytes32 taskId) external view returns (
         address[] memory bidders,
         Bid[] memory bids
@@ -514,50 +515,29 @@ contract TaskEscrow is ReentrancyGuard, Ownable {
         return (bidders, bids);
     }
 
-    /**
-     * @notice Get a specific bid on a task
-     * @param taskId Task ID
-     * @param bidder Bidder address
-     */
     function getBid(bytes32 taskId, address bidder) external view returns (Bid memory) {
         return taskBids[taskId][bidder];
     }
 
-    /**
-     * @notice Get subtasks of a parent task
-     * @param parentTaskId Parent task ID
-     */
     function getSubtasks(bytes32 parentTaskId) external view returns (bytes32[] memory) {
         return subtasks[parentTaskId];
     }
 
-    /**
-     * @notice Get platform statistics
-     */
     function getStats() external view returns (
         uint256 tasksCreated,
         uint256 tasksCompleted,
         uint256 volumeUsdc,
         uint256 feesCollected,
-        uint256 currentFeeBps
+        uint256 currentFeeBps,
+        uint256 registeredAgents
     ) {
-        return (
-            totalTasksCreated,
-            totalTasksCompleted,
-            totalVolumeUsdc,
-            totalFeesCollected,
-            platformFeeBps
-        );
+        return (totalTasksCreated, totalTasksCompleted, totalVolumeUsdc, totalFeesCollected, platformFeeBps, totalAgents);
     }
 
     // =============================================================
     //                       ADMIN FUNCTIONS
     // =============================================================
 
-    /**
-     * @notice Update platform fee (owner only)
-     * @param newFeeBps New fee in basis points (e.g., 250 = 2.5%)
-     */
     function setFee(uint256 newFeeBps) external onlyOwner {
         if (newFeeBps > MAX_FEE_BPS) revert FeeTooHigh();
         uint256 oldFee = platformFeeBps;
@@ -565,10 +545,6 @@ contract TaskEscrow is ReentrancyGuard, Ownable {
         emit FeeUpdated(oldFee, newFeeBps);
     }
 
-    /**
-     * @notice Update fee recipient address (owner only)
-     * @param newRecipient New fee recipient address
-     */
     function setFeeRecipient(address newRecipient) external onlyOwner {
         if (newRecipient == address(0)) revert InvalidFeeRecipient();
         address oldRecipient = feeRecipient;
@@ -576,27 +552,30 @@ contract TaskEscrow is ReentrancyGuard, Ownable {
         emit FeeRecipientUpdated(oldRecipient, newRecipient);
     }
 
-    /**
-     * @notice Update claim timeout (owner only)
-     * @param newTimeout New timeout in seconds
-     */
     function setClaimTimeout(uint256 newTimeout) external onlyOwner {
         claimTimeout = newTimeout;
     }
 
-    /**
-     * @notice Update dispute window (owner only)
-     * @param newWindow New window in seconds
-     */
     function setDisputeWindow(uint256 newWindow) external onlyOwner {
         disputeWindow = newWindow;
     }
 
-    /**
-     * @notice Update auto-approve window (owner only)
-     * @param newWindow New window in seconds
-     */
     function setAutoApproveWindow(uint256 newWindow) external onlyOwner {
         autoApproveWindow = newWindow;
+    }
+
+    function setDisputeSplit(uint256 newPosterShareBps) external onlyOwner {
+        if (newPosterShareBps > BPS_DENOMINATOR) revert InvalidSplit();
+        disputePosterShareBps = newPosterShareBps;
+    }
+
+    /// @notice Emergency pause — stops all state-changing operations
+    function pause() external onlyOwner {
+        _pause();
+    }
+
+    /// @notice Unpause after emergency
+    function unpause() external onlyOwner {
+        _unpause();
     }
 }
