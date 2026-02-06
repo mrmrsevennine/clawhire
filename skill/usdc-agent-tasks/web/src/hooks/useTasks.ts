@@ -18,20 +18,44 @@ export function useTasks() {
     registeredAgents: number;
   } | null>(null);
 
-  // Fetch on-chain stats on mount
+  // Fetch on-chain stats and tasks on mount
   useEffect(() => {
-    const fetchStats = async () => {
+    const fetchOnChainData = async () => {
       setLoadingStats(true);
       try {
+        // Fetch stats
         const stats = await blockchainService.getStats();
         setOnChainStats(stats);
+
+        // Fetch on-chain tasks and merge into store
+        const onChainTasks = await blockchainService.fetchAllTasks();
+        if (onChainTasks.length > 0) {
+          const store = useStore.getState();
+          const existingIds = new Set(store.tasks.map(t => t.id));
+          for (const task of onChainTasks) {
+            if (!existingIds.has(task.id)) {
+              store.addTask(task);
+            } else {
+              // Update existing task with on-chain status
+              store.updateTask(task.id, {
+                status: task.status,
+                worker: task.worker,
+                workerFull: task.workerFull,
+                bidCount: task.bidCount,
+                bids: task.bids,
+                onchain: true,
+                txHash: task.txHash,
+              });
+            }
+          }
+        }
       } catch (err) {
-        console.error('Failed to fetch on-chain stats:', err);
+        console.error('Failed to fetch on-chain data:', err);
       } finally {
         setLoadingStats(false);
       }
     };
-    fetchStats();
+    fetchOnChainData();
   }, []);
 
   const getTaskById = (id: string): Task | undefined => tasks.find((t) => t.id === id);

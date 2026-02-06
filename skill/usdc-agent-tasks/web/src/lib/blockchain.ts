@@ -1,6 +1,26 @@
-import { JsonRpcProvider, Contract, formatUnits, EventLog } from 'ethers';
+import { JsonRpcProvider, Contract, formatUnits, EventLog, id as ethersId } from 'ethers';
 import { ESCROW_ADDRESS, ESCROW_ABI, RPC_URL, CHAIN_ID } from './contract';
 import type { Task, Bid, TaskStatus } from './types';
+
+// Known task metadata (seeded from CLI)
+// Maps bytes32 taskId -> { title, description, tags }
+const KNOWN_TASKS: Record<string, { title: string; description: string; tags: string[] }> = {
+  '0xbbf5790d4f31a2c197049705acb99efdcc2a04a7d1d9aa218901653ba5556991': {
+    title: 'SEO Audit for clawhire.app',
+    description: 'Perform a comprehensive SEO audit of clawhire.app. Check meta tags, page speed, mobile responsiveness, structured data, and provide actionable recommendations.',
+    tags: ['seo', 'audit', 'web'],
+  },
+  '0xd1c1d4fb50ab973a7aac6549fb72bf7a31913d8b272302ab88783e7f30ba48ff': {
+    title: 'Smart Contract Security Review',
+    description: 'Review TaskEscrow.sol for vulnerabilities. Check reentrancy, access control, integer overflow, and gas optimization. Provide detailed report with severity levels.',
+    tags: ['solidity', 'security', 'audit'],
+  },
+  '0x98a3161769bbf4faad96da0f4f1923ac32cf0d3752810bb9e9c671c78abee20f': {
+    title: 'Generate Marketing Copy for Launch',
+    description: 'Write compelling marketing copy for clawhire launch. Need: 5 tweet variations, 1 LinkedIn post, product description (150 words), and 3 email subject lines.',
+    tags: ['copywriting', 'marketing', 'content'],
+  },
+};
 
 // Read-only provider for fetching blockchain data
 const getReadProvider = () => new JsonRpcProvider(RPC_URL);
@@ -213,14 +233,15 @@ export const blockchainService = {
 
         if (!taskData) continue;
 
+        const knownMeta = KNOWN_TASKS[taskId];
         const task: Task = {
           id: taskId,
-          title: `Task ${taskId.slice(0, 10)}...`,
-          description: 'On-chain task',
+          title: knownMeta?.title || `Task ${taskId.slice(0, 10)}...`,
+          description: knownMeta?.description || 'On-chain task',
           bounty,
           agreedPrice: taskData.agreedPrice > 0 ? taskData.agreedPrice : undefined,
           status: taskData.status,
-          tags: ['on-chain'],
+          tags: knownMeta?.tags || ['on-chain'],
           poster: truncateAddress(poster),
           posterFull: poster,
           worker: taskData.worker !== '0x0000000000000000000000000000000000000000'
