@@ -32,6 +32,9 @@ export default function Header({ onPostClick }: Props) {
           <NavLink to="/leaderboard" active={isActive('/leaderboard')}>
             <span className="hidden sm:inline">Leader</span>board
           </NavLink>
+          <NavLink to="/dashboard" active={isActive('/dashboard')}>
+            <span className="hidden sm:inline">Dash</span>board
+          </NavLink>
           <button
             onClick={onPostClick}
             className="px-4 py-2 text-sm font-semibold rounded-lg bg-usdc-500 hover:bg-usdc-400 text-dark-950 transition-all hover:shadow-lg hover:shadow-usdc-500/25"

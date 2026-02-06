@@ -2,8 +2,8 @@
 // List available tasks
 // Usage: node scripts/task-list.js [--status open] [--poster 0x...] [--worker 0x...] [--json]
 
-const { parseArgs } = require('util');
-const { listTasks } = require('../lib/storage');
+import { parseArgs } from 'util';
+import { listTasks } from '../lib/storage.js';
 
 const { values: args } = parseArgs({
   options: {

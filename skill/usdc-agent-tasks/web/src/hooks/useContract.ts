@@ -1,4 +1,4 @@
-import { BrowserProvider, Contract, parseUnits, id as ethId } from 'ethers';
+import { BrowserProvider, Contract, parseUnits, formatUnits, id as ethId } from 'ethers';
 import { ESCROW_ADDRESS, ESCROW_ABI, USDC_ADDRESS, ERC20_ABI } from '../lib/contract';
 
 function getProvider(): BrowserProvider | null {
@@ -20,6 +20,28 @@ export function useContract() {
     await approveTx.wait();
     const escrow = new Contract(ESCROW_ADDRESS, ESCROW_ABI, signer);
     const tx = await escrow.createTask(taskIdHash, bountyAmount);
+    await tx.wait();
+    return tx.hash;
+  };
+
+  const bidOnTaskOnChain = async (taskId: string, priceUsdc: number, estimatedHours: number) => {
+    const provider = getProvider();
+    if (!provider) throw new Error('No wallet connected');
+    const signer = await provider.getSigner();
+    const escrow = new Contract(ESCROW_ADDRESS, ESCROW_ABI, signer);
+    const priceAmount = parseUnits(priceUsdc.toString(), 6);
+    const estimatedSeconds = estimatedHours * 3600;
+    const tx = await escrow.bidOnTask(ethId(taskId), priceAmount, estimatedSeconds);
+    await tx.wait();
+    return tx.hash;
+  };
+
+  const acceptBidOnChain = async (taskId: string, bidderAddress: string) => {
+    const provider = getProvider();
+    if (!provider) throw new Error('No wallet connected');
+    const signer = await provider.getSigner();
+    const escrow = new Contract(ESCROW_ADDRESS, ESCROW_ABI, signer);
+    const tx = await escrow.acceptBid(ethId(taskId), bidderAddress);
     await tx.wait();
     return tx.hash;
   };
@@ -64,5 +86,28 @@ export function useContract() {
     return tx.hash;
   };
 
-  return { createTaskOnChain, claimTaskOnChain, submitDeliverableOnChain, approveTaskOnChain, disputeTaskOnChain };
+  const getOnChainStats = async () => {
+    const provider = getProvider();
+    if (!provider) throw new Error('No wallet connected');
+    const escrow = new Contract(ESCROW_ADDRESS, ESCROW_ABI, provider);
+    const [tasksCreated, tasksCompleted, volumeUsdc, feesCollected, currentFeeBps] = await escrow.getStats();
+    return {
+      tasksCreated: Number(tasksCreated),
+      tasksCompleted: Number(tasksCompleted),
+      volumeUsdc: Number(formatUnits(volumeUsdc, 6)),
+      feesCollected: Number(formatUnits(feesCollected, 6)),
+      currentFeeBps: Number(currentFeeBps),
+    };
+  };
+
+  return {
+    createTaskOnChain,
+    bidOnTaskOnChain,
+    acceptBidOnChain,
+    claimTaskOnChain,
+    submitDeliverableOnChain,
+    approveTaskOnChain,
+    disputeTaskOnChain,
+    getOnChainStats,
+  };
 }

@@ -1,6 +1,7 @@
 import { expect } from "chai";
 import hre from "hardhat";
 import { parseUnits, keccak256, toBytes, zeroHash } from "viem";
+import { describe, it } from "node:test";
 
 describe("TaskEscrow", function () {
   // Helper to create task ID
@@ -10,14 +11,15 @@ describe("TaskEscrow", function () {
 
   // Fixture to deploy contracts and set up test accounts
   async function deployFixture() {
-    const [owner, poster, worker1, worker2, feeRecipient] = await hre.viem.getWalletClients();
-    const publicClient = await hre.viem.getPublicClient();
+    const networkConnection = await hre.network.connect();
+    const [owner, poster, worker1, worker2, feeRecipient] = await networkConnection.viem.getWalletClients();
+    const publicClient = await networkConnection.viem.getPublicClient();
 
     // Deploy mock USDC token
-    const usdc = await hre.viem.deployContract("MockERC20", ["USD Coin", "USDC", 6]);
+    const usdc = await networkConnection.viem.deployContract("MockERC20", ["USD Coin", "USDC", 6]);
 
     // Deploy TaskEscrow
-    const escrow = await hre.viem.deployContract("TaskEscrow", [
+    const escrow = await networkConnection.viem.deployContract("TaskEscrow", [
       usdc.address,
       feeRecipient.account.address,
     ]);
@@ -30,24 +32,24 @@ describe("TaskEscrow", function () {
     await usdc.write.mint([worker1.account.address, mintAmount]);
 
     // Approve escrow to spend poster's USDC
-    const usdcAsPoster = await hre.viem.getContractAt("MockERC20", usdc.address, {
+    const usdcAsPoster = await networkConnection.viem.getContractAt("MockERC20", usdc.address, {
       client: { wallet: poster },
     });
     await usdcAsPoster.write.approve([escrow.address, mintAmount]);
 
-    const usdcAsWorker1 = await hre.viem.getContractAt("MockERC20", usdc.address, {
+    const usdcAsWorker1 = await networkConnection.viem.getContractAt("MockERC20", usdc.address, {
       client: { wallet: worker1 },
     });
     await usdcAsWorker1.write.approve([escrow.address, mintAmount]);
 
     // Get contract instances for different accounts
-    const escrowAsPoster = await hre.viem.getContractAt("TaskEscrow", escrow.address, {
+    const escrowAsPoster = await networkConnection.viem.getContractAt("TaskEscrow", escrow.address, {
       client: { wallet: poster },
     });
-    const escrowAsWorker1 = await hre.viem.getContractAt("TaskEscrow", escrow.address, {
+    const escrowAsWorker1 = await networkConnection.viem.getContractAt("TaskEscrow", escrow.address, {
       client: { wallet: worker1 },
     });
-    const escrowAsWorker2 = await hre.viem.getContractAt("TaskEscrow", escrow.address, {
+    const escrowAsWorker2 = await networkConnection.viem.getContractAt("TaskEscrow", escrow.address, {
       client: { wallet: worker2 },
     });
 
@@ -314,7 +316,7 @@ describe("TaskEscrow", function () {
 
       await escrowAsPoster.write.createTask([taskId, bounty]);
       await escrowAsWorker1.write.bidOnTask([taskId, bidPrice, 3600n]);
-      await escrowAsPoster.write.acceptBid([taskId, (await escrowAsWorker1.read.getTask([taskId])).worker || worker1.account.address]);
+      await escrowAsPoster.write.acceptBid([taskId, worker1.account.address]);
       await escrowAsWorker1.write.submitDeliverable([taskId, keccak256(toBytes("work"))]);
 
       const workerBalanceBefore = await usdc.read.balanceOf([worker1.account.address]);

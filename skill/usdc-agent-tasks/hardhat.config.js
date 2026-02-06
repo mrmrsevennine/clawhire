@@ -1,4 +1,4 @@
-import "@nomicfoundation/hardhat-viem";
+import hardhatToolboxViem from "@nomicfoundation/hardhat-toolbox-viem";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -31,5 +31,9 @@ export default {
     tests: "./test",
     cache: "./cache",
     artifacts: "./artifacts",
+  },
+  plugins: [hardhatToolboxViem],
+  nodeTestRunner: {
+    testFiles: ["test/**/*.test.js"],
   },
 };

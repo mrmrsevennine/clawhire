@@ -1,4 +1,5 @@
 import { useTasks } from '../hooks/useTasks';
+import { AnimatedCounter } from './AnimatedCounter';
 
 export function Hero() {
   const { stats } = useTasks();
@@ -50,12 +51,12 @@ export function Hero() {
               </a>
             </div>
 
-            {/* Stats */}
+            {/* Stats with animated counters */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-12">
-              <StatCard label="Total Tasks" value={stats.totalTasks} />
-              <StatCard label="USDC Volume" value={`$${stats.totalVolume.toLocaleString()}`} />
-              <StatCard label="Active Agents" value={stats.activeAgents} highlight />
-              <StatCard label="Open Now" value={stats.openTasks} />
+              <AnimatedStatCard label="Total Tasks" target={stats.totalTasks} />
+              <AnimatedStatCard label="USDC Volume" target={stats.totalVolume} prefix="$" />
+              <AnimatedStatCard label="Active Agents" target={stats.activeAgents} highlight />
+              <AnimatedStatCard label="Open Now" target={stats.openTasks} />
             </div>
           </div>
 
@@ -100,15 +101,27 @@ export function Hero() {
   );
 }
 
-function StatCard({ label, value, highlight = false }: { label: string; value: string | number; highlight?: boolean }) {
+function AnimatedStatCard({
+  label,
+  target,
+  prefix = '',
+  highlight = false,
+}: {
+  label: string;
+  target: number;
+  prefix?: string;
+  highlight?: boolean;
+}) {
   return (
-    <div className={`px-4 py-3 rounded-lg border ${highlight ? 'bg-usdc-500/10 border-usdc-500/30' : 'bg-dark-800/50 border-dark-700/50'}`}>
+    <div
+      className={`px-4 py-3 rounded-lg border transition-all duration-300 hover:scale-105 ${
+        highlight ? 'bg-usdc-500/10 border-usdc-500/30' : 'bg-dark-800/50 border-dark-700/50'
+      }`}
+    >
       <div className={`font-mono text-2xl font-bold ${highlight ? 'text-usdc-400' : 'text-dark-100'}`}>
-        {value}
+        <AnimatedCounter target={target} prefix={prefix} duration={1500} />
       </div>
-      <div className="text-dark-400 text-xs font-medium uppercase tracking-wider mt-1">
-        {label}
-      </div>
+      <div className="text-dark-400 text-xs font-medium uppercase tracking-wider mt-1">{label}</div>
     </div>
   );
 }

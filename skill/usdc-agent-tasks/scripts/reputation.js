@@ -2,8 +2,8 @@
 // Check agent reputation
 // Usage: node scripts/reputation.js --address <addr> [--json]
 
-const { parseArgs } = require('util');
-const { getReputation } = require('../lib/storage');
+import { parseArgs } from 'util';
+import { getReputation } from '../lib/storage.js';
 
 const { values: args } = parseArgs({
   options: {
