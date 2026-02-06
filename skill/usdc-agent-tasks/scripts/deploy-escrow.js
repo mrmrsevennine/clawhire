@@ -22,7 +22,7 @@ const __dirname = path.dirname(__filename);
 const CONFIG = {
   rpcUrl: process.env.RPC_URL || 'https://rpc-amoy.polygon.technology',
   chainId: 80002,
-  usdcAddress: '0x41e94Eb71eF8dc0523A4871b57AdB007B9E7e8Da',
+  usdcAddress: '0x0FA8781a83E46826621b3BC094Ea2A0212e71B23',
   // Fee recipient - defaults to deployer if not specified
   feeRecipient: process.env.FEE_RECIPIENT || null,
 };
@@ -80,7 +80,10 @@ async function main() {
   const factory = new ethers.ContractFactory(artifact.abi, artifact.bytecode, wallet);
 
   try {
-    const contract = await factory.deploy(CONFIG.usdcAddress, feeRecipient);
+    const contract = await factory.deploy(CONFIG.usdcAddress, feeRecipient, {
+      maxFeePerGas: ethers.parseUnits('3', 'gwei'),
+      maxPriorityFeePerGas: ethers.parseUnits('1', 'gwei'),
+    });
     console.log('⏳ Transaction sent:', contract.deploymentTransaction().hash);
     console.log('   Waiting for confirmation...\n');
 

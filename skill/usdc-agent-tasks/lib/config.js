@@ -11,7 +11,7 @@ export const config = {
   chainId: parseInt(process.env.CHAIN_ID || '80002'),
 
   // USDC on Polygon Amoy
-  usdcAddress: process.env.USDC_ADDRESS || '0x41E94Eb71Ef8DC0523A4871B57AdB007b9e7e8dA',
+  usdcAddress: process.env.USDC_ADDRESS || '0x0FA8781a83E46826621b3BC094Ea2A0212e71B23',
   usdcDecimals: 6,
 
   // TaskEscrow contract (set after deployment)
