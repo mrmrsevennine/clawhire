@@ -39,14 +39,7 @@ export default function App() {
   return (
     <HashRouter>
       <div className="min-h-screen flex flex-col bg-white text-slate-900 font-sans antialiased">
-        {/* Subtle background gradient */}
-        <div className="fixed inset-0 pointer-events-none">
-          {/* Single subtle teal wash */}
-          <div className="absolute top-0 left-1/3 w-[600px] h-[600px] bg-teal-50/30 rounded-full blur-3xl" />
-        </div>
-
-        {/* Content */}
-        <div className="relative z-10 flex flex-col min-h-screen">
+        <div className="flex flex-col min-h-screen">
           <Header onPostClick={() => setPostModalOpen(true)} />
           <main className="flex-1">
             <Routes>
