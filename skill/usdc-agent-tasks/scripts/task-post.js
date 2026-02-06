@@ -7,6 +7,7 @@ import crypto from 'crypto';
 import { config } from '../lib/config.js';
 import { saveTask, updateReputation } from '../lib/storage.js';
 import { getWallet, getUsdcBalance, createTaskOnChain } from '../lib/wallet.js';
+import { sanitizeTaskInput, logSecurityEvent } from '../lib/sanitize.js';
 
 const { values: args } = parseArgs({
   options: {
@@ -50,11 +51,25 @@ async function main() {
     process.exit(1);
   }
 
+  // 🛡️ Input Sanitization — Prompt Injection Prevention
+  const validation = sanitizeTaskInput(args.title, args.description);
+  if (!validation.valid) {
+    console.error('❌ Task validation failed:');
+    validation.errors.forEach(e => console.error(`   • ${e}`));
+    if (validation.threats?.length > 0) {
+      logSecurityEvent('PROMPT_INJECTION_BLOCKED', {
+        title: args.title?.slice(0, 50),
+        threats: validation.threats,
+      });
+    }
+    process.exit(1);
+  }
+
   // Generate unique task ID
   const taskId = `task-${Date.now()}-${crypto.randomBytes(4).toString('hex')}`;
 
   console.log('📋 Posting new task...');
-  console.log(`   Title: ${args.title}`);
+  console.log(`   Title: ${validation.sanitizedTitle}`);
   console.log(`   Bounty: ${bounty} USDC`);
   console.log(`   Task ID: ${taskId}`);
 
