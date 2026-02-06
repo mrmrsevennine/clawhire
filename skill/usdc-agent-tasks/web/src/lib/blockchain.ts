@@ -211,7 +211,8 @@ export const blockchainService = {
       const contract = new Contract(ESCROW_ADDRESS, ESCROW_ABI, provider);
 
       const currentBlock = await provider.getBlockNumber();
-      const startBlock = Math.max(fromBlock, currentBlock - 100000);
+      // Public RPCs limit log range — use 5000 blocks (plenty for testnet)
+      const startBlock = Math.max(fromBlock, currentBlock - 5000);
 
       const taskCreatedFilter = contract.filters.TaskCreated();
       const taskCreatedEvents = await contract.queryFilter(taskCreatedFilter, startBlock, currentBlock);
