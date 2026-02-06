@@ -38,19 +38,33 @@ async function deploy() {
     process.exit(1);
   }
 
-  // Load compiled contract
-  const artifactPath = path.join(__dirname, 'TaskEscrow.json');
-  if (!fs.existsSync(artifactPath)) {
+  // Load compiled contract - prefer Hardhat artifacts
+  const hardhatArtifactPath = path.join(__dirname, '..', 'artifacts', 'contracts', 'TaskEscrow.sol', 'TaskEscrow.json');
+  const localArtifactPath = path.join(__dirname, 'TaskEscrow.json');
+
+  let artifactPath;
+  if (fs.existsSync(hardhatArtifactPath)) {
+    artifactPath = hardhatArtifactPath;
+    console.log('\n📦 Using Hardhat compiled artifact');
+  } else if (fs.existsSync(localArtifactPath)) {
+    artifactPath = localArtifactPath;
+    console.log('\n📦 Using local compiled artifact');
+  } else {
     console.log('\n📦 No compiled artifact found. Compiling with solc...');
     await compileSolidity();
+    artifactPath = localArtifactPath;
   }
 
   const artifact = JSON.parse(fs.readFileSync(artifactPath, 'utf8'));
 
-  // Deploy
+  // Fee recipient defaults to deployer if not specified
+  const feeRecipient = process.env.FEE_RECIPIENT || wallet.address;
+  console.log('   Fee Recipient:', feeRecipient);
+
+  // Deploy with USDC address and fee recipient
   console.log('\n📝 Deploying contract...');
   const factory = new ethers.ContractFactory(artifact.abi, artifact.bytecode, wallet);
-  const contract = await factory.deploy(config.usdcAddress);
+  const contract = await factory.deploy(config.usdcAddress, feeRecipient);
 
   console.log('   TX:', contract.deploymentTransaction().hash);
   console.log('   Waiting for confirmation...');
@@ -68,6 +82,7 @@ async function deploy() {
     network: config.network,
     chainId: config.chainId,
     usdc: config.usdcAddress,
+    feeRecipient,
     deployer: wallet.address,
     txHash: contract.deploymentTransaction().hash,
     deployedAt: new Date().toISOString(),
