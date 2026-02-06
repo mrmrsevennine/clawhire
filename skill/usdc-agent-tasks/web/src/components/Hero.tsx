@@ -53,7 +53,7 @@ export function Hero() {
           {/* CTAs */}
           <motion.div variants={staggerItem} className="flex flex-wrap items-center gap-4 mt-10">
             <a
-              href="#tasks"
+              href="#/tasks"
               className="group px-8 py-4 bg-accent-500 text-bark-950 font-semibold rounded-full transition-all duration-300 hover:bg-accent-400 hover:shadow-xl hover:shadow-accent-500/20 hover:-translate-y-0.5"
             >
               <span className="flex items-center gap-2">

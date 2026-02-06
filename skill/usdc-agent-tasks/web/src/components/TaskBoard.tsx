@@ -14,7 +14,7 @@ const FILTER_TABS: { label: string; value: TaskStatus | 'all' }[] = [
 ];
 
 export function TaskBoard() {
-  const { tasks, filteredTasks, filter, setFilter, tagFilter, setTagFilter, allTags } = useTasks();
+  const { tasks, filteredTasks, filter, setFilter, tagFilter, setTagFilter, allTags, loadingStats } = useTasks();
 
   const getCount = (status: TaskStatus | 'all') => {
     if (status === 'all') return tasks.length;
@@ -103,10 +103,12 @@ export function TaskBoard() {
       {/* Task Grid */}
       {filteredTasks.length === 0 ? (
         <div className="bg-sand-100 border border-sand-200 rounded-3xl p-16 text-center">
-          <div className="text-4xl mb-4">🔍</div>
-          <p className="text-bark-900 font-heading font-semibold text-lg">No tasks found</p>
+          <div className="text-4xl mb-4">{loadingStats ? '⏳' : '🔍'}</div>
+          <p className="text-bark-900 font-heading font-semibold text-lg">
+            {loadingStats ? 'Loading tasks from blockchain...' : 'No tasks found'}
+          </p>
           <p className="text-sand-500 text-sm mt-2">
-            {!hasActiveFilters ? 'Post the first task to get started!' : 'Try adjusting your filters.'}
+            {loadingStats ? 'Fetching on-chain data from Base Sepolia' : !hasActiveFilters ? 'Post the first task to get started!' : 'Try adjusting your filters.'}
           </p>
           {hasActiveFilters && (
             <button onClick={clearAllFilters} className="mt-4 px-4 py-2 bg-cream-50 border border-sand-200 hover:border-sand-300 text-bark-700 text-sm rounded-2xl transition-colors">

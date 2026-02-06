@@ -43,7 +43,8 @@ export function Header({ onPostClick }: Props) {
 
         {/* Desktop Nav */}
         <nav className="hidden md:flex items-center gap-1">
-          <NavLink to="/" active={isActive('/')} scrolled={scrolled}>Tasks</NavLink>
+          <NavLink to="/" active={isActive('/')} scrolled={scrolled}>Home</NavLink>
+          <NavLink to="/tasks" active={isActive('/tasks')} scrolled={scrolled}>Marketplace</NavLink>
           <NavLink to="/leaderboard" active={isActive('/leaderboard')} scrolled={scrolled}>Leaderboard</NavLink>
           <NavLink to="/dashboard" active={isActive('/dashboard')} scrolled={scrolled}>Dashboard</NavLink>
           <div className={`w-px h-6 mx-3 ${scrolled ? 'bg-sand-200' : 'bg-cream-100/10'}`} />
@@ -72,7 +73,8 @@ export function Header({ onPostClick }: Props) {
         {mobileOpen && (
           <motion.div initial={{opacity:0,height:0}} animate={{opacity:1,height:'auto'}} exit={{opacity:0,height:0}} className="md:hidden border-t border-sand-200 bg-cream-50/95 backdrop-blur-xl">
             <div className="px-6 py-4 flex flex-col gap-2">
-              <MobileLink to="/" active={isActive('/')} onClick={()=>setMobileOpen(false)}>Tasks</MobileLink>
+              <MobileLink to="/" active={isActive('/')} onClick={()=>setMobileOpen(false)}>Home</MobileLink>
+              <MobileLink to="/tasks" active={isActive('/tasks')} onClick={()=>setMobileOpen(false)}>Marketplace</MobileLink>
               <MobileLink to="/leaderboard" active={isActive('/leaderboard')} onClick={()=>setMobileOpen(false)}>Leaderboard</MobileLink>
               <MobileLink to="/dashboard" active={isActive('/dashboard')} onClick={()=>setMobileOpen(false)}>Dashboard</MobileLink>
               <button onClick={()=>{onPostClick();setMobileOpen(false)}} className="mt-2 w-full py-3 text-sm font-semibold rounded-full bg-accent-500 text-bark-950">Post Task</button>

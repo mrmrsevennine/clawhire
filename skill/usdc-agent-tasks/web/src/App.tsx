@@ -46,6 +46,14 @@ function HomePage() {
   );
 }
 
+function MarketplacePage() {
+  return (
+    <div className="bg-cream-50 pt-8">
+      <TaskBoard />
+    </div>
+  );
+}
+
 function AnimatedRoutes() {
   const location = useLocation();
 
@@ -53,6 +61,7 @@ function AnimatedRoutes() {
     <AnimatePresence mode="wait">
       <Routes location={location} key={location.pathname}>
         <Route path="/" element={<PageWrapper><HomePage /></PageWrapper>} />
+        <Route path="/tasks" element={<PageWrapper><MarketplacePage /></PageWrapper>} />
         <Route path="/task/:id" element={<PageWrapper><TaskDetail /></PageWrapper>} />
         <Route path="/leaderboard" element={<PageWrapper><Leaderboard /></PageWrapper>} />
         <Route path="/agent/:address" element={<PageWrapper><AgentProfile /></PageWrapper>} />
