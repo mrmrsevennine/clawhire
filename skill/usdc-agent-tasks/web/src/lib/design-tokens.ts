@@ -1,43 +1,44 @@
-// Claw Marketplace — Design Tokens
-// Premium SaaS aesthetic: Stripe/Linear/Vercel vibes
+// Claw Marketplace — Design Tokens v2
+// NO PURPLE. Fintech premium: Blue + Emerald + Amber
+// Inspired by Stripe, Mercury, Ramp — not generic AI
 
 export const colors = {
-  // Primary Palette
+  // Primary — Rich Blue (Trust, Stability)
   primary: {
-    50: '#EEF2FF',
-    100: '#E0E7FF',
-    200: '#C7D2FE',
-    300: '#A5B4FC',
-    400: '#818CF8',
-    500: '#6366F1', // Main accent
-    600: '#4F46E5',
-    700: '#4338CA',
-    800: '#3730A3',
-    900: '#312E81',
+    50: '#EFF6FF',
+    100: '#DBEAFE',
+    200: '#BFDBFE',
+    300: '#93C5FD',
+    400: '#60A5FA',
+    500: '#3B82F6',
+    600: '#2563EB', // Main accent
+    700: '#1D4ED8',
+    800: '#1E40AF',
+    900: '#1E3A8A',
   },
-  // Secondary (Cyan - USDC/crypto accent)
+  // Secondary — Emerald (Growth, Money, USDC vibes)
   secondary: {
-    50: '#ECFEFF',
-    100: '#CFFAFE',
-    200: '#A5F3FC',
-    300: '#67E8F9',
-    400: '#22D3EE',
-    500: '#06B6D4',
-    600: '#0891B2',
-    700: '#0E7490',
+    50: '#ECFDF5',
+    100: '#D1FAE5',
+    200: '#A7F3D0',
+    300: '#6EE7B7',
+    400: '#34D399',
+    500: '#10B981',
+    600: '#059669',
+    700: '#047857',
   },
-  // Accent (Purple - premium feel)
+  // Accent — Amber (Value, Premium, Warmth)
   accent: {
-    50: '#F5F3FF',
-    100: '#EDE9FE',
-    200: '#DDD6FE',
-    300: '#C4B5FD',
-    400: '#A78BFA',
-    500: '#8B5CF6',
-    600: '#7C3AED',
-    700: '#6D28D9',
+    50: '#FFFBEB',
+    100: '#FEF3C7',
+    200: '#FDE68A',
+    300: '#FCD34D',
+    400: '#FBBF24',
+    500: '#F59E0B',
+    600: '#D97706',
+    700: '#B45309',
   },
-  // Neutrals
+  // Neutrals — Slate
   slate: {
     50: '#F8FAFC',
     100: '#F1F5F9',
@@ -53,21 +54,22 @@ export const colors = {
 } as const;
 
 export const gradients = {
-  hero: 'linear-gradient(135deg, #6366F1 0%, #06B6D4 50%, #8B5CF6 100%)',
-  heroText: 'linear-gradient(135deg, #6366F1 0%, #06B6D4 100%)',
-  card: 'linear-gradient(135deg, rgba(99,102,241,0.05) 0%, rgba(6,182,212,0.05) 100%)',
-  button: 'linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%)',
-  buttonHover: 'linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%)',
+  hero: 'linear-gradient(135deg, #2563EB 0%, #0EA5E9 50%, #10B981 100%)',
+  heroText: 'linear-gradient(135deg, #1E3A8A 0%, #2563EB 50%, #0EA5E9 100%)',
+  card: 'linear-gradient(135deg, rgba(37,99,235,0.03) 0%, rgba(16,185,129,0.03) 100%)',
+  button: 'linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%)',
+  buttonHover: 'linear-gradient(135deg, #1D4ED8 0%, #1E40AF 100%)',
+  accent: 'linear-gradient(135deg, #2563EB 0%, #10B981 100%)',
   subtle: 'linear-gradient(180deg, #F8FAFC 0%, #FFFFFF 100%)',
 } as const;
 
 export const shadows = {
-  sm: '0 1px 2px rgba(0,0,0,0.05)',
-  md: '0 4px 6px -1px rgba(0,0,0,0.07), 0 2px 4px -2px rgba(0,0,0,0.05)',
-  lg: '0 10px 15px -3px rgba(0,0,0,0.08), 0 4px 6px -4px rgba(0,0,0,0.04)',
-  xl: '0 20px 25px -5px rgba(0,0,0,0.08), 0 8px 10px -6px rgba(0,0,0,0.04)',
-  glow: '0 0 40px rgba(99,102,241,0.15)',
-  glowCyan: '0 0 40px rgba(6,182,212,0.15)',
+  sm: '0 1px 2px rgba(0,0,0,0.04)',
+  md: '0 4px 6px -1px rgba(0,0,0,0.06), 0 2px 4px -2px rgba(0,0,0,0.04)',
+  lg: '0 10px 15px -3px rgba(0,0,0,0.06), 0 4px 6px -4px rgba(0,0,0,0.03)',
+  xl: '0 20px 25px -5px rgba(0,0,0,0.06), 0 8px 10px -6px rgba(0,0,0,0.03)',
+  glow: '0 0 40px rgba(37,99,235,0.12)',
+  glowEmerald: '0 0 40px rgba(16,185,129,0.12)',
 } as const;
 
 export const typography = {

@@ -4,67 +4,56 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Primary - Indigo
-        indigo: {
-          50: '#EEF2FF',
-          100: '#E0E7FF',
-          200: '#C7D2FE',
-          300: '#A5B4FC',
-          400: '#818CF8',
-          500: '#6366F1',
-          600: '#4F46E5',
-          700: '#4338CA',
-          800: '#3730A3',
-          900: '#312E81',
+        // NO PURPLE. Blue + Emerald + Amber = Fintech Premium.
+        brand: {
+          50: '#EFF6FF',
+          100: '#DBEAFE',
+          200: '#BFDBFE',
+          300: '#93C5FD',
+          400: '#60A5FA',
+          500: '#3B82F6',
+          600: '#2563EB',
+          700: '#1D4ED8',
+          800: '#1E40AF',
+          900: '#1E3A8A',
         },
-        // Secondary - Cyan (USDC accent)
-        cyan: {
-          50: '#ECFEFF',
-          100: '#CFFAFE',
-          200: '#A5F3FC',
-          300: '#67E8F9',
-          400: '#22D3EE',
-          500: '#06B6D4',
-          600: '#0891B2',
-          700: '#0E7490',
+        emerald: {
+          50: '#ECFDF5',
+          100: '#D1FAE5',
+          200: '#A7F3D0',
+          300: '#6EE7B7',
+          400: '#34D399',
+          500: '#10B981',
+          600: '#059669',
+          700: '#047857',
         },
-        // Accent - Purple
-        purple: {
-          50: '#F5F3FF',
-          100: '#EDE9FE',
-          200: '#DDD6FE',
-          300: '#C4B5FD',
-          400: '#A78BFA',
-          500: '#8B5CF6',
-          600: '#7C3AED',
-          700: '#6D28D9',
+        amber: {
+          50: '#FFFBEB',
+          100: '#FEF3C7',
+          200: '#FDE68A',
+          300: '#FCD34D',
+          400: '#FBBF24',
+          500: '#F59E0B',
+          600: '#D97706',
         },
         // Status colors
         status: {
-          open: '#22c55e',
-          claimed: '#3b82f6',
-          submitted: '#f59e0b',
-          approved: '#10b981',
-          disputed: '#ef4444',
+          open: '#10B981',
+          claimed: '#3B82F6',
+          submitted: '#F59E0B',
+          approved: '#059669',
+          disputed: '#EF4444',
         },
-        // Keep usdc alias for backward compat
+        // Backward compat aliases
         usdc: {
-          400: '#22D3EE',
-          500: '#06B6D4',
-          600: '#0891B2',
+          400: '#34D399',
+          500: '#10B981',
+          600: '#059669',
         },
-        // Keep dark alias for components not yet migrated
         dark: {
-          100: '#f1f5f9',
-          200: '#e2e8f0',
-          300: '#cbd5e1',
-          400: '#94a3b8',
-          500: '#64748b',
-          600: '#475569',
-          700: '#334155',
-          800: '#1e293b',
-          900: '#0f172a',
-          950: '#020617',
+          100: '#f1f5f9', 200: '#e2e8f0', 300: '#cbd5e1',
+          400: '#94a3b8', 500: '#64748b', 600: '#475569',
+          700: '#334155', 800: '#1e293b', 900: '#0f172a', 950: '#020617',
         },
       },
       fontFamily: {
@@ -86,10 +75,6 @@ export default {
           '0%, 100%': { transform: 'translateY(0)' },
           '50%': { transform: 'translateY(-10px)' },
         },
-      },
-      borderRadius: {
-        '2xl': '1rem',
-        '3xl': '1.5rem',
       },
     },
   },

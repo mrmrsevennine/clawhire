@@ -38,10 +38,10 @@
   /* Premium button */
   .btn-primary {
     @apply px-6 py-3 rounded-xl font-semibold text-white transition-all duration-300 cursor-pointer text-sm;
-    background: linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%);
+    background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);
   }
   .btn-primary:hover {
-    box-shadow: 0 10px 25px rgba(99,102,241,0.25);
+    box-shadow: 0 10px 25px rgba(37,99,235,0.25);
     transform: translateY(-1px);
   }
   .btn-primary:active {
@@ -67,7 +67,7 @@
 
   /* Gradient text utility */
   .gradient-text {
-    background: linear-gradient(135deg, #6366F1 0%, #06B6D4 100%);
+    background: linear-gradient(135deg, #1E3A8A 0%, #2563EB 50%, #0EA5E9 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -103,7 +103,7 @@
 
 /* Selection */
 ::selection {
-  @apply bg-indigo-100 text-indigo-900;
+  @apply bg-blue-100 text-blue-900;
 }
 
 /* Scrollbar - minimal */

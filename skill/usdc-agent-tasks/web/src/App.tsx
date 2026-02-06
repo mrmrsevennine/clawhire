@@ -35,9 +35,9 @@ export default function App() {
       <div className="min-h-screen flex flex-col bg-white text-slate-900 font-sans antialiased">
         {/* Subtle background gradient */}
         <div className="fixed inset-0 pointer-events-none">
-          <div className="absolute top-0 left-1/4 w-96 h-96 bg-indigo-100/40 rounded-full blur-3xl" />
-          <div className="absolute top-20 right-1/4 w-80 h-80 bg-cyan-100/30 rounded-full blur-3xl" />
-          <div className="absolute bottom-0 left-1/2 w-[600px] h-[600px] bg-purple-50/30 rounded-full blur-3xl" />
+          <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-50/40 rounded-full blur-3xl" />
+          <div className="absolute top-20 right-1/4 w-80 h-80 bg-emerald-50/30 rounded-full blur-3xl" />
+          <div className="absolute bottom-0 left-1/2 w-[600px] h-[600px] bg-sky-50/20 rounded-full blur-3xl" />
         </div>
 
         {/* Content */}

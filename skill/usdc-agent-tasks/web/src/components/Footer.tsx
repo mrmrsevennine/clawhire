@@ -14,7 +14,7 @@ export function Footer() {
         <div className="flex flex-col md:flex-row items-center justify-between gap-6">
           {/* Logo */}
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-cyan-500 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-600 to-emerald-500 flex items-center justify-center">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M12 2L2 7l10 5 10-5-10-5z" />
                 <path d="M2 17l10 5 10-5" />
@@ -46,9 +46,9 @@ export function Footer() {
           <span>© 2026 Claw Marketplace. Built for the Circle USDC Hackathon.</span>
           <span className="flex items-center gap-1.5">
             Powered by
-            <span className="font-semibold text-indigo-500">USDC</span>
+            <span className="font-semibold text-emerald-600">USDC</span>
             on
-            <span className="font-semibold text-purple-500">Polygon</span>
+            <span className="font-semibold text-blue-600">Polygon</span>
             &
             <span className="font-semibold text-blue-500">Base</span>
           </span>

@@ -31,7 +31,7 @@ export function Header({ onPostClick }: Props) {
       <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
         {/* Logo */}
         <Link to="/" className="flex items-center gap-3 group">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-cyan-500 flex items-center justify-center shadow-lg shadow-indigo-500/20 group-hover:shadow-indigo-500/40 transition-all duration-300 group-hover:scale-105">
+          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-600 to-emerald-500 flex items-center justify-center shadow-lg shadow-blue-600/20 group-hover:shadow-blue-600/30 transition-all duration-300 group-hover:scale-105">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <path d="M12 2L2 7l10 5 10-5-10-5z" />
               <path d="M2 17l10 5 10-5" />
@@ -54,8 +54,8 @@ export function Header({ onPostClick }: Props) {
           
           <button
             onClick={onPostClick}
-            className="px-5 py-2.5 text-sm font-semibold rounded-xl text-white transition-all duration-300 hover:shadow-lg hover:shadow-indigo-500/25 hover:-translate-y-0.5 active:translate-y-0"
-            style={{ background: 'linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%)' }}
+            className="px-5 py-2.5 text-sm font-semibold rounded-xl text-white transition-all duration-300 hover:shadow-lg hover:shadow-blue-600/25 hover:-translate-y-0.5 active:translate-y-0"
+            style={{ background: 'linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%)' }}
           >
             Post Task
           </button>
@@ -94,7 +94,7 @@ export function Header({ onPostClick }: Props) {
               <button
                 onClick={() => { onPostClick(); setMobileOpen(false); }}
                 className="mt-2 w-full px-5 py-3 text-sm font-semibold rounded-xl text-white text-center"
-                style={{ background: 'linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%)' }}
+                style={{ background: 'linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%)' }}
               >
                 Post Task
               </button>
@@ -115,7 +115,7 @@ function NavLink({ to, active, children }: { to: string; active: boolean; childr
       to={to}
       className={`relative px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${
         active
-          ? 'text-indigo-600 bg-indigo-50'
+          ? 'text-blue-600 bg-blue-50'
           : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'
       }`}
     >
@@ -123,7 +123,7 @@ function NavLink({ to, active, children }: { to: string; active: boolean; childr
       {active && (
         <motion.div
           layoutId="nav-indicator"
-          className="absolute bottom-0 left-3 right-3 h-0.5 bg-indigo-500 rounded-full"
+          className="absolute bottom-0 left-3 right-3 h-0.5 bg-blue-600 rounded-full"
           transition={{ type: 'spring', stiffness: 500, damping: 30 }}
         />
       )}
@@ -137,7 +137,7 @@ function MobileNavLink({ to, active, onClick, children }: { to: string; active: 
       to={to}
       onClick={onClick}
       className={`px-4 py-3 text-sm font-medium rounded-xl transition-colors ${
-        active ? 'text-indigo-600 bg-indigo-50' : 'text-slate-600 hover:bg-slate-50'
+        active ? 'text-blue-600 bg-blue-50' : 'text-slate-600 hover:bg-slate-50'
       }`}
     >
       {children}

@@ -8,10 +8,10 @@ export function Hero() {
 
   return (
     <section className="relative overflow-hidden pt-20 pb-24 sm:pt-28 sm:pb-32">
-      {/* Decorative gradient orbs */}
-      <motion.div {...float} className="absolute top-10 left-[15%] w-72 h-72 bg-indigo-200/30 rounded-full blur-3xl pointer-events-none" />
-      <motion.div {...floatSlow} className="absolute top-40 right-[10%] w-96 h-96 bg-cyan-100/25 rounded-full blur-3xl pointer-events-none" />
-      <motion.div {...float} className="absolute -bottom-20 left-[40%] w-80 h-80 bg-purple-100/20 rounded-full blur-3xl pointer-events-none" />
+      {/* Decorative gradient orbs — blue + emerald, NO purple */}
+      <motion.div {...float} className="absolute top-10 left-[15%] w-72 h-72 bg-blue-100/40 rounded-full blur-3xl pointer-events-none" />
+      <motion.div {...floatSlow} className="absolute top-40 right-[10%] w-96 h-96 bg-emerald-50/40 rounded-full blur-3xl pointer-events-none" />
+      <motion.div {...float} className="absolute -bottom-20 left-[40%] w-80 h-80 bg-sky-50/30 rounded-full blur-3xl pointer-events-none" />
 
       <div className="relative z-10 max-w-7xl mx-auto px-6">
         <motion.div
@@ -21,22 +21,22 @@ export function Hero() {
           className="text-center max-w-4xl mx-auto"
         >
           {/* Badge */}
-          <motion.div variants={staggerItem} className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-indigo-50 border border-indigo-100 mb-8">
+          <motion.div variants={staggerItem} className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-50 border border-emerald-100 mb-8">
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="text-indigo-600 text-sm font-medium">Powered by Circle USDC</span>
+            <span className="text-emerald-700 text-sm font-medium">Powered by Circle USDC</span>
           </motion.div>
 
           {/* Hero Title */}
           <motion.h1
             variants={staggerItem}
-            className="font-heading font-extrabold tracking-tight leading-[1.1]"
+            className="font-heading font-extrabold tracking-tight leading-[1.08]"
             style={{ fontSize: 'clamp(2.5rem, 6vw, 4.5rem)' }}
           >
             <span className="text-slate-900">The Agent</span>
             <br />
             <span
               className="bg-clip-text text-transparent"
-              style={{ backgroundImage: 'linear-gradient(135deg, #6366F1 0%, #06B6D4 100%)' }}
+              style={{ backgroundImage: 'linear-gradient(135deg, #1E3A8A 0%, #2563EB 50%, #0EA5E9 100%)' }}
             >
               Economy Protocol
             </span>
@@ -55,8 +55,8 @@ export function Hero() {
           <motion.div variants={staggerItem} className="flex flex-wrap gap-4 mt-10 justify-center">
             <a
               href="#tasks"
-              className="group px-7 py-3.5 text-white font-semibold rounded-xl transition-all duration-300 hover:shadow-xl hover:shadow-indigo-500/25 hover:-translate-y-0.5 active:translate-y-0"
-              style={{ background: 'linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%)' }}
+              className="group px-7 py-3.5 text-white font-semibold rounded-xl transition-all duration-300 hover:shadow-xl hover:shadow-blue-600/20 hover:-translate-y-0.5 active:translate-y-0"
+              style={{ background: 'linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%)' }}
             >
               <span className="flex items-center gap-2">
                 Browse Tasks
@@ -122,12 +122,12 @@ function StatCard({
       whileHover={{ y: -2, scale: 1.02 }}
       className={`px-5 py-4 rounded-2xl border transition-all duration-300 backdrop-blur-sm ${
         highlight
-          ? 'bg-indigo-50/80 border-indigo-100'
+          ? 'bg-blue-50/80 border-blue-100'
           : 'bg-white/60 border-slate-100 hover:border-slate-200'
       }`}
-      style={{ boxShadow: highlight ? '0 0 30px rgba(99,102,241,0.08)' : undefined }}
+      style={{ boxShadow: highlight ? '0 0 30px rgba(37,99,235,0.06)' : undefined }}
     >
-      <div className={`font-heading text-2xl sm:text-3xl font-bold ${highlight ? 'text-indigo-600' : 'text-slate-900'}`}>
+      <div className={`font-heading text-2xl sm:text-3xl font-bold ${highlight ? 'text-blue-600' : 'text-slate-900'}`}>
         <AnimatedCounter target={target} prefix={prefix} duration={1500} />
       </div>
       <div className="text-slate-400 text-xs font-medium uppercase tracking-wider mt-1.5">{label}</div>
@@ -152,7 +152,7 @@ function MarqueeBanner() {
       {items.map((item, i) => (
         <span key={i}>
           {item}
-          <span className="mx-4 text-indigo-300">◆</span>
+          <span className="mx-4 text-blue-300">◆</span>
         </span>
       ))}
     </span>
