@@ -36,13 +36,13 @@ export function TaskDetail() {
   if (!task) {
     return (
       <div className="max-w-4xl mx-auto px-4 py-16 text-center">
-        <div className="bg-dark-800/50 backdrop-blur-sm border border-dark-700 rounded-xl p-12">
+        <div className="bg-white border border-slate-100 rounded-xl p-12">
           <div className="text-5xl mb-4">404</div>
-          <h2 className="font-mono font-bold text-2xl mb-2 text-white">TASK NOT FOUND</h2>
-          <p className="text-dark-400 mb-6">This task does not exist or was removed.</p>
+          <h2 className="font-heading font-bold text-2xl mb-2 text-slate-900">TASK NOT FOUND</h2>
+          <p className="text-slate-500 mb-6">This task does not exist or was removed.</p>
           <button
             onClick={() => navigate('/')}
-            className="px-6 py-3 bg-dark-700 hover:bg-dark-600 border border-dark-600 rounded-lg font-mono text-sm text-white transition-colors"
+            className="px-6 py-3 bg-slate-100 hover:bg-slate-200 border border-slate-200 rounded-lg font-mono text-sm text-slate-900 transition-colors"
           >
             Back to Board
           </button>
@@ -167,7 +167,7 @@ export function TaskDetail() {
       {/* Back button */}
       <button
         onClick={() => navigate('/')}
-        className="flex items-center gap-2 text-dark-400 hover:text-white font-mono text-sm mb-6 transition-colors"
+        className="flex items-center gap-2 text-slate-500 hover:text-slate-900 text-sm mb-6 transition-colors"
       >
         <span>←</span> Back to Board
       </button>
@@ -176,22 +176,22 @@ export function TaskDetail() {
         {/* Main Content */}
         <div className="lg:col-span-2 space-y-6">
           {/* Header Card */}
-          <div className="bg-dark-800/50 backdrop-blur-sm border border-dark-700 rounded-xl overflow-hidden">
-            <div className="p-6 border-b border-dark-700">
+          <div className="bg-white border border-slate-100 rounded-xl overflow-hidden">
+            <div className="p-6 border-b border-slate-100">
               <div className="flex items-start justify-between gap-4 mb-4">
                 <StatusBadge status={task.status} size="md" />
                 {task.onchain && (
-                  <span className="px-3 py-1 bg-usdc-500/10 border border-usdc-500/30 rounded-full text-usdc-400 font-mono text-xs">
+                  <span className="px-3 py-1 bg-teal-50 border border-teal-200 rounded-full text-teal-600 font-mono text-xs">
                     On-chain
                   </span>
                 )}
               </div>
-              <h1 className="font-mono font-bold text-2xl sm:text-3xl text-white mb-3">{task.title}</h1>
+              <h1 className="font-mono font-bold text-2xl sm:text-3xl text-slate-900 mb-3">{task.title}</h1>
               <div className="flex flex-wrap gap-2">
                 {task.tags.map((tag) => (
                   <span
                     key={tag}
-                    className="px-2 py-1 bg-dark-700/50 border border-dark-600 rounded text-dark-300 font-mono text-xs"
+                    className="px-2 py-1 bg-slate-100 border border-slate-200 rounded text-slate-600 font-mono text-xs"
                   >
                     {tag}
                   </span>
@@ -200,8 +200,8 @@ export function TaskDetail() {
             </div>
 
             {/* Timeline */}
-            <div className="p-6 bg-dark-900/30">
-              <h3 className="font-mono text-xs uppercase tracking-wider text-dark-500 mb-4">Progress</h3>
+            <div className="p-6 bg-slate-50">
+              <h3 className="font-mono text-xs uppercase tracking-wider text-slate-400 mb-4">Progress</h3>
               <div className="flex items-center">
                 {TIMELINE_STEPS.map((step, i) => {
                   const isActive = i <= currentStep;
@@ -213,20 +213,20 @@ export function TaskDetail() {
                           w-10 h-10 rounded-full flex items-center justify-center font-mono font-bold text-sm
                           border-2 transition-all
                           ${isCurrent
-                            ? 'bg-usdc-500 border-usdc-400 text-white shadow-lg shadow-usdc-500/30'
+                            ? 'bg-teal-500 border-teal-400 text-slate-900 shadow-lg shadow-teal-500/20'
                             : isActive
                               ? 'bg-status-approved/20 border-status-approved text-status-approved'
-                              : 'bg-dark-800 border-dark-600 text-dark-500'
+                              : 'bg-slate-50 border-slate-200 text-slate-400'
                           }
                         `}>
                           {isActive ? '✓' : step.icon}
                         </div>
-                        <span className={`font-mono text-[10px] mt-2 uppercase ${isCurrent ? 'text-usdc-400' : 'text-dark-500'}`}>
+                        <span className={`font-mono text-[10px] mt-2 uppercase ${isCurrent ? 'text-teal-600' : 'text-slate-400'}`}>
                           {step.label}
                         </span>
                       </div>
                       {i < TIMELINE_STEPS.length - 1 && (
-                        <div className={`flex-1 h-0.5 mx-2 ${i < currentStep ? 'bg-status-approved' : 'bg-dark-700'}`} />
+                        <div className={`flex-1 h-0.5 mx-2 ${i < currentStep ? 'bg-status-approved' : 'bg-slate-100'}`} />
                       )}
                     </div>
                   );
@@ -241,16 +241,16 @@ export function TaskDetail() {
           </div>
 
           {/* Description */}
-          <div className="bg-dark-800/50 backdrop-blur-sm border border-dark-700 rounded-xl p-6">
-            <h3 className="font-mono text-xs uppercase tracking-wider text-dark-500 mb-3">Description</h3>
-            <p className="text-dark-200 leading-relaxed whitespace-pre-wrap">{task.description}</p>
+          <div className="bg-white border border-slate-100 rounded-xl p-6">
+            <h3 className="font-mono text-xs uppercase tracking-wider text-slate-400 mb-3">Description</h3>
+            <p className="text-slate-700 leading-relaxed whitespace-pre-wrap">{task.description}</p>
           </div>
 
           {/* Bids Section */}
           {task.status === 'open' && (
-            <div className="bg-dark-800/50 backdrop-blur-sm border border-dark-700 rounded-xl p-6">
+            <div className="bg-white border border-slate-100 rounded-xl p-6">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="font-mono text-xs uppercase tracking-wider text-dark-500">
+                <h3 className="font-mono text-xs uppercase tracking-wider text-slate-400">
                   Bids ({task.bidCount || task.bids?.length || 0})
                 </h3>
               </div>
@@ -266,12 +266,12 @@ export function TaskDetail() {
                         className={`p-4 rounded-lg border transition-all ${
                           bid.accepted
                             ? 'bg-status-approved/10 border-status-approved/30'
-                            : 'bg-dark-900/50 border-dark-600 hover:border-dark-500'
+                            : 'bg-slate-50 border-slate-200 hover:border-slate-300'
                         }`}
                       >
                         <div className="flex items-center justify-between gap-4">
                           <div className="min-w-0">
-                            <span className="font-mono text-sm text-white">{bid.bidder}</span>
+                            <span className="font-mono text-sm text-slate-900">{bid.bidder}</span>
                             {bid.accepted && (
                               <span className="ml-2 px-2 py-0.5 bg-status-approved/20 text-status-approved text-xs rounded">
                                 Accepted
@@ -280,8 +280,8 @@ export function TaskDetail() {
                           </div>
                           <div className="flex items-center gap-4">
                             <div className="text-right">
-                              <div className="font-mono font-bold text-usdc-400">${bid.price} USDC</div>
-                              <div className="text-dark-500 text-xs">
+                              <div className="font-mono font-bold text-teal-600">${bid.price} USDC</div>
+                              <div className="text-slate-400 text-xs">
                                 {bid.estimatedHours}h
                                 {savings > 0 && (
                                   <span className="text-status-approved ml-2">(-{savingsPercent}%)</span>
@@ -292,7 +292,7 @@ export function TaskDetail() {
                               <button
                                 onClick={() => handleAcceptBid(bid.bidderFull!)}
                                 disabled={isSubmitting}
-                                className="px-3 py-2 bg-usdc-600 hover:bg-usdc-500 disabled:opacity-50 text-white font-mono text-xs font-semibold rounded-lg transition-colors whitespace-nowrap"
+                                className="px-3 py-2 bg-slate-900 hover:bg-teal-500 disabled:opacity-50 text-slate-900 font-mono text-xs font-semibold rounded-lg transition-colors whitespace-nowrap"
                               >
                                 Accept Bid
                               </button>
@@ -304,38 +304,38 @@ export function TaskDetail() {
                   })}
                 </div>
               ) : (
-                <p className="text-dark-500 text-sm mb-6">No bids yet. Be the first to bid!</p>
+                <p className="text-slate-400 text-sm mb-6">No bids yet. Be the first to bid!</p>
               )}
 
               {/* Place Bid Form */}
-              <div className="border-t border-dark-700 pt-6">
-                <h4 className="font-mono text-sm text-white mb-4">Place Your Bid</h4>
+              <div className="border-t border-slate-100 pt-6">
+                <h4 className="font-mono text-sm text-slate-900 mb-4">Place Your Bid</h4>
                 <div className="grid sm:grid-cols-2 gap-4 mb-4">
                   <div>
-                    <label className="block font-mono text-xs text-dark-500 mb-2">Your Price (USDC)</label>
+                    <label className="block font-mono text-xs text-slate-400 mb-2">Your Price (USDC)</label>
                     <input
                       type="number"
                       value={bidPrice}
                       onChange={(e) => setBidPrice(e.target.value)}
                       placeholder="0.00"
-                      className="w-full px-4 py-3 bg-dark-900 border border-dark-600 rounded-lg font-mono text-white placeholder-dark-500 focus:outline-none focus:border-usdc-500 transition-colors"
+                      className="w-full px-4 py-3 bg-white border border-slate-200 rounded-lg font-mono text-slate-900 placeholder-slate-400 focus:outline-none focus:border-teal-400 transition-colors"
                     />
                   </div>
                   <div>
-                    <label className="block font-mono text-xs text-dark-500 mb-2">Estimated Hours</label>
+                    <label className="block font-mono text-xs text-slate-400 mb-2">Estimated Hours</label>
                     <input
                       type="number"
                       value={bidHours}
                       onChange={(e) => setBidHours(e.target.value)}
                       placeholder="0"
-                      className="w-full px-4 py-3 bg-dark-900 border border-dark-600 rounded-lg font-mono text-white placeholder-dark-500 focus:outline-none focus:border-usdc-500 transition-colors"
+                      className="w-full px-4 py-3 bg-white border border-slate-200 rounded-lg font-mono text-slate-900 placeholder-slate-400 focus:outline-none focus:border-teal-400 transition-colors"
                     />
                   </div>
                 </div>
                 <button
                   onClick={handlePlaceBid}
                   disabled={isSubmitting || !bidPrice || !bidHours}
-                  className="w-full px-6 py-3 bg-usdc-600 hover:bg-usdc-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-mono font-semibold rounded-lg transition-colors"
+                  className="w-full px-6 py-3 bg-slate-900 hover:bg-teal-500 disabled:opacity-50 disabled:cursor-not-allowed text-slate-900 font-mono font-semibold rounded-lg transition-colors"
                 >
                   {isSubmitting ? 'Submitting...' : 'Submit Bid'}
                 </button>
@@ -345,8 +345,8 @@ export function TaskDetail() {
 
           {/* Deliverable Section */}
           {task.deliverable && (
-            <div className="bg-dark-800/50 backdrop-blur-sm border border-dark-700 rounded-xl p-6">
-              <h3 className="font-mono text-xs uppercase tracking-wider text-dark-500 mb-3">Deliverable</h3>
+            <div className="bg-white border border-slate-100 rounded-xl p-6">
+              <h3 className="font-mono text-xs uppercase tracking-wider text-slate-400 mb-3">Deliverable</h3>
               <div className="p-4 bg-status-approved/10 border border-status-approved/30 rounded-lg">
                 <code className="text-status-approved font-mono text-sm break-all">{task.deliverable}</code>
               </div>
@@ -354,12 +354,12 @@ export function TaskDetail() {
           )}
 
           {/* Actions */}
-          <div className="bg-dark-800/50 backdrop-blur-sm border border-dark-700 rounded-xl p-6">
+          <div className="bg-white border border-slate-100 rounded-xl p-6">
             {task.status === 'open' && !hasBids && (
               <button
                 onClick={handleClaimTask}
                 disabled={isSubmitting}
-                className="w-full px-6 py-4 bg-status-claimed hover:bg-status-claimed/80 disabled:opacity-50 disabled:cursor-not-allowed text-white font-mono font-semibold rounded-lg transition-colors"
+                className="w-full px-6 py-4 bg-status-claimed hover:bg-status-claimed/80 disabled:opacity-50 disabled:cursor-not-allowed text-slate-900 font-mono font-semibold rounded-lg transition-colors"
               >
                 {isSubmitting ? 'Claiming...' : 'Claim This Task (Direct)'}
               </button>
@@ -372,12 +372,12 @@ export function TaskDetail() {
                   value={deliverableInput}
                   onChange={(e) => setDeliverableInput(e.target.value)}
                   placeholder="Deliverable link (URL, IPFS hash, etc.)"
-                  className="w-full px-4 py-3 bg-dark-900 border border-dark-600 rounded-lg font-mono text-white placeholder-dark-500 focus:outline-none focus:border-usdc-500 transition-colors"
+                  className="w-full px-4 py-3 bg-white border border-slate-200 rounded-lg font-mono text-slate-900 placeholder-slate-400 focus:outline-none focus:border-teal-400 transition-colors"
                 />
                 <button
                   onClick={handleSubmitDeliverable}
                   disabled={isSubmitting || !deliverableInput.trim()}
-                  className="w-full px-6 py-4 bg-status-submitted hover:bg-status-submitted/80 disabled:opacity-50 disabled:cursor-not-allowed text-white font-mono font-semibold rounded-lg transition-colors"
+                  className="w-full px-6 py-4 bg-status-submitted hover:bg-status-submitted/80 disabled:opacity-50 disabled:cursor-not-allowed text-slate-900 font-mono font-semibold rounded-lg transition-colors"
                 >
                   {isSubmitting ? 'Submitting...' : 'Submit Deliverable'}
                 </button>
@@ -389,14 +389,14 @@ export function TaskDetail() {
                 <button
                   onClick={handleApproveTask}
                   disabled={isSubmitting}
-                  className="flex-1 px-6 py-4 bg-status-approved hover:bg-status-approved/80 disabled:opacity-50 disabled:cursor-not-allowed text-white font-mono font-semibold rounded-lg transition-colors"
+                  className="flex-1 px-6 py-4 bg-status-approved hover:bg-status-approved/80 disabled:opacity-50 disabled:cursor-not-allowed text-slate-900 font-mono font-semibold rounded-lg transition-colors"
                 >
                   {isSubmitting ? 'Processing...' : 'Approve & Pay'}
                 </button>
                 <button
                   onClick={handleDisputeTask}
                   disabled={isSubmitting}
-                  className="flex-1 px-6 py-4 bg-status-disputed hover:bg-status-disputed/80 disabled:opacity-50 disabled:cursor-not-allowed text-white font-mono font-semibold rounded-lg transition-colors"
+                  className="flex-1 px-6 py-4 bg-status-disputed hover:bg-status-disputed/80 disabled:opacity-50 disabled:cursor-not-allowed text-slate-900 font-mono font-semibold rounded-lg transition-colors"
                 >
                   {isSubmitting ? 'Processing...' : 'Dispute'}
                 </button>
@@ -420,43 +420,43 @@ export function TaskDetail() {
         {/* Sidebar */}
         <div className="space-y-6">
           {/* Bounty Card */}
-          <div className="bg-gradient-to-br from-usdc-900/50 to-dark-800/50 backdrop-blur-sm border border-usdc-700/30 rounded-xl p-6">
-            <h3 className="font-mono text-xs uppercase tracking-wider text-usdc-400 mb-2">Bounty</h3>
-            <div className="font-mono font-bold text-4xl text-white mb-1">
+          <div className="bg-teal-50 border border-teal-100 rounded-xl p-6">
+            <h3 className="font-mono text-xs uppercase tracking-wider text-teal-600 mb-2">Bounty</h3>
+            <div className="font-mono font-bold text-4xl text-slate-900 mb-1">
               ${task.agreedPrice || task.bounty}
             </div>
-            <div className="text-usdc-400 text-sm">USDC</div>
+            <div className="text-teal-600 text-sm">USDC</div>
             {task.agreedPrice && task.agreedPrice !== task.bounty && (
-              <div className="mt-2 text-dark-500 text-xs">
+              <div className="mt-2 text-slate-400 text-xs">
                 Original: ${task.bounty} USDC
               </div>
             )}
           </div>
 
           {/* Poster Info */}
-          <div className="bg-dark-800/50 backdrop-blur-sm border border-dark-700 rounded-xl p-6">
-            <h3 className="font-mono text-xs uppercase tracking-wider text-dark-500 mb-3">Posted By</h3>
+          <div className="bg-white border border-slate-100 rounded-xl p-6">
+            <h3 className="font-mono text-xs uppercase tracking-wider text-slate-400 mb-3">Posted By</h3>
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-usdc-500 to-usdc-700 flex items-center justify-center text-white font-mono font-bold">
+              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-teal-500 to-teal-700 flex items-center justify-center text-slate-900 font-mono font-bold">
                 {task.poster.charAt(0)}
               </div>
               <div>
-                <div className="font-mono text-sm text-white">{task.poster}</div>
-                <div className="text-dark-500 text-xs">{task.timePosted}</div>
+                <div className="font-mono text-sm text-slate-900">{task.poster}</div>
+                <div className="text-slate-400 text-xs">{task.timePosted}</div>
               </div>
             </div>
           </div>
 
           {/* Worker Info */}
           {task.worker && (
-            <div className="bg-dark-800/50 backdrop-blur-sm border border-dark-700 rounded-xl p-6">
-              <h3 className="font-mono text-xs uppercase tracking-wider text-dark-500 mb-3">Worker</h3>
+            <div className="bg-white border border-slate-100 rounded-xl p-6">
+              <h3 className="font-mono text-xs uppercase tracking-wider text-slate-400 mb-3">Worker</h3>
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-status-claimed to-status-submitted flex items-center justify-center text-white font-mono font-bold">
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-status-claimed to-status-submitted flex items-center justify-center text-slate-900 font-mono font-bold">
                   {task.worker.charAt(0)}
                 </div>
                 <div>
-                  <div className="font-mono text-sm text-white">{task.worker}</div>
+                  <div className="font-mono text-sm text-slate-900">{task.worker}</div>
                 </div>
               </div>
             </div>
@@ -464,12 +464,12 @@ export function TaskDetail() {
 
           {/* Parent Task Info (for subtasks) */}
           {task.parentTaskId && (
-            <div className="bg-gradient-to-br from-purple-900/20 to-dark-800/50 backdrop-blur-sm border border-purple-700/30 rounded-xl p-6">
+            <div className="bg-white border border-slate-200 rounded-xl p-6">
               <div className="flex items-center gap-2 mb-3">
                 <span className="text-lg">⬆️</span>
-                <h3 className="font-mono text-xs uppercase tracking-wider text-purple-400">Part of Supply Chain</h3>
+                <h3 className="font-mono text-xs uppercase tracking-wider text-slate-500">Part of Supply Chain</h3>
               </div>
-              <p className="text-dark-400 text-xs mb-3">
+              <p className="text-slate-500 text-xs mb-3">
                 This is a subtask created by an agent working on a larger project.
               </p>
               {(() => {
@@ -477,17 +477,17 @@ export function TaskDetail() {
                 return (
                   <button
                     onClick={() => navigate(`/task/${task.parentTaskId}`)}
-                    className="block w-full text-left p-3 bg-dark-900/50 hover:bg-dark-900/80 border border-dark-700 hover:border-purple-600/50 rounded-lg transition-all group"
+                    className="block w-full text-left p-3 bg-slate-50 hover:bg-white/80 border border-slate-200 hover:border-teal-300 rounded-lg transition-all group"
                   >
                     <div className="flex items-center justify-between">
-                      <span className="font-mono text-sm text-white group-hover:text-purple-400 transition-colors">
+                      <span className="font-mono text-sm text-slate-900 group-hover:text-slate-500 transition-colors">
                         {parent?.title || task.parentTaskId}
                       </span>
-                      <span className="text-dark-500 group-hover:text-purple-400 transition-colors">→</span>
+                      <span className="text-slate-400 group-hover:text-slate-500 transition-colors">→</span>
                     </div>
                     {parent && (
-                      <div className="flex items-center gap-2 mt-2 text-xs text-dark-500">
-                        <span className="text-usdc-400 font-mono">${parent.agreedPrice || parent.bounty}</span>
+                      <div className="flex items-center gap-2 mt-2 text-xs text-slate-400">
+                        <span className="text-teal-600 font-mono">${parent.agreedPrice || parent.bounty}</span>
                         <span>by {parent.poster}</span>
                       </div>
                     )}
@@ -498,14 +498,14 @@ export function TaskDetail() {
           )}
 
           {task.subtasks && task.subtasks.length > 0 && (
-            <div className="bg-gradient-to-br from-blue-900/20 to-dark-800/50 backdrop-blur-sm border border-blue-700/30 rounded-xl p-6">
+            <div className="bg-white border border-slate-200 rounded-xl p-6">
               <div className="flex items-center gap-2 mb-4">
                 <span className="text-lg">🔗</span>
-                <h3 className="font-mono text-xs uppercase tracking-wider text-blue-400">
+                <h3 className="font-mono text-xs uppercase tracking-wider text-slate-500">
                   Agent Supply Chain ({task.subtasks.length} subtasks)
                 </h3>
               </div>
-              <p className="text-dark-400 text-xs mb-4">
+              <p className="text-slate-500 text-xs mb-4">
                 This task has been broken down into specialized subtasks assigned to other agents.
               </p>
               <div className="space-y-3">
@@ -515,13 +515,13 @@ export function TaskDetail() {
                     <button
                       key={subtaskId}
                       onClick={() => navigate(`/task/${subtaskId}`)}
-                      className="block w-full text-left p-3 bg-dark-900/50 hover:bg-dark-900/80 border border-dark-700 hover:border-blue-600/50 rounded-lg transition-all group"
+                      className="block w-full text-left p-3 bg-slate-50 hover:bg-white/80 border border-slate-200 hover:border-teal-300 rounded-lg transition-all group"
                     >
                       <div className="flex items-center justify-between">
-                        <span className="font-mono text-sm text-white group-hover:text-blue-400 transition-colors">
+                        <span className="font-mono text-sm text-slate-900 group-hover:text-slate-500 transition-colors">
                           {subtask?.title || subtaskId}
                         </span>
-                        <span className="text-dark-500 group-hover:text-blue-400 transition-colors">→</span>
+                        <span className="text-slate-400 group-hover:text-slate-500 transition-colors">→</span>
                       </div>
                       {subtask && (
                         <div className="flex items-center gap-3 mt-2 text-xs">
@@ -529,13 +529,13 @@ export function TaskDetail() {
                             subtask.status === 'approved' ? 'bg-status-approved/20 text-status-approved' :
                             subtask.status === 'submitted' ? 'bg-status-submitted/20 text-status-submitted' :
                             subtask.status === 'claimed' ? 'bg-status-claimed/20 text-status-claimed' :
-                            'bg-dark-700 text-dark-400'
+                            'bg-slate-100 text-slate-500'
                           }`}>
                             {subtask.status}
                           </span>
-                          <span className="text-usdc-400 font-mono">${subtask.agreedPrice || subtask.bounty}</span>
+                          <span className="text-teal-600 font-mono">${subtask.agreedPrice || subtask.bounty}</span>
                           {subtask.worker && (
-                            <span className="text-dark-500">→ {subtask.worker}</span>
+                            <span className="text-slate-400">→ {subtask.worker}</span>
                           )}
                         </div>
                       )}
@@ -548,13 +548,13 @@ export function TaskDetail() {
 
           {/* Transaction Info */}
           {task.txHash && (
-            <div className="bg-dark-800/50 backdrop-blur-sm border border-dark-700 rounded-xl p-6">
-              <h3 className="font-mono text-xs uppercase tracking-wider text-dark-500 mb-3">Transaction</h3>
+            <div className="bg-white border border-slate-100 rounded-xl p-6">
+              <h3 className="font-mono text-xs uppercase tracking-wider text-slate-400 mb-3">Transaction</h3>
               <a
                 href={`https://amoy.polygonscan.com/tx/${task.txHash}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-usdc-400 hover:text-usdc-300 font-mono text-xs break-all transition-colors"
+                className="text-teal-600 hover:text-teal-500 font-mono text-xs break-all transition-colors"
               >
                 {task.txHash.slice(0, 10)}...{task.txHash.slice(-8)} ↗
               </a>

@@ -65,8 +65,8 @@ const ICONS: Record<ToastType, string> = {
 const COLORS: Record<ToastType, string> = {
   success: 'bg-status-approved/20 border-status-approved/40 text-status-approved',
   error: 'bg-status-disputed/20 border-status-disputed/40 text-status-disputed',
-  info: 'bg-usdc-500/20 border-usdc-500/40 text-usdc-400',
-  loading: 'bg-dark-700 border-dark-600 text-dark-300',
+  info: 'bg-teal-50 border-teal-200 text-teal-700',
+  loading: 'bg-slate-100 border-slate-200 text-slate-600',
 };
 
 function ToastItem({ toast: t, onClose }: { toast: Toast; onClose: () => void }) {
