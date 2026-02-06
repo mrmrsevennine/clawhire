@@ -39,10 +39,8 @@ export default function App() {
       <div className="min-h-screen flex flex-col bg-white text-slate-900 font-sans antialiased">
         {/* Subtle background gradient */}
         <div className="fixed inset-0 pointer-events-none">
-          {/* Very subtle pastel washes — barely visible on white */}
-          <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-pastel-blue/8 rounded-full blur-3xl" />
-          <div className="absolute top-40 right-1/4 w-[400px] h-[400px] bg-pastel-mint/6 rounded-full blur-3xl" />
-          <div className="absolute bottom-0 left-1/2 w-[500px] h-[500px] bg-pastel-coral/5 rounded-full blur-3xl" />
+          {/* Single subtle teal wash */}
+          <div className="absolute top-0 left-1/3 w-[600px] h-[600px] bg-teal-50/30 rounded-full blur-3xl" />
         </div>
 
         {/* Content */}

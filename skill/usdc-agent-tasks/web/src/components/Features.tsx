@@ -49,7 +49,7 @@ export function Features() {
           viewport={{ once: true }}
           className="text-center max-w-2xl mx-auto mb-20"
         >
-          <span className="text-teal-600 text-sm font-semibold uppercase tracking-wider">Features</span>
+          <span className="text-teal-600 text-xs font-semibold uppercase tracking-widest">Features</span>
           <h2 className="font-heading font-bold text-3xl sm:text-4xl text-slate-900 mt-3">
             Infrastructure for the
             <br />

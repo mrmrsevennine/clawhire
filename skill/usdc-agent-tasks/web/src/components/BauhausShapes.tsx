@@ -1,64 +1,67 @@
 import { motion } from 'framer-motion';
 import { float, floatSlow } from '../lib/animations';
 
-// Bauhaus-inspired geometric decorations — pastel colors, clean shapes
-// Use sparingly on white backgrounds for subtle visual interest
+// Product-relevant geometric decorations
+// Nodes + connections = agent network / marketplace
+// Single accent color: Mint (#5EEAD4) = USDC green
 
-export function BauhausCircle({ color = '#93C5FD', size = 80, className = '' }: { color?: string; size?: number; className?: string }) {
-  return (
-    <motion.div
-      {...float}
-      className={`absolute pointer-events-none ${className}`}
-      style={{ width: size, height: size }}
-    >
-      <div className="w-full h-full rounded-full opacity-40" style={{ backgroundColor: color }} />
-    </motion.div>
-  );
-}
-
-export function BauhausSquare({ color = '#5EEAD4', size = 60, rotation = 15, className = '' }: { color?: string; size?: number; rotation?: number; className?: string }) {
-  return (
-    <motion.div
-      {...floatSlow}
-      className={`absolute pointer-events-none ${className}`}
-      style={{ width: size, height: size, transform: `rotate(${rotation}deg)` }}
-    >
-      <div className="w-full h-full rounded-md opacity-30" style={{ backgroundColor: color }} />
-    </motion.div>
-  );
-}
-
-export function BauhausTriangle({ color = '#FDA4AF', size = 70, className = '' }: { color?: string; size?: number; className?: string }) {
+/** A single agent node — small circle with subtle pulse */
+export function AgentNode({ size = 8, className = '' }: { size?: number; className?: string }) {
   return (
     <motion.div
       {...float}
       className={`absolute pointer-events-none ${className}`}
     >
-      <svg width={size} height={size} viewBox="0 0 100 100" className="opacity-30">
-        <polygon points="50,10 90,90 10,90" fill={color} />
+      <div
+        className="rounded-full bg-teal-300/30 border border-teal-300/20"
+        style={{ width: size, height: size }}
+      />
+    </motion.div>
+  );
+}
+
+/** Connection line between nodes */
+export function ConnectionLine({ width = 80, angle = 0, className = '' }: { width?: number; angle?: number; className?: string }) {
+  return (
+    <div
+      className={`absolute pointer-events-none ${className}`}
+      style={{ transform: `rotate(${angle}deg)` }}
+    >
+      <div className="h-px bg-gradient-to-r from-transparent via-teal-200/40 to-transparent" style={{ width }} />
+    </div>
+  );
+}
+
+/** Small node cluster — represents agent network */
+export function NodeCluster({ className = '' }: { className?: string }) {
+  return (
+    <motion.div {...floatSlow} className={`absolute pointer-events-none ${className}`}>
+      <svg width="120" height="80" viewBox="0 0 120 80" fill="none" className="opacity-20">
+        {/* Connections */}
+        <line x1="20" y1="20" x2="60" y2="40" stroke="#5EEAD4" strokeWidth="1" />
+        <line x1="60" y1="40" x2="100" y2="25" stroke="#5EEAD4" strokeWidth="1" />
+        <line x1="60" y1="40" x2="80" y2="65" stroke="#5EEAD4" strokeWidth="1" />
+        <line x1="20" y1="20" x2="40" y2="60" stroke="#5EEAD4" strokeWidth="1" />
+        {/* Nodes */}
+        <circle cx="20" cy="20" r="4" fill="#5EEAD4" />
+        <circle cx="60" cy="40" r="5" fill="#5EEAD4" />
+        <circle cx="100" cy="25" r="3.5" fill="#5EEAD4" />
+        <circle cx="80" cy="65" r="3" fill="#5EEAD4" />
+        <circle cx="40" cy="60" r="3.5" fill="#5EEAD4" />
       </svg>
     </motion.div>
   );
 }
 
-export function BauhausLine({ color = '#93C5FD', width = 120, className = '' }: { color?: string; width?: number; className?: string }) {
+/** Dotted grid — represents distributed network */
+export function DotGrid({ className = '' }: { className?: string }) {
   return (
-    <div className={`absolute pointer-events-none ${className}`}>
-      <div className="h-[3px] rounded-full opacity-25" style={{ width, backgroundColor: color }} />
+    <div className={`absolute pointer-events-none opacity-[0.08] ${className}`}>
+      <div className="grid grid-cols-6 gap-6">
+        {Array.from({ length: 24 }).map((_, i) => (
+          <div key={i} className="w-1.5 h-1.5 rounded-full bg-teal-500" />
+        ))}
+      </div>
     </div>
-  );
-}
-
-// Composed Bauhaus decoration group
-export function BauhausDecoration() {
-  return (
-    <>
-      <BauhausCircle color="#93C5FD" size={90} className="top-20 left-[8%]" />
-      <BauhausSquare color="#5EEAD4" size={50} rotation={20} className="top-40 right-[12%]" />
-      <BauhausTriangle color="#FDA4AF" size={60} className="bottom-32 left-[15%]" />
-      <BauhausCircle color="#FDE68A" size={40} className="top-60 right-[25%]" />
-      <BauhausLine color="#5EEAD4" width={100} className="bottom-48 right-[8%] rotate-12" />
-      <BauhausSquare color="#93C5FD" size={35} rotation={45} className="bottom-20 right-[30%]" />
-    </>
   );
 }

@@ -63,7 +63,7 @@ export function HowItWorks() {
           viewport={{ once: true }}
           className="text-center max-w-2xl mx-auto mb-16"
         >
-          <span className="text-teal-600 text-sm font-semibold uppercase tracking-wider">How it works</span>
+          <span className="text-teal-600 text-xs font-semibold uppercase tracking-widest">How it works</span>
           <h2 className="font-heading font-bold text-3xl sm:text-4xl text-slate-900 mt-3">
             Put your AI agent to work.
             <br />
@@ -139,8 +139,8 @@ export function HowItWorks() {
                 <div className="font-heading font-bold text-slate-900 text-sm">{agent.model}</div>
                 <div className="text-slate-500 text-xs mt-1 mb-3">{agent.strength}</div>
                 <div className="flex items-center justify-between text-xs">
-                  <span className="flex items-center gap-1 text-emerald-600">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                  <span className="flex items-center gap-1 text-teal-600">
+                    <span className="w-1.5 h-1.5 rounded-full bg-teal-500" />
                     {agent.speed}
                   </span>
                   <span className="text-slate-400 font-mono">{agent.context} ctx</span>
