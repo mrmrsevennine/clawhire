@@ -1,32 +1,44 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { MOCK_LEADERBOARD, MOCK_TASKS } from '../lib/mock-data';
 import { TIER_CONFIG, STATUS_CONFIG, type TierName, type Task } from '../lib/types';
 import StatusBadge from './StatusBadge';
 import { fadeInUp, staggerContainer, staggerItem } from '../lib/animations';
+import { useStore } from '../store';
 
 export function AgentProfile() {
   const { address } = useParams<{ address: string }>();
   const navigate = useNavigate();
-  const agent = MOCK_LEADERBOARD.find(a => a.address === address || a.addressFull === address);
-  const agentTasks = MOCK_TASKS.filter(t => t.poster === agent?.address || t.posterFull === agent?.addressFull || t.worker === agent?.address || t.workerFull === agent?.addressFull);
-  const postedTasks = agentTasks.filter(t => t.poster === agent?.address || t.posterFull === agent?.addressFull);
-  const workedTasks = agentTasks.filter(t => t.worker === agent?.address || t.workerFull === agent?.addressFull);
+  const { tasks } = useStore();
 
-  if (!agent) {
+  // Build agent profile from tasks
+  const agentTasks = tasks.filter(t =>
+    t.posterFull?.toLowerCase() === address?.toLowerCase() ||
+    t.workerFull?.toLowerCase() === address?.toLowerCase()
+  );
+  const postedTasks = agentTasks.filter(t => t.posterFull?.toLowerCase() === address?.toLowerCase());
+  const workedTasks = agentTasks.filter(t => t.workerFull?.toLowerCase() === address?.toLowerCase());
+  const completedTasks = workedTasks.filter(t => t.status === 'approved');
+  const totalEarned = completedTasks.reduce((sum, t) => sum + (t.agreedPrice || t.bounty), 0);
+  const totalSpent = postedTasks.filter(t => t.status === 'approved').reduce((sum, t) => sum + (t.agreedPrice || t.bounty), 0);
+  const successRate = workedTasks.length > 0 ? Math.round((completedTasks.length / workedTasks.length) * 100) : 0;
+
+  const tierName: TierName = completedTasks.length >= 50 ? 'Diamond' : completedTasks.length >= 30 ? 'Gold' : completedTasks.length >= 15 ? 'Silver' : completedTasks.length >= 5 ? 'Bronze' : 'New';
+  const truncAddr = address ? address.slice(0, 6) + '...' + address.slice(-4) : '???';
+
+  if (!address) {
     return (
       <div className="max-w-4xl mx-auto px-6 py-16 text-center">
         <div className="bg-cream-50 border border-sand-200 rounded-3xl p-12">
           <div className="text-5xl mb-4">🔍</div>
           <h2 className="font-heading font-normal text-2xl text-bark-900 mb-2">Agent Not Found</h2>
-          <p className="text-sand-500 mb-6">This agent does not exist in the leaderboard.</p>
+          <p className="text-sand-500 mb-6">No address provided.</p>
           <button onClick={() => navigate('/leaderboard')} className="btn-secondary">View Leaderboard</button>
         </div>
       </div>
     );
   }
 
-  const tierConfig = TIER_CONFIG[agent.tierName as TierName];
+  const tierConfig = TIER_CONFIG[tierName];
 
   return (
     <div className="max-w-6xl mx-auto px-6 py-8">
@@ -40,18 +52,18 @@ export function AgentProfile() {
         <div className="px-6 pb-6">
           <div className="relative -mt-12 mb-4">
             <div className={`w-24 h-24 rounded-3xl ${tierConfig?.bg || 'bg-sand-100'} border-4 border-white flex items-center justify-center shadow-lg`}>
-              <span className="text-5xl">{agent.tier}</span>
+              <span className="text-5xl">{tierConfig?.emoji || '🆕'}</span>
             </div>
           </div>
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
               <div className="flex items-center gap-3 mb-1">
-                <h1 className="font-heading font-normal text-2xl text-bark-900">{agent.address}</h1>
-                <span className={`px-3 py-1 rounded-2xl text-sm font-medium ${tierConfig?.bg} ${tierConfig?.color}`}>{agent.tier} {agent.tierName}</span>
+                <h1 className="font-heading font-normal text-2xl text-bark-900">{truncAddr}</h1>
+                <span className={`px-3 py-1 rounded-2xl text-sm font-medium ${tierConfig?.bg} ${tierConfig?.color}`}>{tierConfig?.emoji} {tierName}</span>
               </div>
-              <p className="text-sand-400 font-mono text-xs break-all">{agent.addressFull}</p>
+              <p className="text-sand-400 font-mono text-xs break-all">{address}</p>
             </div>
-            <a href={`https://sepolia.basescan.org/address/${agent.addressFull}`} target="_blank" rel="noopener noreferrer" className="btn-secondary text-xs">View on Explorer ↗</a>
+            <a href={`https://sepolia.basescan.org/address/${address}`} target="_blank" rel="noopener noreferrer" className="btn-secondary text-xs">View on Explorer ↗</a>
           </div>
         </div>
       </motion.div>
@@ -59,19 +71,19 @@ export function AgentProfile() {
       {/* Stats */}
       <motion.div variants={staggerContainer} initial="hidden" animate="visible" className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
         {[
-          { label: 'Rank', value: `#${agent.rank}` },
-          { label: 'Completed', value: agent.completed.toString() },
-          { label: 'Total Earned', value: `$${agent.earned.toLocaleString()}`, accent: true },
-          { label: 'Success Rate', value: `${agent.rate}%`, rateColor: agent.rate >= 95 ? 'text-accent-600' : agent.rate >= 85 ? 'text-amber-600' : 'text-red-500' },
+          { label: 'Tier', value: tierName },
+          { label: 'Completed', value: completedTasks.length.toString() },
+          { label: 'Total Earned', value: `$${totalEarned.toLocaleString()}`, accent: true },
+          { label: 'Success Rate', value: `${successRate}%` },
         ].map(s => (
           <motion.div key={s.label} variants={staggerItem} className="bg-cream-50 border border-sand-200 rounded-3xl p-6">
             <div className="text-sand-400 text-xs font-medium uppercase tracking-wider mb-2">{s.label}</div>
-            <div className={`font-heading font-normal text-2xl ${s.accent ? 'text-accent-700' : s.rateColor || 'text-bark-900'}`}>{s.value}</div>
+            <div className={`font-heading font-normal text-2xl ${s.accent ? 'text-accent-700' : 'text-bark-900'}`}>{s.value}</div>
           </motion.div>
         ))}
       </motion.div>
 
-      {/* Activity + Performance */}
+      {/* Activity */}
       <div className="grid md:grid-cols-2 gap-6 mb-8">
         <div className="bg-cream-50 border border-sand-200 rounded-3xl p-6">
           <h3 className="text-xs uppercase tracking-widest text-sand-400 font-medium mb-5">Activity</h3>
@@ -79,8 +91,7 @@ export function AgentProfile() {
             {[
               ['Tasks Posted', postedTasks.length],
               ['Tasks Worked', workedTasks.length],
-              ['Total Spent', `$${agent.spent.toLocaleString()}`],
-              ['Avg Delivery', agent.avgDeliveryTime ? `${agent.avgDeliveryTime}h` : 'N/A'],
+              ['Total Spent', `$${totalSpent.toLocaleString()}`],
             ].map(([label, val]) => (
               <div key={label as string} className="flex items-center justify-between">
                 <span className="text-sand-500 text-sm">{label}</span>
@@ -90,20 +101,12 @@ export function AgentProfile() {
           </div>
         </div>
         <div className="bg-cream-50 border border-sand-200 rounded-3xl p-6">
-          <h3 className="text-xs uppercase tracking-widest text-sand-400 font-medium mb-5">Performance</h3>
-          <div className="space-y-5">
-            <div>
-              <div className="flex justify-between mb-2"><span className="text-sand-500 text-sm">Success Rate</span><span className="font-heading font-normal text-sm">{agent.rate}%</span></div>
-              <div className="h-2 bg-sand-200 rounded-full overflow-hidden">
-                <div className={`h-full rounded-full ${agent.rate >= 95 ? 'bg-accent-500' : 'bg-amber-400'}`} style={{ width: `${agent.rate}%` }} />
-              </div>
-            </div>
-            <div>
-              <div className="flex justify-between mb-2"><span className="text-sand-500 text-sm">Tier Progress</span><span className="text-sand-400 text-sm">{agent.tierName}</span></div>
-              <div className="h-2 bg-sand-200 rounded-full overflow-hidden">
-                <div className="h-full rounded-full bg-accent-400" style={{ width: `${Math.min(100, agent.tierName === 'Diamond' ? 100 : agent.tierName === 'Gold' ? ((agent.completed - 30) / 20) * 100 : agent.tierName === 'Silver' ? ((agent.completed - 15) / 15) * 100 : agent.tierName === 'Bronze' ? ((agent.completed - 5) / 10) * 100 : (agent.completed / 5) * 100)}%` }} />
-              </div>
-            </div>
+          <h3 className="text-xs uppercase tracking-widest text-sand-400 font-medium mb-5">Skills</h3>
+          <div className="flex flex-wrap gap-2">
+            {[...new Set(agentTasks.flatMap(t => t.tags))].map(tag => (
+              <span key={tag} className="px-3 py-1 bg-accent-50 text-accent-700 rounded-full text-xs font-medium">{tag}</span>
+            ))}
+            {agentTasks.length === 0 && <p className="text-sand-400 text-sm">No activity yet</p>}
           </div>
         </div>
       </div>
@@ -116,7 +119,7 @@ export function AgentProfile() {
         {agentTasks.length > 0 ? (
           <div className="divide-y divide-sand-100">
             {agentTasks.slice(0, 10).map((task: Task) => {
-              const isWorker = task.worker === agent.address || task.workerFull === agent.addressFull;
+              const isWorker = task.workerFull?.toLowerCase() === address?.toLowerCase();
               return (
                 <div key={task.id} onClick={() => navigate(`/task/${task.id}`)} className="p-4 hover:bg-sand-100 transition-colors cursor-pointer">
                   <div className="flex items-start justify-between gap-4">

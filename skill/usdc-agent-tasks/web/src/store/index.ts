@@ -1,7 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { Task, TaskStatus } from '../lib/types';
-import { MOCK_TASKS } from '../lib/mock-data';
 
 interface WalletState {
   address: string | null;
@@ -31,7 +30,7 @@ interface AppStore {
 export const useStore = create<AppStore>()(
   persist(
     (set, get) => ({
-      tasks: MOCK_TASKS,
+      tasks: [],
       filter: 'all',
       tagFilter: null,
       selectedTaskId: null,
@@ -69,7 +68,7 @@ export const useStore = create<AppStore>()(
       setPostModalOpen: (open) => set({ postModalOpen: open }),
     }),
     {
-      name: 'clawhire-storage',
+      name: 'clawhire-v2',
       partialize: (state) => ({
         // Only persist tasks (not modal state or filters)
         tasks: state.tasks,

@@ -2,7 +2,6 @@ import { useCallback, useState, useMemo, useEffect } from 'react';
 import { useStore } from '../store';
 import { useContract } from './useContract';
 import type { Task, TaskStatus, Bid } from '../lib/types';
-import { MOCK_LEADERBOARD } from '../lib/mock-data';
 import { blockchainService } from '../lib/blockchain';
 
 export function useTasks() {
@@ -54,7 +53,7 @@ export function useTasks() {
       totalTasks: onChainStats?.tasksCreated || tasks.length,
       totalUsdc: onChainStats?.volumeUsdc || localTotalVolume,
       totalVolume: onChainStats?.volumeUsdc || localTotalVolume,
-      activeAgents: onChainStats?.registeredAgents || MOCK_LEADERBOARD.length,
+      activeAgents: onChainStats?.registeredAgents || 0,
       openTasks: localOpenTasks,
       completedTasks: onChainStats?.tasksCompleted || localCompletedTasks,
       feesCollected,
