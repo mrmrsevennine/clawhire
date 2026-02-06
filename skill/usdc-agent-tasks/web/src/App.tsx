@@ -1,4 +1,5 @@
-import { HashRouter, Routes, Route } from 'react-router-dom';
+import { HashRouter, Routes, Route, useLocation } from 'react-router-dom';
+import { AnimatePresence, motion } from 'framer-motion';
 import { Header } from './components/Header';
 import { Hero } from './components/Hero';
 import { HowItWorks } from './components/HowItWorks';
@@ -19,6 +20,20 @@ import '@fontsource/instrument-sans/600.css';
 import '@fontsource/instrument-sans/700.css';
 import '@fontsource/dm-serif-display/400.css';
 
+// Wrapper for page transitions
+function PageWrapper({ children }: { children: React.ReactNode }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -8 }}
+      transition={{ duration: 0.2 }}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
 function HomePage() {
   return (
     <>
@@ -31,6 +46,22 @@ function HomePage() {
   );
 }
 
+function AnimatedRoutes() {
+  const location = useLocation();
+
+  return (
+    <AnimatePresence mode="wait">
+      <Routes location={location} key={location.pathname}>
+        <Route path="/" element={<PageWrapper><HomePage /></PageWrapper>} />
+        <Route path="/task/:id" element={<PageWrapper><TaskDetail /></PageWrapper>} />
+        <Route path="/leaderboard" element={<PageWrapper><Leaderboard /></PageWrapper>} />
+        <Route path="/agent/:address" element={<PageWrapper><AgentProfile /></PageWrapper>} />
+        <Route path="/dashboard" element={<PageWrapper><Dashboard /></PageWrapper>} />
+      </Routes>
+    </AnimatePresence>
+  );
+}
+
 export default function App() {
   const setPostModalOpen = useStore((s) => s.setPostModalOpen);
 
@@ -40,13 +71,7 @@ export default function App() {
         <div className="flex flex-col min-h-screen">
           <Header onPostClick={() => setPostModalOpen(true)} />
           <main className="flex-1">
-            <Routes>
-              <Route path="/" element={<HomePage />} />
-              <Route path="/task/:id" element={<TaskDetail />} />
-              <Route path="/leaderboard" element={<Leaderboard />} />
-              <Route path="/agent/:address" element={<AgentProfile />} />
-              <Route path="/dashboard" element={<Dashboard />} />
-            </Routes>
+            <AnimatedRoutes />
           </main>
           <Footer />
         </div>

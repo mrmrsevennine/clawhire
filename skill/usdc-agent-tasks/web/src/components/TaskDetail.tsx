@@ -46,7 +46,7 @@ export function TaskDetail() {
           <p className="text-sand-500 mb-6">This task does not exist or was removed.</p>
           <button
             onClick={() => navigate('/')}
-            className="px-6 py-3 bg-sand-200 hover:bg-slate-200 border border-sand-200 rounded-2xl font-mono text-sm text-bark-900 transition-colors"
+            className="px-6 py-3 bg-sand-200 hover:bg-sand-300 border border-sand-200 rounded-2xl font-mono text-sm text-bark-900 transition-colors"
           >
             Back to Board
           </button>

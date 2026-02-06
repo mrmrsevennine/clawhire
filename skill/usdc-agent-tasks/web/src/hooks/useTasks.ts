@@ -1,41 +1,66 @@
-import { useCallback, useState, useMemo } from 'react';
+import { useCallback, useState, useMemo, useEffect } from 'react';
 import { useStore } from '../store';
 import { useContract } from './useContract';
 import type { Task, TaskStatus, Bid } from '../lib/types';
 import { MOCK_LEADERBOARD } from '../lib/mock-data';
+import { blockchainService } from '../lib/blockchain';
 
 export function useTasks() {
   const { tasks, filter, setFilter, tagFilter, setTagFilter, allTags, selectedTaskId, setSelectedTask, addTask, updateTask, filteredTasks, wallet } = useStore();
   const contract = useContract();
   const [loading, setLoading] = useState(false);
+  const [loadingStats, setLoadingStats] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [txHash, setTxHash] = useState<string | null>(null);
+  const [onChainStats, setOnChainStats] = useState<{
+    tasksCreated: number;
+    tasksCompleted: number;
+    volumeUsdc: number;
+    registeredAgents: number;
+  } | null>(null);
+
+  // Fetch on-chain stats on mount
+  useEffect(() => {
+    const fetchStats = async () => {
+      setLoadingStats(true);
+      try {
+        const stats = await blockchainService.getStats();
+        setOnChainStats(stats);
+      } catch (err) {
+        console.error('Failed to fetch on-chain stats:', err);
+      } finally {
+        setLoadingStats(false);
+      }
+    };
+    fetchStats();
+  }, []);
 
   const getTaskById = (id: string): Task | undefined => tasks.find((t) => t.id === id);
   const selectedTask = selectedTaskId ? getTaskById(selectedTaskId) : null;
 
-  // Compute stats dynamically from actual task data
+  // Compute stats - prefer on-chain data when available
   const stats = useMemo(() => {
-    const openTasks = tasks.filter(t => t.status === 'open').length;
-    const completedTasks = tasks.filter(t => t.status === 'approved').length;
-    const totalVolume = tasks.reduce((sum, t) => sum + t.bounty, 0);
+    const localOpenTasks = tasks.filter(t => t.status === 'open').length;
+    const localCompletedTasks = tasks.filter(t => t.status === 'approved').length;
+    const localTotalVolume = tasks.reduce((sum, t) => sum + t.bounty, 0);
     const totalBids = tasks.reduce((sum, t) => sum + (t.bidCount || 0), 0);
     const feesCollected = Math.round(
       tasks.filter(t => t.status === 'approved')
         .reduce((sum, t) => sum + (t.agreedPrice || t.bounty), 0) * 0.025 * 100
     ) / 100;
 
+    // Use on-chain stats if available, otherwise use local data
     return {
-      totalTasks: tasks.length,
-      totalUsdc: totalVolume,
-      totalVolume: totalVolume,
-      activeAgents: MOCK_LEADERBOARD.length,
-      openTasks,
-      completedTasks,
+      totalTasks: onChainStats?.tasksCreated || tasks.length,
+      totalUsdc: onChainStats?.volumeUsdc || localTotalVolume,
+      totalVolume: onChainStats?.volumeUsdc || localTotalVolume,
+      activeAgents: onChainStats?.registeredAgents || MOCK_LEADERBOARD.length,
+      openTasks: localOpenTasks,
+      completedTasks: onChainStats?.tasksCompleted || localCompletedTasks,
       feesCollected,
       totalBids,
     };
-  }, [tasks]);
+  }, [tasks, onChainStats]);
 
   const truncateAddress = (addr: string) => addr.slice(0, 6) + '...' + addr.slice(-4);
 
@@ -310,6 +335,7 @@ export function useTasks() {
     disputeTask,
     // State
     loading,
+    loadingStats,
     error,
     txHash,
     clearError,

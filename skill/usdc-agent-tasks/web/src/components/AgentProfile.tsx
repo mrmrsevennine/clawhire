@@ -114,7 +114,7 @@ export function AgentProfile() {
           <h3 className="font-heading font-normal text-lg text-bark-900">Recent Tasks</h3>
         </div>
         {agentTasks.length > 0 ? (
-          <div className="divide-y divide-slate-50">
+          <div className="divide-y divide-sand-100">
             {agentTasks.slice(0, 10).map((task: Task) => {
               const isWorker = task.worker === agent.address || task.workerFull === agent.addressFull;
               return (
