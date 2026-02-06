@@ -49,15 +49,15 @@ export function PostTaskModal() {
   return (
     <AnimatePresence>
       <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 bg-slate-900/30 backdrop-blur-sm" onClick={() => setPostModalOpen(false)} />
-        <motion.div initial={{ opacity: 0, scale: 0.95, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 20 }} transition={{ type: 'spring', damping: 25, stiffness: 300 }} className="relative w-full max-w-lg bg-white border border-slate-200 rounded-2xl shadow-2xl max-h-[90vh] overflow-y-auto">
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 bg-bark-900/30 backdrop-blur-sm" onClick={() => setPostModalOpen(false)} />
+        <motion.div initial={{ opacity: 0, scale: 0.95, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 20 }} transition={{ type: 'spring', damping: 25, stiffness: 300 }} className="relative w-full max-w-lg bg-cream-50 border border-sand-200 rounded-3xl shadow-2xl max-h-[90vh] overflow-y-auto">
           {/* Header */}
-          <div className="border-b border-slate-100 p-6 flex items-center justify-between">
+          <div className="border-b border-sand-200 p-6 flex items-center justify-between">
             <div>
-              <h2 className="font-heading font-bold text-xl text-slate-900">Post a Task</h2>
-              <p className="text-slate-500 text-sm mt-1">Create a new task for agents to bid on</p>
+              <h2 className="font-heading font-normal text-xl text-bark-900">Post a Task</h2>
+              <p className="text-sand-500 text-sm mt-1">Create a new task for agents to bid on</p>
             </div>
-            <button onClick={() => setPostModalOpen(false)} className="w-10 h-10 rounded-xl bg-slate-50 hover:bg-slate-100 flex items-center justify-center text-slate-400 hover:text-slate-600 transition-colors text-lg">×</button>
+            <button onClick={() => setPostModalOpen(false)} className="w-10 h-10 rounded-3xl bg-sand-100 hover:bg-sand-200 flex items-center justify-center text-sand-400 hover:text-sand-600 transition-colors text-lg">×</button>
           </div>
 
           <form onSubmit={handleSubmit} className="p-6 space-y-5">
@@ -72,9 +72,9 @@ export function PostTaskModal() {
             <Field label="Bounty (USDC)">
               <div className="relative">
                 <input type="number" value={bounty} onChange={e => setBounty(e.target.value)} placeholder="0.00" min="1" step="0.01" className="input-field pr-20" required />
-                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-teal-600 text-sm font-semibold">USDC</span>
+                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-accent-600 text-sm font-semibold">USDC</span>
               </div>
-              {bountyNum > 0 && <p className="text-slate-400 text-xs mt-2">Platform fee (2.5%): ${platformFee.toFixed(2)} USDC</p>}
+              {bountyNum > 0 && <p className="text-sand-400 text-xs mt-2">Platform fee (2.5%): ${platformFee.toFixed(2)} USDC</p>}
             </Field>
 
             <Field label="Tags (comma-separated)">
@@ -82,23 +82,23 @@ export function PostTaskModal() {
             </Field>
 
             {/* On-chain Toggle */}
-            <div className="p-4 bg-slate-50 border border-slate-100 rounded-xl">
+            <div className="p-4 bg-sand-100 border border-sand-200 rounded-3xl">
               <div className="flex items-center justify-between">
                 <div>
-                  <div className="text-sm font-semibold text-slate-900">On-chain Escrow</div>
-                  <div className="text-slate-500 text-xs mt-0.5">Lock USDC in smart contract for guaranteed payment</div>
+                  <div className="text-sm font-semibold text-bark-900">On-chain Escrow</div>
+                  <div className="text-sand-500 text-xs mt-0.5">Lock USDC in smart contract for guaranteed payment</div>
                 </div>
-                <button type="button" onClick={() => setOnChain(!onChain)} className={`w-12 h-7 rounded-full relative transition-colors ${onChain ? 'bg-teal-500' : 'bg-slate-300'}`}>
-                  <div className={`w-5 h-5 bg-white rounded-full absolute top-1 transition-all shadow-sm ${onChain ? 'left-6' : 'left-1'}`} />
+                <button type="button" onClick={() => setOnChain(!onChain)} className={`w-12 h-7 rounded-full relative transition-colors ${onChain ? 'bg-accent-500' : 'bg-slate-300'}`}>
+                  <div className={`w-5 h-5 bg-cream-50 rounded-full absolute top-1 transition-all shadow-sm ${onChain ? 'left-6' : 'left-1'}`} />
                 </button>
               </div>
             </div>
 
-            <button type="submit" disabled={isSubmitting || loading} className="w-full px-6 py-4 bg-slate-900 hover:bg-slate-800 disabled:bg-slate-300 disabled:cursor-not-allowed text-white font-semibold rounded-xl transition-all hover:shadow-lg hover:shadow-slate-900/10">
+            <button type="submit" disabled={isSubmitting || loading} className="w-full px-6 py-4 bg-bark-900 hover:bg-slate-800 disabled:bg-slate-300 disabled:cursor-not-allowed text-white font-semibold rounded-3xl transition-all hover:shadow-lg hover:shadow-slate-900/10">
               {isSubmitting ? 'Posting...' : bountyNum > 0 ? `Post Task — Deposit $${bountyNum.toFixed(2)} USDC` : 'Post Task'}
             </button>
 
-            <p className="text-center text-slate-400 text-xs">
+            <p className="text-center text-sand-400 text-xs">
               By posting, you agree to deposit USDC into escrow until task completion.
             </p>
           </form>
@@ -111,7 +111,7 @@ export function PostTaskModal() {
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div>
-      <label className="block text-xs uppercase tracking-wider text-slate-400 font-medium mb-2">{label}</label>
+      <label className="block text-xs uppercase tracking-wider text-sand-400 font-medium mb-2">{label}</label>
       {children}
     </div>
   );

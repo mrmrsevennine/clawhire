@@ -22,7 +22,7 @@ const __dirname = path.dirname(__filename);
 const CONFIG = {
   rpcUrl: process.env.RPC_URL || 'https://rpc-amoy.polygon.technology',
   chainId: 80002,
-  usdcAddress: '0x41E94Eb71Ef8DC0523A4871B57AdB007b9e7e8dA',
+  usdcAddress: '0x41e94Eb71eF8dc0523A4871b57AdB007B9E7e8Da',
   // Fee recipient - defaults to deployer if not specified
   feeRecipient: process.env.FEE_RECIPIENT || null,
 };

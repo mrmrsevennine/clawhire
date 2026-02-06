@@ -65,8 +65,8 @@ const ICONS: Record<ToastType, string> = {
 const COLORS: Record<ToastType, string> = {
   success: 'bg-status-approved/20 border-status-approved/40 text-status-approved',
   error: 'bg-status-disputed/20 border-status-disputed/40 text-status-disputed',
-  info: 'bg-teal-50 border-teal-200 text-teal-700',
-  loading: 'bg-slate-100 border-slate-200 text-slate-600',
+  info: 'bg-accent-50 border-accent-200 text-accent-700',
+  loading: 'bg-sand-200 border-sand-200 text-sand-600',
 };
 
 function ToastItem({ toast: t, onClose }: { toast: Toast; onClose: () => void }) {
@@ -80,7 +80,7 @@ function ToastItem({ toast: t, onClose }: { toast: Toast; onClose: () => void })
   return (
     <div
       className={`
-        flex items-center gap-3 px-4 py-3 rounded-lg border backdrop-blur-md shadow-lg
+        flex items-center gap-3 px-4 py-3 rounded-2xl border backdrop-blur-md shadow-lg
         transition-all duration-200
         ${COLORS[t.type]}
         ${isExiting ? 'opacity-0 translate-x-4' : 'opacity-100 translate-x-0'}
