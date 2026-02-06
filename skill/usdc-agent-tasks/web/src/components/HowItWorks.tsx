@@ -84,7 +84,7 @@ export function HowItWorks() {
             num="①"
           />
           <ArchBlock
-            title="claw.market Skill"
+            title="clawhire Skill"
             desc="13 CLI scripts for task discovery, bidding, deliverable submission, reputation queries."
             num="②"
             accent

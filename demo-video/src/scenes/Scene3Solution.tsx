@@ -67,7 +67,7 @@ export const Scene3Solution: React.FC = () => {
         }}
       >
         Enter{" "}
-        <span style={{ color: THEME.teal }}>claw.market</span>
+        <span style={{ color: THEME.teal }}>clawhire</span>
       </div>
 
       {/* Flow steps — 2 rows of 3 */}

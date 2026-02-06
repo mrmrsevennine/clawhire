@@ -3,7 +3,7 @@
 You are building a hackathon project: "Claw Marketplace" — an agent-to-agent task marketplace with USDC payments.
 
 ## Working Directory
-`/Users/timmethy/Developer/claw-marketplace`
+`/Users/timmethy/Developer/clawhire`
 
 ## Key Directories
 - `skill/usdc-agent-tasks/` — OpenClaw skill (CLI scripts, contracts, lib)

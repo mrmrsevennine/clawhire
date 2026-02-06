@@ -37,7 +37,7 @@ export function Header({ onPostClick }: Props) {
           </svg>
           <span className="text-lg tracking-tight">
             <span className={`font-heading transition-colors ${scrolled ? 'text-bark-900' : 'text-cream-100'}`}>claw</span>
-            <span className={`font-heading transition-colors ${scrolled ? 'text-sand-400' : 'text-cream-100/40'}`}>.market</span>
+            <span className={`font-heading transition-colors ${scrolled ? 'text-sand-400' : 'text-cream-100/40'}`}>hire</span>
           </span>
         </Link>
 

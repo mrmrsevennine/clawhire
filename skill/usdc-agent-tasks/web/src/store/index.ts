@@ -69,7 +69,7 @@ export const useStore = create<AppStore>()(
       setPostModalOpen: (open) => set({ postModalOpen: open }),
     }),
     {
-      name: 'claw-marketplace-storage',
+      name: 'clawhire-storage',
       partialize: (state) => ({
         // Only persist tasks (not modal state or filters)
         tasks: state.tasks,

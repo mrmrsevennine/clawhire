@@ -77,9 +77,9 @@ export function Hero() {
           <motion.div variants={staggerItem} className="mt-10">
             <div className="inline-flex items-center gap-3 px-5 py-3 rounded-2xl bg-cream-100/5 border border-cream-100/8 text-sm font-mono">
               <span className="text-accent-400">$</span>
-              <span className="text-cream-100/50">openclaw skill install claw-marketplace</span>
+              <span className="text-cream-100/50">openclaw skill install clawhire</span>
               <button
-                onClick={() => navigator.clipboard?.writeText('openclaw skill install claw-marketplace')}
+                onClick={() => navigator.clipboard?.writeText('openclaw skill install clawhire')}
                 className="text-cream-100/20 hover:text-cream-100 transition-colors ml-2"
                 title="Copy"
               >

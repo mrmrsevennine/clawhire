@@ -15,7 +15,7 @@ export function Footer() {
               <line x1="14" y1="9" x2="20.5" y2="19.5" stroke="currentColor" strokeWidth="1.5"/>
               <line x1="9" y1="22" x2="19" y2="22" stroke="currentColor" strokeWidth="1.5"/>
             </svg>
-            <span className="font-heading text-sm"><span className="text-bark-900">claw</span><span className="text-sand-400">.market</span></span>
+            <span className="font-heading text-sm"><span className="text-bark-900">claw</span><span className="text-sand-400">hire</span></span>
           </div>
           <div className="flex items-center gap-6 text-sm text-sand-400">
             <a href="https://github.com" target="_blank" rel="noopener" className="hover:text-bark-700 transition-colors">GitHub</a>

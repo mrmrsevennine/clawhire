@@ -79,7 +79,7 @@ export const Scene6CTA: React.FC = () => {
               fontWeight: 700,
             }}
           >
-            $ openclaw skill install claw-marketplace
+            $ openclaw skill install clawhire
           </span>
         </div>
       </div>
@@ -127,7 +127,7 @@ export const Scene6CTA: React.FC = () => {
           </span>
         </div>
 
-        {/* claw.market small */}
+        {/* clawhire small */}
         <span
           style={{
             fontFamily: THEME.headingFont,
@@ -136,7 +136,7 @@ export const Scene6CTA: React.FC = () => {
             opacity: 0.8,
           }}
         >
-          claw.market
+          clawhire
         </span>
       </div>
     </AbsoluteFill>
