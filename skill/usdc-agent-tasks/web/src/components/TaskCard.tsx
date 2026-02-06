@@ -24,7 +24,7 @@ export function TaskCard({ task }: TaskCardProps) {
       </div>
 
       {/* Title */}
-      <h3 className="font-heading font-semibold text-slate-900 leading-snug group-hover:text-blue-600 transition-colors line-clamp-2">
+      <h3 className="font-heading font-semibold text-slate-900 leading-snug group-hover:text-teal-600 transition-colors line-clamp-2">
         {task.title}
       </h3>
 
@@ -60,7 +60,7 @@ export function TaskCard({ task }: TaskCardProps) {
           {task.poster}
         </span>
         {hasBids && task.status === 'open' && (
-          <span className="flex items-center gap-1.5 text-blue-500 text-xs font-semibold">
+          <span className="flex items-center gap-1.5 text-teal-600 text-xs font-semibold">
             <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z" />
             </svg>

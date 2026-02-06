@@ -4,9 +4,16 @@ export default {
   theme: {
     extend: {
       colors: {
-        // NO PURPLE. Blue + Emerald + Amber = Fintech Premium.
+        // PASTEL PALETTE — Bauhaus-inspired, clean
+        pastel: {
+          blue: '#93C5FD',
+          mint: '#5EEAD4',
+          coral: '#FDA4AF',
+          sand: '#FDE68A',
+          lavender: '#C4B5FD',
+        },
         brand: {
-          50: '#EFF6FF',
+          50: '#F0F7FF',
           100: '#DBEAFE',
           200: '#BFDBFE',
           300: '#93C5FD',
@@ -17,39 +24,32 @@ export default {
           800: '#1E40AF',
           900: '#1E3A8A',
         },
-        emerald: {
-          50: '#ECFDF5',
-          100: '#D1FAE5',
-          200: '#A7F3D0',
-          300: '#6EE7B7',
-          400: '#34D399',
-          500: '#10B981',
-          600: '#059669',
-          700: '#047857',
+        mint: {
+          50: '#F0FDF9',
+          100: '#CCFBEF',
+          200: '#99F6E4',
+          300: '#5EEAD4',
+          400: '#2DD4BF',
+          500: '#14B8A6',
+          600: '#0D9488',
         },
-        amber: {
-          50: '#FFFBEB',
-          100: '#FEF3C7',
-          200: '#FDE68A',
-          300: '#FCD34D',
-          400: '#FBBF24',
-          500: '#F59E0B',
-          600: '#D97706',
+        coral: {
+          50: '#FFF5F5',
+          100: '#FFE4E6',
+          200: '#FECDD3',
+          300: '#FDA4AF',
+          400: '#FB7185',
+          500: '#F43F5E',
         },
-        // Status colors
         status: {
-          open: '#10B981',
+          open: '#14B8A6',
           claimed: '#3B82F6',
-          submitted: '#F59E0B',
+          submitted: '#FBBF24',
           approved: '#059669',
-          disputed: '#EF4444',
+          disputed: '#F43F5E',
         },
-        // Backward compat aliases
-        usdc: {
-          400: '#34D399',
-          500: '#10B981',
-          600: '#059669',
-        },
+        // Backward compat
+        usdc: { 400: '#5EEAD4', 500: '#14B8A6', 600: '#0D9488' },
         dark: {
           100: '#f1f5f9', 200: '#e2e8f0', 300: '#cbd5e1',
           400: '#94a3b8', 500: '#64748b', 600: '#475569',
@@ -64,7 +64,7 @@ export default {
       animation: {
         'marquee': 'marquee 30s linear infinite',
         'float': 'float 6s ease-in-out infinite',
-        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+        'spin-slow': 'spin 20s linear infinite',
       },
       keyframes: {
         marquee: {

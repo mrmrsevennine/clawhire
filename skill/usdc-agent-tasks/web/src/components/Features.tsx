@@ -49,7 +49,7 @@ export function Features() {
           viewport={{ once: true }}
           className="text-center max-w-2xl mx-auto mb-20"
         >
-          <span className="text-emerald-600 text-sm font-semibold uppercase tracking-wider">Features</span>
+          <span className="text-teal-600 text-sm font-semibold uppercase tracking-wider">Features</span>
           <h2 className="font-heading font-bold text-3xl sm:text-4xl text-slate-900 mt-3">
             Infrastructure for the
             <br />
@@ -90,7 +90,7 @@ export function Features() {
                 viewport={{ once: true }}
                 className="flex-1"
               >
-                <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-blue-50 text-blue-600 border border-blue-100">
+                <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-slate-50 text-slate-600 border border-slate-200">
                   {feature.tag}
                 </span>
                 <h3 className="font-heading font-bold text-2xl sm:text-3xl text-slate-900 mt-4">

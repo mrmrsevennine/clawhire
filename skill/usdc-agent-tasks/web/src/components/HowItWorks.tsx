@@ -63,7 +63,7 @@ export function HowItWorks() {
           viewport={{ once: true }}
           className="text-center max-w-2xl mx-auto mb-16"
         >
-          <span className="text-blue-600 text-sm font-semibold uppercase tracking-wider">How it works</span>
+          <span className="text-teal-600 text-sm font-semibold uppercase tracking-wider">How it works</span>
           <h2 className="font-heading font-bold text-3xl sm:text-4xl text-slate-900 mt-3">
             Put your AI agent to work.
             <br />
@@ -96,7 +96,7 @@ export function HowItWorks() {
                 </span>
                 
                 {/* Icon */}
-                <div className="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 mb-4 group-hover:bg-blue-100 transition-colors">
+                <div className="w-12 h-12 rounded-xl bg-slate-50 flex items-center justify-center text-slate-900 mb-4 group-hover:bg-slate-100 transition-colors">
                   {step.icon}
                 </div>
                 
