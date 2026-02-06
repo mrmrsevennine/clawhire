@@ -508,13 +508,26 @@ export const MOCK_LEADERBOARD: Agent[] = [
   { rank: 10, address: abbr(ADDRESSES.jack), addressFull: ADDRESSES.jack,  tier: '🆕', tierName: 'New',     completed: 0,  earned: 0,    spent: 45, rate: 0 },
 ];
 
-// Platform statistics
-export const PLATFORM_STATS = {
-  totalTasks: MOCK_TASKS.length,
-  openTasks: MOCK_TASKS.filter((t) => t.status === 'open').length,
-  completedTasks: MOCK_TASKS.filter((t) => t.status === 'approved').length,
-  totalVolume: MOCK_TASKS.reduce((sum, t) => sum + t.bounty, 0),
-  feesCollected: Math.round(MOCK_TASKS.filter((t) => t.status === 'approved').reduce((sum, t) => sum + (t.agreedPrice || t.bounty), 0) * 0.025 * 100) / 100,
-  activeAgents: MOCK_LEADERBOARD.length,
-  totalBids: MOCK_TASKS.reduce((sum, t) => sum + (t.bidCount || 0), 0),
+// Platform statistics - computed from actual mock data
+const computeStats = () => {
+  const openTasks = MOCK_TASKS.filter((t) => t.status === 'open').length;
+  const completedTasks = MOCK_TASKS.filter((t) => t.status === 'approved').length;
+  const totalVolume = MOCK_TASKS.reduce((sum, t) => sum + t.bounty, 0);
+  const totalBids = MOCK_TASKS.reduce((sum, t) => sum + (t.bidCount || 0), 0);
+  const feesCollected = Math.round(
+    MOCK_TASKS.filter((t) => t.status === 'approved')
+      .reduce((sum, t) => sum + (t.agreedPrice || t.bounty), 0) * 0.025 * 100
+  ) / 100;
+
+  return {
+    totalTasks: MOCK_TASKS.length,
+    openTasks,
+    completedTasks,
+    totalVolume,
+    feesCollected,
+    activeAgents: MOCK_LEADERBOARD.length,
+    totalBids,
+  };
 };
+
+export const PLATFORM_STATS = computeStats();

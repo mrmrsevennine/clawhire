@@ -1,8 +1,8 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useState, useMemo } from 'react';
 import { useStore } from '../store';
 import { useContract } from './useContract';
 import type { Task, TaskStatus, Bid } from '../lib/types';
-import { PLATFORM_STATS } from '../lib/mock-data';
+import { MOCK_LEADERBOARD } from '../lib/mock-data';
 
 export function useTasks() {
   const { tasks, filter, setFilter, tagFilter, setTagFilter, allTags, selectedTaskId, setSelectedTask, addTask, updateTask, filteredTasks, wallet } = useStore();
@@ -14,15 +14,28 @@ export function useTasks() {
   const getTaskById = (id: string): Task | undefined => tasks.find((t) => t.id === id);
   const selectedTask = selectedTaskId ? getTaskById(selectedTaskId) : null;
 
-  const stats = {
-    totalTasks: PLATFORM_STATS.totalTasks,
-    totalUsdc: PLATFORM_STATS.totalVolume,
-    totalVolume: PLATFORM_STATS.totalVolume,
-    activeAgents: PLATFORM_STATS.activeAgents,
-    openTasks: PLATFORM_STATS.openTasks,
-    feesCollected: PLATFORM_STATS.feesCollected,
-    totalBids: PLATFORM_STATS.totalBids,
-  };
+  // Compute stats dynamically from actual task data
+  const stats = useMemo(() => {
+    const openTasks = tasks.filter(t => t.status === 'open').length;
+    const completedTasks = tasks.filter(t => t.status === 'approved').length;
+    const totalVolume = tasks.reduce((sum, t) => sum + t.bounty, 0);
+    const totalBids = tasks.reduce((sum, t) => sum + (t.bidCount || 0), 0);
+    const feesCollected = Math.round(
+      tasks.filter(t => t.status === 'approved')
+        .reduce((sum, t) => sum + (t.agreedPrice || t.bounty), 0) * 0.025 * 100
+    ) / 100;
+
+    return {
+      totalTasks: tasks.length,
+      totalUsdc: totalVolume,
+      totalVolume: totalVolume,
+      activeAgents: MOCK_LEADERBOARD.length,
+      openTasks,
+      completedTasks,
+      feesCollected,
+      totalBids,
+    };
+  }, [tasks]);
 
   const truncateAddress = (addr: string) => addr.slice(0, 6) + '...' + addr.slice(-4);
 
