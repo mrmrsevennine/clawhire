@@ -14,8 +14,8 @@ export const POLYGON_AMOY_EXPLORER = 'https://amoy.polygonscan.com/';
 export const USDC_ADDRESS = '0x036CbD53842c5426634e7929541eC2318f3dCF7e'; // Base Sepolia (PRIMARY)
 export const USDC_POLYGON_AMOY = '0x0FA8781a83E46826621b3BC094Ea2A0212e71B23'; // Polygon Amoy
 
-// Escrow contract — will be updated after Base Sepolia deployment
-export const ESCROW_ADDRESS = ''; // Base Sepolia — deploy pending
+// Escrow contract on Base Sepolia — deployed 2026-02-06
+export const ESCROW_ADDRESS = '0x42D7c6f615BDc0e55B63D49605d3a57150590E8A';
 
 export const ESCROW_ABI = [
   // Task creation
