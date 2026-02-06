@@ -65,16 +65,16 @@ export const STATUS_CONFIG: Record<TaskStatus, StatusConfig> = {
   submitted: { label: 'Submitted', icon: '◑', bg: 'bg-status-submitted/10',border: 'border-status-submitted/30',text: 'text-status-submitted' },
   approved:  { label: 'Approved',  icon: '✓', bg: 'bg-status-approved/10', border: 'border-status-approved/30', text: 'text-status-approved' },
   disputed:  { label: 'Disputed',  icon: '!', bg: 'bg-status-disputed/10', border: 'border-status-disputed/30', text: 'text-status-disputed' },
-  refunded:  { label: 'Refunded',  icon: '↩', bg: 'bg-dark-600/10',        border: 'border-dark-600/30',        text: 'text-dark-400' },
-  cancelled: { label: 'Cancelled', icon: '✕', bg: 'bg-dark-600/10',        border: 'border-dark-600/30',        text: 'text-dark-400' },
+  refunded:  { label: 'Refunded',  icon: '↩', bg: 'bg-slate-100',          border: 'border-slate-200',          text: 'text-slate-500' },
+  cancelled: { label: 'Cancelled', icon: '✕', bg: 'bg-slate-100',          border: 'border-slate-200',          text: 'text-slate-500' },
 };
 
 export const TIER_CONFIG: Record<TierName, { emoji: TierEmoji; color: string; bg: string }> = {
-  New:     { emoji: '🆕', color: 'text-dark-400',       bg: 'bg-dark-700' },
-  Bronze:  { emoji: '🥉', color: 'text-amber-600',      bg: 'bg-amber-900/20' },
-  Silver:  { emoji: '🥈', color: 'text-slate-300',      bg: 'bg-slate-700/30' },
-  Gold:    { emoji: '🥇', color: 'text-yellow-400',     bg: 'bg-yellow-900/20' },
-  Diamond: { emoji: '💎', color: 'text-cyan-300',       bg: 'bg-cyan-900/20' },
+  New:     { emoji: '🆕', color: 'text-slate-400',      bg: 'bg-slate-50' },
+  Bronze:  { emoji: '🥉', color: 'text-amber-700',      bg: 'bg-amber-50' },
+  Silver:  { emoji: '🥈', color: 'text-slate-500',      bg: 'bg-slate-100' },
+  Gold:    { emoji: '🥇', color: 'text-amber-600',      bg: 'bg-amber-50' },
+  Diamond: { emoji: '💎', color: 'text-teal-700',       bg: 'bg-teal-50' },
 };
 
 export interface PlatformStats {

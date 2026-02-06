@@ -3,6 +3,7 @@ import { Header } from './components/Header';
 import { Hero } from './components/Hero';
 import { HowItWorks } from './components/HowItWorks';
 import { Features } from './components/Features';
+import { Roadmap } from './components/Roadmap';
 import { TaskBoard } from './components/TaskBoard';
 import { TaskDetail } from './components/TaskDetail';
 import { PostTaskModal } from './components/PostTaskModal';
@@ -26,6 +27,7 @@ function HomePage() {
       <Hero />
       <HowItWorks />
       <Features />
+      <Roadmap />
       <TaskBoard />
     </>
   );
