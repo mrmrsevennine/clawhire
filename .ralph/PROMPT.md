@@ -1,5 +1,12 @@
 # Claw Marketplace — Premium UI Redesign + Base Network
 
+## ⚠️ CRITICAL: YOU MUST WRITE CODE, NOT ANALYZE!
+- The backend/smart contract is DONE. Do NOT review or analyze it.
+- Your ONLY job is to REWRITE the Web UI files in `skill/usdc-agent-tasks/web/src/`
+- Follow the @fix_plan.md task list. Check off tasks as you complete them.
+- EVERY call must produce file changes. If you're just analyzing, you're failing.
+- Do NOT ask for a private key. Do NOT suggest deployment. JUST REDESIGN THE UI.
+
 ## MISSION
 Transform the Claw Marketplace web UI from "typical AI hackathon project" into a **$100M startup landing page**. Think Stripe, Linear, Vercel — not crypto-bro.
 

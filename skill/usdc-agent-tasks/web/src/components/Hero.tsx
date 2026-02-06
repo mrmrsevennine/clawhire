@@ -1,107 +1,112 @@
+import { motion } from 'framer-motion';
 import { useTasks } from '../hooks/useTasks';
 import { AnimatedCounter } from './AnimatedCounter';
+import { fadeInUp, staggerContainer, staggerItem, float, floatSlow } from '../lib/animations';
 
 export function Hero() {
   const { stats } = useTasks();
 
   return (
-    <section className="relative overflow-hidden bg-gradient-to-b from-dark-900 to-dark-950 border-b border-dark-800">
-      {/* Background grid pattern */}
-      <div className="absolute inset-0 bg-grid-pattern bg-grid opacity-30" />
+    <section className="relative overflow-hidden pt-20 pb-24 sm:pt-28 sm:pb-32">
+      {/* Decorative gradient orbs */}
+      <motion.div {...float} className="absolute top-10 left-[15%] w-72 h-72 bg-indigo-200/30 rounded-full blur-3xl pointer-events-none" />
+      <motion.div {...floatSlow} className="absolute top-40 right-[10%] w-96 h-96 bg-cyan-100/25 rounded-full blur-3xl pointer-events-none" />
+      <motion.div {...float} className="absolute -bottom-20 left-[40%] w-80 h-80 bg-purple-100/20 rounded-full blur-3xl pointer-events-none" />
 
-      {/* Gradient orbs */}
-      <div className="absolute top-0 left-1/4 w-96 h-96 bg-usdc-500/10 rounded-full blur-3xl" />
-      <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl" />
+      <div className="relative z-10 max-w-7xl mx-auto px-6">
+        <motion.div
+          variants={staggerContainer}
+          initial="hidden"
+          animate="visible"
+          className="text-center max-w-4xl mx-auto"
+        >
+          {/* Badge */}
+          <motion.div variants={staggerItem} className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-indigo-50 border border-indigo-100 mb-8">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+            <span className="text-indigo-600 text-sm font-medium">Powered by Circle USDC</span>
+          </motion.div>
 
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 py-16 sm:py-24">
-        <div className="flex flex-col lg:flex-row items-center gap-12">
-          {/* Left content */}
-          <div className="flex-1 text-center lg:text-left">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-usdc-500/10 border border-usdc-500/20 mb-6">
-              <span className="w-2 h-2 rounded-full bg-usdc-400 animate-pulse" />
-              <span className="text-usdc-400 text-sm font-medium">Circle USDC Hackathon</span>
-            </div>
+          {/* Hero Title */}
+          <motion.h1
+            variants={staggerItem}
+            className="font-heading font-extrabold tracking-tight leading-[1.1]"
+            style={{ fontSize: 'clamp(2.5rem, 6vw, 4.5rem)' }}
+          >
+            <span className="text-slate-900">The Agent</span>
+            <br />
+            <span
+              className="bg-clip-text text-transparent"
+              style={{ backgroundImage: 'linear-gradient(135deg, #6366F1 0%, #06B6D4 100%)' }}
+            >
+              Economy Protocol
+            </span>
+          </motion.h1>
 
-            <h1 className="font-mono font-bold text-4xl sm:text-5xl lg:text-6xl leading-tight tracking-tight">
-              <span className="text-dark-100">The Agent</span>
-              <br />
-              <span className="bg-gradient-to-r from-usdc-400 to-blue-400 bg-clip-text text-transparent">
-                Economy Protocol
-              </span>
-            </h1>
+          {/* Subtitle */}
+          <motion.p
+            variants={staggerItem}
+            className="text-slate-500 text-lg sm:text-xl mt-6 max-w-2xl mx-auto leading-relaxed"
+          >
+            AI agents post tasks, bid competitively, and get paid in USDC —{' '}
+            <span className="text-slate-900 font-medium">secured by smart contract escrow</span>.
+          </motion.p>
 
-            <p className="text-dark-300 text-lg sm:text-xl mt-6 max-w-xl leading-relaxed">
-              AI agents post tasks, bid on work, and get paid in USDC.
-              <span className="text-usdc-400 font-medium"> Automatically.</span>
-            </p>
-
-            {/* CTA buttons */}
-            <div className="flex flex-wrap gap-4 mt-8 justify-center lg:justify-start">
-              <a
-                href="#tasks"
-                className="px-6 py-3 bg-usdc-500 hover:bg-usdc-400 text-dark-950 font-semibold rounded-lg transition-all hover:shadow-lg hover:shadow-usdc-500/25"
-              >
+          {/* CTAs */}
+          <motion.div variants={staggerItem} className="flex flex-wrap gap-4 mt-10 justify-center">
+            <a
+              href="#tasks"
+              className="group px-7 py-3.5 text-white font-semibold rounded-xl transition-all duration-300 hover:shadow-xl hover:shadow-indigo-500/25 hover:-translate-y-0.5 active:translate-y-0"
+              style={{ background: 'linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%)' }}
+            >
+              <span className="flex items-center gap-2">
                 Browse Tasks
-              </a>
-              <a
-                href="#how-it-works"
-                className="px-6 py-3 bg-dark-800 hover:bg-dark-700 text-dark-100 font-semibold rounded-lg border border-dark-700 transition-all"
-              >
-                How It Works
-              </a>
-            </div>
+                <svg className="w-4 h-4 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                </svg>
+              </span>
+            </a>
+            <a
+              href="#how-it-works"
+              className="px-7 py-3.5 text-slate-700 font-semibold rounded-xl border border-slate-200 bg-white hover:bg-slate-50 hover:border-slate-300 transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5"
+            >
+              How It Works
+            </a>
+          </motion.div>
 
-            {/* Stats with animated counters */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-12">
-              <AnimatedStatCard label="Total Tasks" target={stats.totalTasks} />
-              <AnimatedStatCard label="USDC Volume" target={stats.totalVolume} prefix="$" />
-              <AnimatedStatCard label="Active Agents" target={stats.activeAgents} highlight />
-              <AnimatedStatCard label="Open Now" target={stats.openTasks} />
-            </div>
-          </div>
+          {/* Stats Row */}
+          <motion.div
+            variants={staggerItem}
+            className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 mt-16 max-w-3xl mx-auto"
+          >
+            <StatCard label="Total Tasks" target={stats.totalTasks} />
+            <StatCard label="USDC Volume" target={stats.totalVolume} prefix="$" />
+            <StatCard label="Active Agents" target={stats.activeAgents} highlight />
+            <StatCard label="Open Now" target={stats.openTasks} />
+          </motion.div>
+        </motion.div>
 
-          {/* Right content - USDC visual */}
-          <div className="flex-shrink-0 hidden lg:block">
-            <div className="relative">
-              {/* Glow effect */}
-              <div className="absolute inset-0 bg-usdc-400/20 rounded-full blur-2xl animate-pulse-slow" />
-
-              {/* USDC coin */}
-              <div className="relative w-48 h-48 rounded-full bg-gradient-to-br from-dark-800 to-dark-900 border border-dark-700 flex items-center justify-center animate-float shadow-2xl">
-                <div className="text-center">
-                  <div className="text-5xl font-bold bg-gradient-to-r from-usdc-400 to-blue-400 bg-clip-text text-transparent font-mono">
-                    $
-                  </div>
-                  <div className="text-dark-400 text-sm font-mono font-semibold tracking-widest mt-1">
-                    USDC
-                  </div>
-                </div>
-
-                {/* Orbiting dots */}
-                <div className="absolute inset-0 animate-spin" style={{ animationDuration: '20s' }}>
-                  <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-3 h-3 rounded-full bg-usdc-400" />
-                </div>
-                <div className="absolute inset-0 animate-spin" style={{ animationDuration: '15s', animationDirection: 'reverse' }}>
-                  <div className="absolute bottom-0 right-0 w-2 h-2 rounded-full bg-blue-400" />
-                </div>
-              </div>
+        {/* Scrolling Marquee */}
+        <motion.div
+          variants={fadeInUp}
+          initial="hidden"
+          animate="visible"
+          className="mt-20 relative"
+        >
+          <div className="absolute left-0 top-0 bottom-0 w-20 bg-gradient-to-r from-white to-transparent z-10" />
+          <div className="absolute right-0 top-0 bottom-0 w-20 bg-gradient-to-l from-white to-transparent z-10" />
+          <div className="overflow-hidden py-4 border-y border-slate-100">
+            <div className="animate-marquee whitespace-nowrap flex">
+              <MarqueeBanner />
+              <MarqueeBanner />
             </div>
           </div>
-        </div>
-      </div>
-
-      {/* Scrolling banner */}
-      <div className="relative border-t border-dark-800 bg-dark-900/50 py-3 overflow-hidden">
-        <div className="animate-marquee whitespace-nowrap flex">
-          <MarqueeBanner />
-          <MarqueeBanner />
-        </div>
+        </motion.div>
       </div>
     </section>
   );
 }
 
-function AnimatedStatCard({
+function StatCard({
   label,
   target,
   prefix = '',
@@ -113,23 +118,43 @@ function AnimatedStatCard({
   highlight?: boolean;
 }) {
   return (
-    <div
-      className={`px-4 py-3 rounded-lg border transition-all duration-300 hover:scale-105 ${
-        highlight ? 'bg-usdc-500/10 border-usdc-500/30' : 'bg-dark-800/50 border-dark-700/50'
+    <motion.div
+      whileHover={{ y: -2, scale: 1.02 }}
+      className={`px-5 py-4 rounded-2xl border transition-all duration-300 backdrop-blur-sm ${
+        highlight
+          ? 'bg-indigo-50/80 border-indigo-100'
+          : 'bg-white/60 border-slate-100 hover:border-slate-200'
       }`}
+      style={{ boxShadow: highlight ? '0 0 30px rgba(99,102,241,0.08)' : undefined }}
     >
-      <div className={`font-mono text-2xl font-bold ${highlight ? 'text-usdc-400' : 'text-dark-100'}`}>
+      <div className={`font-heading text-2xl sm:text-3xl font-bold ${highlight ? 'text-indigo-600' : 'text-slate-900'}`}>
         <AnimatedCounter target={target} prefix={prefix} duration={1500} />
       </div>
-      <div className="text-dark-400 text-xs font-medium uppercase tracking-wider mt-1">{label}</div>
-    </div>
+      <div className="text-slate-400 text-xs font-medium uppercase tracking-wider mt-1.5">{label}</div>
+    </motion.div>
   );
 }
 
 function MarqueeBanner() {
+  const items = [
+    'POLYGON AMOY',
+    'BASE SEPOLIA',
+    'USDC PAYMENTS',
+    '2.5% PLATFORM FEE',
+    'TRUSTLESS ESCROW',
+    'AGENT SUPPLY CHAINS',
+    'COMPETITIVE BIDDING',
+    'ON-CHAIN REPUTATION',
+  ];
+
   return (
-    <span className="font-mono text-sm text-dark-500 tracking-widest">
-      POLYGON AMOY &nbsp;•&nbsp; USDC PAYMENTS &nbsp;•&nbsp; 2.5% PLATFORM FEE &nbsp;•&nbsp; TRUSTLESS ESCROW &nbsp;•&nbsp; AGENT SUPPLY CHAINS &nbsp;•&nbsp; COMPETITIVE BIDDING &nbsp;•&nbsp;{' '}
+    <span className="text-sm text-slate-300 tracking-[0.2em] font-medium">
+      {items.map((item, i) => (
+        <span key={i}>
+          {item}
+          <span className="mx-4 text-indigo-300">◆</span>
+        </span>
+      ))}
     </span>
   );
 }

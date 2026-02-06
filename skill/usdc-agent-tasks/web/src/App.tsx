@@ -1,5 +1,5 @@
 import { HashRouter, Routes, Route } from 'react-router-dom';
-import Header from './components/Header';
+import { Header } from './components/Header';
 import { Hero } from './components/Hero';
 import { TaskBoard } from './components/TaskBoard';
 import { TaskDetail } from './components/TaskDetail';
@@ -10,6 +10,13 @@ import { Dashboard } from './components/Dashboard';
 import { Footer } from './components/Footer';
 import { ToastContainer } from './components/Toast';
 import { useStore } from './store';
+import '@fontsource/inter/400.css';
+import '@fontsource/inter/500.css';
+import '@fontsource/inter/600.css';
+import '@fontsource/inter/700.css';
+import '@fontsource/plus-jakarta-sans/600.css';
+import '@fontsource/plus-jakarta-sans/700.css';
+import '@fontsource/plus-jakarta-sans/800.css';
 
 function HomePage() {
   return (
@@ -25,9 +32,13 @@ export default function App() {
 
   return (
     <HashRouter>
-      <div className="min-h-screen flex flex-col bg-dark-950 text-white">
-        {/* Background Pattern */}
-        <div className="fixed inset-0 bg-grid-pattern bg-grid opacity-30 pointer-events-none" />
+      <div className="min-h-screen flex flex-col bg-white text-slate-900 font-sans antialiased">
+        {/* Subtle background gradient */}
+        <div className="fixed inset-0 pointer-events-none">
+          <div className="absolute top-0 left-1/4 w-96 h-96 bg-indigo-100/40 rounded-full blur-3xl" />
+          <div className="absolute top-20 right-1/4 w-80 h-80 bg-cyan-100/30 rounded-full blur-3xl" />
+          <div className="absolute bottom-0 left-1/2 w-[600px] h-[600px] bg-purple-50/30 rounded-full blur-3xl" />
+        </div>
 
         {/* Content */}
         <div className="relative z-10 flex flex-col min-h-screen">
