@@ -39,11 +39,10 @@ const features = [
 
 export function Features() {
   return (
-    <section className="py-24 sm:py-32 bg-slate-950 text-white relative overflow-hidden">
-      {/* Subtle grid */}
-      <div className="absolute inset-0 opacity-[0.02]" style={{
-        backgroundImage: 'radial-gradient(circle, #fff 1px, transparent 1px)',
-        backgroundSize: '32px 32px',
+    <section className="py-24 sm:py-32 bg-bark-950 text-cream-100 relative overflow-hidden">
+      {/* Organic grain */}
+      <div className="absolute inset-0 opacity-[0.03]" style={{
+        backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E")`,
       }} />
 
       <div className="relative z-10 max-w-7xl mx-auto px-6">
@@ -55,13 +54,13 @@ export function Features() {
           viewport={{ once: true }}
           className="mb-20"
         >
-          <span className="text-teal-400 text-xs font-semibold uppercase tracking-widest">Features</span>
-          <h2 className="font-heading font-bold text-4xl sm:text-5xl mt-3 max-w-lg">
+          <span className="text-accent-400 text-xs font-semibold uppercase tracking-widest">Features</span>
+          <h2 className="font-heading text-4xl sm:text-5xl mt-3 max-w-lg">
             Infrastructure for
             <br />
-            <span className="text-white/30">the agent economy.</span>
+            <span className="text-cream-100/20 italic">the agent economy.</span>
           </h2>
-          <p className="text-white/40 text-lg mt-4 max-w-xl">
+          <p className="text-cream-100/35 text-lg mt-4 max-w-xl">
             Built as an OpenClaw skill. Secured by Circle USDC. Powered by smart contract escrow.
           </p>
         </motion.div>
@@ -79,10 +78,10 @@ export function Features() {
               key={f.tag}
               variants={staggerItem}
               whileHover={{ y: -4 }}
-              className="group rounded-2xl border border-white/10 bg-white/[0.03] hover:bg-white/[0.06] hover:border-teal-500/30 transition-all duration-500 overflow-hidden"
+              className="group rounded-3xl border border-cream-100/8 bg-cream-100/[0.03] hover:bg-cream-100/[0.06] hover:border-accent-500/30 transition-all duration-500 overflow-hidden"
             >
               {/* Image */}
-              <div className="aspect-[16/10] overflow-hidden bg-slate-900">
+              <div className="aspect-[16/10] overflow-hidden bg-bark-900">
                 <img
                   src={f.image}
                   alt={f.title}
@@ -93,18 +92,18 @@ export function Features() {
 
               {/* Content */}
               <div className="p-6">
-                <span className="inline-flex px-3 py-1 rounded-full text-[10px] font-semibold uppercase tracking-wider bg-teal-500/10 text-teal-400 border border-teal-500/20">
+                <span className="inline-flex px-3 py-1 rounded-full text-[10px] font-semibold uppercase tracking-wider bg-accent-500/10 text-accent-400 border border-accent-500/20">
                   {f.tag}
                 </span>
-                <h3 className="font-heading font-bold text-xl text-white mt-4">{f.title}</h3>
-                <p className="text-white/40 text-sm mt-3 leading-relaxed">{f.description}</p>
+                <h3 className="font-heading text-xl text-cream-100 mt-4">{f.title}</h3>
+                <p className="text-cream-100/35 text-sm mt-3 leading-relaxed">{f.description}</p>
 
                 {/* Stats row */}
-                <div className="flex gap-6 mt-6 pt-6 border-t border-white/5">
+                <div className="flex gap-6 mt-6 pt-6 border-t border-cream-100/5">
                   {f.stats.map((s) => (
                     <div key={s.label}>
-                      <div className="font-heading font-bold text-white text-sm">{s.value}</div>
-                      <div className="text-white/30 text-[10px] uppercase tracking-wider mt-0.5">{s.label}</div>
+                      <div className="font-heading text-cream-100 text-sm">{s.value}</div>
+                      <div className="text-cream-100/25 text-[10px] uppercase tracking-wider mt-0.5">{s.label}</div>
                     </div>
                   ))}
                 </div>

@@ -4,7 +4,29 @@ export default {
   theme: {
     extend: {
       colors: {
-        // ONE accent: Mint/Teal — USDC green, growth, trust
+        // Boho/organic palette — warm cream base with teal accent
+        cream: {
+          50: '#FFFDF8',
+          100: '#FFF9EE',
+          200: '#FFF3DC',
+          300: '#FFECC8',
+          400: '#FFE0A3',
+        },
+        sand: {
+          100: '#F5F0E8',
+          200: '#EBE4D8',
+          300: '#D9CFC0',
+          400: '#C4B8A5',
+          500: '#A69B8A',
+          600: '#8A7F6F',
+        },
+        bark: {
+          700: '#4A3F35',
+          800: '#3A3129',
+          900: '#2A231D',
+          950: '#1A1610',
+        },
+        // Teal accent stays — but warmer/turquoise
         accent: {
           50: '#F0FDFA',
           100: '#CCFBF1',
@@ -17,23 +39,21 @@ export default {
         },
         status: {
           open: '#14B8A6',
-          claimed: '#64748B',
+          claimed: '#A69B8A',
           submitted: '#D97706',
           approved: '#059669',
           disputed: '#DC2626',
         },
-        // Backward compat
         usdc: { 400: '#5EEAD4', 500: '#14B8A6', 600: '#0D9488' },
-        dark: {
-          100: '#f1f5f9', 200: '#e2e8f0', 300: '#cbd5e1',
-          400: '#94a3b8', 500: '#64748b', 600: '#475569',
-          700: '#334155', 800: '#1e293b', 900: '#0f172a', 950: '#020617',
-        },
       },
       fontFamily: {
-        heading: ['"Plus Jakarta Sans"', '"Inter"', 'system-ui', 'sans-serif'],
-        sans: ['"Inter"', 'system-ui', 'sans-serif'],
+        heading: ['"DM Serif Display"', 'Georgia', 'serif'],
+        sans: ['"Instrument Sans"', '"Inter"', 'system-ui', 'sans-serif'],
         mono: ['"JetBrains Mono"', '"Fira Code"', 'monospace'],
+      },
+      borderRadius: {
+        'organic': '2rem',
+        'blob': '60% 40% 50% 50% / 50% 60% 40% 50%',
       },
       animation: {
         'marquee': 'marquee 30s linear infinite',

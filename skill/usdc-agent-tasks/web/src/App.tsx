@@ -13,13 +13,11 @@ import { Dashboard } from './components/Dashboard';
 import { Footer } from './components/Footer';
 import { ToastContainer } from './components/Toast';
 import { useStore } from './store';
-import '@fontsource/inter/400.css';
-import '@fontsource/inter/500.css';
-import '@fontsource/inter/600.css';
-import '@fontsource/inter/700.css';
-import '@fontsource/plus-jakarta-sans/600.css';
-import '@fontsource/plus-jakarta-sans/700.css';
-import '@fontsource/plus-jakarta-sans/800.css';
+import '@fontsource/instrument-sans/400.css';
+import '@fontsource/instrument-sans/500.css';
+import '@fontsource/instrument-sans/600.css';
+import '@fontsource/instrument-sans/700.css';
+import '@fontsource/dm-serif-display/400.css';
 
 function HomePage() {
   return (
@@ -38,7 +36,7 @@ export default function App() {
 
   return (
     <HashRouter>
-      <div className="min-h-screen flex flex-col bg-white text-slate-900 font-sans antialiased">
+      <div className="min-h-screen flex flex-col bg-cream-50 text-bark-900 font-sans antialiased">
         <div className="flex flex-col min-h-screen">
           <Header onPostClick={() => setPostModalOpen(true)} />
           <main className="flex-1">

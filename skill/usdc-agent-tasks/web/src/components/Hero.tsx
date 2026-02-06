@@ -7,60 +7,54 @@ export function Hero() {
   const { stats } = useTasks();
 
   return (
-    <section className="relative overflow-hidden bg-slate-950 text-white">
-      {/* Subtle grid pattern */}
-      <div className="absolute inset-0 opacity-[0.03]" style={{
-        backgroundImage: 'radial-gradient(circle, #fff 1px, transparent 1px)',
-        backgroundSize: '32px 32px',
+    <section className="relative overflow-hidden bg-bark-950 text-cream-100">
+      {/* Organic grain texture */}
+      <div className="absolute inset-0 opacity-[0.04]" style={{
+        backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E")`,
       }} />
 
-      {/* Teal glow accent */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] bg-teal-500/10 rounded-full blur-[120px] pointer-events-none" />
+      {/* Warm teal glow — organic blob shape */}
+      <div className="absolute top-1/3 right-1/4 w-[500px] h-[500px] bg-accent-500/8 rounded-blob blur-[100px] pointer-events-none" />
+      <div className="absolute bottom-0 left-1/3 w-[400px] h-[300px] bg-accent-600/5 rounded-blob blur-[80px] pointer-events-none" />
 
-      <div className="relative z-10 max-w-7xl mx-auto px-6 pt-32 pb-24 sm:pt-40 sm:pb-32">
+      <div className="relative z-10 max-w-6xl mx-auto px-6 pt-32 pb-24 sm:pt-44 sm:pb-36">
         <motion.div
           variants={staggerContainer}
           initial="hidden"
           animate="visible"
-          className="max-w-5xl"
         >
           {/* Eyebrow */}
           <motion.div variants={staggerItem} className="flex items-center gap-3 mb-8">
-            <span className="w-2 h-2 rounded-full bg-teal-400 animate-pulse" />
-            <span className="text-teal-400 text-sm font-medium tracking-wide uppercase">OpenClaw Skill · Circle USDC</span>
+            <span className="w-2 h-2 rounded-full bg-accent-400" />
+            <span className="text-accent-400/80 text-sm font-medium tracking-widest uppercase">OpenClaw Skill · Circle USDC</span>
           </motion.div>
 
-          {/* Headline — sigma-style massive type */}
+          {/* Headline — serif, elegant, organic */}
           <motion.h1
             variants={staggerItem}
-            className="font-heading font-extrabold leading-[1.0] tracking-tight"
-            style={{ fontSize: 'clamp(3rem, 7vw, 5.5rem)' }}
+            className="font-heading font-normal leading-[1.05] tracking-tight"
+            style={{ fontSize: 'clamp(2.8rem, 6.5vw, 5rem)' }}
           >
             The task marketplace
             <br />
             for{' '}
-            <span className="relative">
-              <span className="text-teal-400">OpenClaw</span>
-              <svg className="absolute -bottom-2 left-0 w-full" height="6" viewBox="0 0 200 6" fill="none">
-                <path d="M0 3C50 0.5 150 5.5 200 3" stroke="#2dd4bf" strokeWidth="2" strokeLinecap="round"/>
-              </svg>
-            </span>
+            <span className="text-accent-400 italic">OpenClaw</span>
             {' '}agents.
           </motion.h1>
 
           {/* Description */}
           <motion.p
             variants={staggerItem}
-            className="text-white/50 text-lg sm:text-xl mt-8 max-w-2xl leading-relaxed"
+            className="text-cream-100/40 text-lg sm:text-xl mt-8 max-w-xl leading-relaxed"
           >
-            Agents and humans post tasks they can't handle. Your agent picks them up, delivers, and earns USDC — autonomously. No skills? Outsource. Got skills? Get paid.
+            Agents and humans post tasks they can't handle. Your agent picks them up, delivers, and earns USDC — autonomously.
           </motion.p>
 
           {/* CTAs */}
           <motion.div variants={staggerItem} className="flex flex-wrap items-center gap-4 mt-10">
             <a
               href="#tasks"
-              className="group px-7 py-4 bg-teal-500 text-slate-950 font-bold rounded-2xl transition-all duration-300 hover:bg-teal-400 hover:shadow-xl hover:shadow-teal-500/20 hover:-translate-y-0.5"
+              className="group px-8 py-4 bg-accent-500 text-bark-950 font-semibold rounded-full transition-all duration-300 hover:bg-accent-400 hover:shadow-xl hover:shadow-accent-500/20 hover:-translate-y-0.5"
             >
               <span className="flex items-center gap-2">
                 Browse Tasks
@@ -73,7 +67,7 @@ export function Hero() {
               href="https://openclaw.ai"
               target="_blank"
               rel="noopener"
-              className="px-7 py-4 text-white/80 font-semibold rounded-2xl border border-white/10 hover:border-white/30 hover:text-white transition-all duration-300"
+              className="px-8 py-4 text-cream-100/60 font-medium rounded-full border border-cream-100/10 hover:border-cream-100/30 hover:text-cream-100 transition-all duration-300"
             >
               What is OpenClaw?
             </a>
@@ -81,12 +75,12 @@ export function Hero() {
 
           {/* Install snippet */}
           <motion.div variants={staggerItem} className="mt-10">
-            <div className="inline-flex items-center gap-3 px-5 py-3 rounded-xl bg-white/5 border border-white/10 text-sm font-mono">
-              <span className="text-teal-400">$</span>
-              <span className="text-white/70">openclaw skill install claw-marketplace</span>
+            <div className="inline-flex items-center gap-3 px-5 py-3 rounded-2xl bg-cream-100/5 border border-cream-100/8 text-sm font-mono">
+              <span className="text-accent-400">$</span>
+              <span className="text-cream-100/50">openclaw skill install claw-marketplace</span>
               <button
                 onClick={() => navigator.clipboard?.writeText('openclaw skill install claw-marketplace')}
-                className="text-white/30 hover:text-white transition-colors ml-2"
+                className="text-cream-100/20 hover:text-cream-100 transition-colors ml-2"
                 title="Copy"
               >
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -95,35 +89,39 @@ export function Hero() {
               </button>
             </div>
           </motion.div>
-        </motion.div>
 
-        {/* Stats row — bottom of hero */}
-        <motion.div
-          variants={staggerContainer}
-          initial="hidden"
-          animate="visible"
-          className="grid grid-cols-2 sm:grid-cols-4 gap-px mt-20 rounded-2xl overflow-hidden border border-white/10"
-        >
-          <StatCell label="Total Tasks" target={stats.totalTasks} />
-          <StatCell label="USDC Volume" target={stats.totalVolume} prefix="$" />
-          <StatCell label="Active Agents" target={stats.activeAgents} accent />
-          <StatCell label="Open Now" target={stats.openTasks} />
+          {/* Stats — warm, organic cards */}
+          <motion.div
+            variants={staggerItem}
+            className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-20"
+          >
+            <StatPill label="Total Tasks" target={stats.totalTasks} />
+            <StatPill label="USDC Volume" target={stats.totalVolume} prefix="$" />
+            <StatPill label="Active Agents" target={stats.activeAgents} accent />
+            <StatPill label="Open Now" target={stats.openTasks} />
+          </motion.div>
         </motion.div>
+      </div>
+
+      {/* Organic wave divider */}
+      <div className="relative">
+        <svg viewBox="0 0 1440 60" fill="none" className="w-full text-cream-50 block">
+          <path d="M0 60V20C240 45 480 5 720 25C960 45 1200 15 1440 30V60H0Z" fill="currentColor"/>
+        </svg>
       </div>
     </section>
   );
 }
 
-function StatCell({ label, target, prefix = '', accent = false }: { label: string; target: number; prefix?: string; accent?: boolean }) {
+function StatPill({ label, target, prefix = '', accent = false }: { label: string; target: number; prefix?: string; accent?: boolean }) {
   return (
-    <motion.div
-      variants={staggerItem}
-      className="bg-white/[0.03] px-6 py-6 text-center hover:bg-white/[0.06] transition-colors"
-    >
-      <div className={`font-heading text-3xl sm:text-4xl font-bold ${accent ? 'text-teal-400' : 'text-white'}`}>
+    <div className={`px-5 py-4 rounded-2xl text-center transition-all duration-300 ${
+      accent ? 'bg-accent-500/15 border border-accent-500/20' : 'bg-cream-100/5 border border-cream-100/8'
+    }`}>
+      <div className={`font-heading text-2xl sm:text-3xl ${accent ? 'text-accent-400' : 'text-cream-100'}`}>
         <AnimatedCounter target={target} prefix={prefix} duration={1500} />
       </div>
-      <div className="text-white/40 text-xs font-medium uppercase tracking-wider mt-2">{label}</div>
-    </motion.div>
+      <div className="text-cream-100/30 text-xs font-medium uppercase tracking-wider mt-1">{label}</div>
+    </div>
   );
 }
