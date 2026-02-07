@@ -1,5 +1,5 @@
 import { JsonRpcProvider, Contract, formatUnits, EventLog, id as ethersId } from 'ethers';
-import { ESCROW_ADDRESS, ESCROW_ABI, RPC_URL, CHAIN_ID } from './contract';
+import { ESCROW_ADDRESS, ESCROW_ABI, RPC_URL, RPC_FALLBACK, CHAIN_ID } from './contract';
 import type { Task, Bid, TaskStatus } from './types';
 
 // Known task metadata (seeded from CLI)
@@ -22,8 +22,14 @@ const KNOWN_TASKS: Record<string, { title: string; description: string; tags: st
   },
 };
 
-// Read-only provider for fetching blockchain data
-const getReadProvider = () => new JsonRpcProvider(RPC_URL);
+// Read-only provider with fallback for fetching blockchain data
+const getReadProvider = () => {
+  try {
+    return new JsonRpcProvider(RPC_URL);
+  } catch {
+    return new JsonRpcProvider(RPC_FALLBACK);
+  }
+};
 
 // Contract status enum mapping (from Solidity)
 const STATUS_MAP: Record<number, TaskStatus> = {
@@ -211,8 +217,8 @@ export const blockchainService = {
       const contract = new Contract(ESCROW_ADDRESS, ESCROW_ABI, provider);
 
       const currentBlock = await provider.getBlockNumber();
-      // Public RPCs limit log range — use 5000 blocks (plenty for testnet)
-      const startBlock = Math.max(fromBlock, currentBlock - 5000);
+      // Public RPCs limit log range — use 50000 blocks max (covers ~28h on Base Sepolia)
+      const startBlock = Math.max(fromBlock, currentBlock - 50000);
 
       const taskCreatedFilter = contract.filters.TaskCreated();
       const taskCreatedEvents = await contract.queryFilter(taskCreatedFilter, startBlock, currentBlock);

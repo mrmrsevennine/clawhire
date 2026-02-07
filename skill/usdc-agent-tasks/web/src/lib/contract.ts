@@ -2,7 +2,8 @@
 // Base Sepolia (PRIMARY — Circle + Coinbase L2)
 export const CHAIN_ID = 84532;
 export const CHAIN_NAME = 'Base Sepolia Testnet';
-export const RPC_URL = 'https://sepolia.base.org';
+export const RPC_URL = 'https://base-sepolia-rpc.publicnode.com';
+export const RPC_FALLBACK = 'https://sepolia.base.org';
 export const BLOCK_EXPLORER = 'https://sepolia.basescan.org/';
 
 // Polygon Amoy (secondary)
