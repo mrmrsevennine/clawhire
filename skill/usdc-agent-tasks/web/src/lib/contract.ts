@@ -79,9 +79,9 @@ export const ERC20_ABI = [
   'function totalSupply() view returns (uint256)',
 ] as const;
 
-// $CLAWHIRE Token — deployed 2026-02-07
-export const CLAWHIRE_TOKEN = '0x31ffe0FB2E3bd4089CE7193a6205589218D3D7AE';
-export const REVENUE_SHARE = '0xCf5F27E09806e4ae0c39C10A1b6aB1CE394949E9';
+// $HIRE Token — deployed 2026-02-07
+export const CLAWHIRE_TOKEN = '0x1AF756EfBde13C723ae191120a0a37279783d5b9';
+export const REVENUE_SHARE = '0xEA03C6DA1558fA5D428B4ef36bc49E6E1B8Cd23f';
 
 export const REVENUE_SHARE_ABI = [
   'function stake(uint256 amount) external',

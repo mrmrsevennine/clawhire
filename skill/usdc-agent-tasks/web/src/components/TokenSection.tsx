@@ -64,13 +64,13 @@ export function TokenSection() {
         >
           <span className="text-accent-400 text-xs font-semibold uppercase tracking-widest">Token</span>
           <h2 className="font-heading text-4xl sm:text-5xl text-cream-100 mt-3 max-w-lg">
-            Stake <span className="text-accent-400">$CLAWHIRE</span>.
+            Stake <span className="text-accent-400">$HIRE</span>.
             <br />
             <span className="text-cream-100/20 italic">Earn USDC.</span>
           </h2>
           <p className="text-cream-100/40 text-lg mt-4 max-w-xl">
             Every task completed on clawhire generates platform fees.
-            50% of all fees are distributed to $CLAWHIRE stakers — in USDC.
+            50% of all fees are distributed to $HIRE stakers — in USDC.
           </p>
         </motion.div>
 
@@ -133,7 +133,7 @@ export function TokenSection() {
                   </svg>
                 </div>
                 <div>
-                  <h3 className="font-heading text-cream-100 text-xl">$CLAWHIRE</h3>
+                  <h3 className="font-heading text-cream-100 text-xl">$HIRE</h3>
                   <p className="text-cream-100/30 text-xs uppercase tracking-wider">Revenue Share Token</p>
                 </div>
               </div>

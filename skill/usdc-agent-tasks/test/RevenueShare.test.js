@@ -47,8 +47,8 @@ describe("ClawToken + RevenueShare", function () {
   describe("ClawToken", function () {
     it("should have correct name, symbol and 100M supply", async function () {
       const { claw } = await deployFixture();
-      expect(await claw.read.name()).to.equal("clawhire");
-      expect(await claw.read.symbol()).to.equal("CLAWHIRE");
+      expect(await claw.read.name()).to.equal("hire");
+      expect(await claw.read.symbol()).to.equal("HIRE");
       expect(await claw.read.totalSupply()).to.equal(parseCLAW(100_000_000));
     });
 

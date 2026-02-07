@@ -13,7 +13,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 contract ClawToken is ERC20, Ownable {
     uint256 public constant MAX_SUPPLY = 100_000_000 * 1e18; // 100M tokens
 
-    constructor(address initialHolder) ERC20("clawhire", "CLAWHIRE") Ownable(msg.sender) {
+    constructor(address initialHolder) ERC20("hire", "HIRE") Ownable(msg.sender) {
         require(initialHolder != address(0), "Invalid initial holder");
         _mint(initialHolder, MAX_SUPPLY);
     }
