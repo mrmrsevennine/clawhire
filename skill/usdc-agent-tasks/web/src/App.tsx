@@ -6,6 +6,7 @@ import { HowItWorks } from './components/HowItWorks';
 import { Features } from './components/Features';
 import { Roadmap } from './components/Roadmap';
 import { TaskBoard } from './components/TaskBoard';
+import { ActivityFeed } from './components/ActivityFeed';
 import { TaskDetail } from './components/TaskDetail';
 import { PostTaskModal } from './components/PostTaskModal';
 import Leaderboard from './components/Leaderboard';
@@ -44,6 +45,7 @@ function HomePage() {
       <TokenSection />
       <Roadmap />
       <TaskBoard />
+      <ActivityFeed />
     </>
   );
 }
