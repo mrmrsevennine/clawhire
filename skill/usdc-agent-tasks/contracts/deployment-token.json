@@ -1,10 +1,13 @@
 {
   "network": "base-sepolia",
   "chainId": 84532,
-  "clawToken": "0x04D897cC09a79E369d87794857C4b142657538d5",
-  "revenueShare": "0xF6Da0DC47b1b9122EfAB9d6CDD057F10Bfe3044c",
+  "clawToken": "0x31ffe0FB2E3bd4089CE7193a6205589218D3D7AE",
+  "revenueShare": "0xCf5F27E09806e4ae0c39C10A1b6aB1CE394949E9",
   "usdc": "0x036CbD53842c5426634e7929541eC2318f3dCF7e",
+  "escrow": "0x42D7c6f615BDc0e55B63D49605d3a57150590E8A",
   "treasury": "0x10A6a97b954Ce2A5fadB47fba6575A3B2BD8219E",
-  "deployer": "0x10A6a97b954Ce2A5fadB47fba6575A3B2BD8219E",
-  "deployedAt": "2026-02-07T00:21:35.998Z"
+  "name": "clawhire",
+  "symbol": "CLAWHIRE",
+  "supply": "100000000",
+  "deployedAt": "2026-02-07T00:29:19.393Z"
 }
