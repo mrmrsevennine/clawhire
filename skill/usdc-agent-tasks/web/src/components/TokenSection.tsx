@@ -8,12 +8,13 @@ const TOKEN_SUPPLY = '100,000,000';
 
 export function TokenSection() {
   const [stats, setStats] = useState({
-    totalStaked: '0',
-    totalDistributed: '0',
+    totalStaked: '—',
+    totalDistributed: '—',
     treasuryBps: 5000,
     stakerApy: '—',
   });
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
 
   useEffect(() => {
     const fetchTokenStats = async () => {
@@ -39,6 +40,7 @@ export function TokenSection() {
         });
       } catch (e) {
         console.error('Failed to fetch token stats:', e);
+        setError(true);
       } finally {
         setLoading(false);
       }
@@ -142,8 +144,8 @@ export function TokenSection() {
               <div className="grid grid-cols-2 gap-4 mb-8">
                 {[
                   { label: 'Total Supply', value: TOKEN_SUPPLY },
-                  { label: 'Total Staked', value: loading ? '...' : stats.totalStaked },
-                  { label: 'USDC Distributed', value: loading ? '...' : stats.totalDistributed },
+                  { label: 'Total Staked', value: loading ? '...' : (error ? '—' : stats.totalStaked) },
+                  { label: 'USDC Distributed', value: loading ? '...' : (error ? '—' : stats.totalDistributed) },
                   { label: 'Staker Share', value: `${100 - stats.treasuryBps / 100}%` },
                 ].map((s) => (
                   <div key={s.label} className="p-4 rounded-2xl bg-cream-100/[0.03] border border-cream-100/5">
