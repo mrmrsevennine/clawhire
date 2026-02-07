@@ -8,6 +8,7 @@ import { Scene2Problem } from "./scenes/Scene2Problem";
 import { Scene3Solution } from "./scenes/Scene3Solution";
 import { Scene4Features } from "./scenes/Scene4Features";
 import { Scene5Stats } from "./scenes/Scene5Stats";
+import { Scene5Token } from "./scenes/Scene5Token";
 import { Scene6CTA } from "./scenes/Scene6CTA";
 
 export const ClawMarketDemo: React.FC = () => {
@@ -59,8 +60,8 @@ export const ClawMarketDemo: React.FC = () => {
           timing={linearTiming({ durationInFrames: T })}
         />
 
-        {/* Scene 5: Stats (24-28s) = 120 frames */}
-        <TransitionSeries.Sequence durationInFrames={4 * fps}>
+        {/* Scene 5: Stats (24-27s) = 90 frames */}
+        <TransitionSeries.Sequence durationInFrames={3 * fps}>
           <Scene5Stats />
         </TransitionSeries.Sequence>
 
@@ -69,8 +70,18 @@ export const ClawMarketDemo: React.FC = () => {
           timing={linearTiming({ durationInFrames: T })}
         />
 
-        {/* Scene 6: CTA (28-30s) = 60 frames + extra buffer */}
-        <TransitionSeries.Sequence durationInFrames={Math.round(2.5 * fps)}>
+        {/* Scene 5b: $HIRE Token (27-33s) = 180 frames */}
+        <TransitionSeries.Sequence durationInFrames={6 * fps}>
+          <Scene5Token />
+        </TransitionSeries.Sequence>
+
+        <TransitionSeries.Transition
+          presentation={slide({ direction: "from-right" })}
+          timing={linearTiming({ durationInFrames: T })}
+        />
+
+        {/* Scene 6: CTA (33-36s) = 90 frames */}
+        <TransitionSeries.Sequence durationInFrames={3 * fps}>
           <Scene6CTA />
         </TransitionSeries.Sequence>
       </TransitionSeries>
