@@ -39,54 +39,7 @@ const EVENT_CONFIG: Record<string, { icon: string; label: string; color: string 
   TaskCancelled: { icon: '❌', label: 'Task Cancelled', color: 'text-gray-500' },
 };
 
-// Fallback events when we can't fetch from chain
-const FALLBACK_EVENTS: ActivityEvent[] = [
-  {
-    id: '1',
-    type: 'TaskCreated',
-    taskId: '0x8a23...f1c2',
-    address: '0x742d...89aF',
-    amount: 50,
-    timestamp: Date.now() - 1000 * 60 * 15,
-    txHash: '0x1234',
-  },
-  {
-    id: '2',
-    type: 'TaskBid',
-    taskId: '0x8a23...f1c2',
-    address: '0xd8dA...4562',
-    amount: 45,
-    timestamp: Date.now() - 1000 * 60 * 12,
-    txHash: '0x2345',
-  },
-  {
-    id: '3',
-    type: 'BidAccepted',
-    taskId: '0x8a23...f1c2',
-    address: '0xd8dA...4562',
-    amount: 45,
-    timestamp: Date.now() - 1000 * 60 * 8,
-    txHash: '0x3456',
-  },
-  {
-    id: '4',
-    type: 'TaskCreated',
-    taskId: '0x3b9c...e4a1',
-    address: '0x1234...5678',
-    amount: 75,
-    timestamp: Date.now() - 1000 * 60 * 5,
-    txHash: '0x4567',
-  },
-  {
-    id: '5',
-    type: 'TaskApproved',
-    taskId: '0xf9e2...a8b3',
-    address: '0xabcd...ef01',
-    amount: 25,
-    timestamp: Date.now() - 1000 * 60 * 2,
-    txHash: '0x5678',
-  },
-];
+// No fallback events — we only show real on-chain data
 
 function shortenAddress(address: string): string {
   if (address.length <= 10) return address;
@@ -124,9 +77,9 @@ export function ActivityFeed() {
         const provider = new ethers.JsonRpcProvider(RPC_URL);
         const contract = new ethers.Contract(CONTRACT_ADDRESS, TASK_ESCROW_ABI, provider);
         
-        // Get recent block range (last ~1000 blocks ≈ 2-3 hours on Base)
+        // Scan a wide range to find our events (they may be days old)
         const currentBlock = await provider.getBlockNumber();
-        const fromBlock = Math.max(0, currentBlock - 1000);
+        const fromBlock = Math.max(0, currentBlock - 100000);
         
         // Fetch all event types
         const eventTypes = [
@@ -200,13 +153,13 @@ export function ActivityFeed() {
           setEvents(allEvents.slice(0, 10));
           setError(null);
         } else {
-          // No events found, use fallback
-          setEvents(FALLBACK_EVENTS);
+          setEvents([]);
+          setError('No events found yet');
         }
       } catch (err) {
         console.error('Failed to fetch events:', err);
-        setError('Using demo data');
-        setEvents(FALLBACK_EVENTS);
+        setError('Could not load on-chain events');
+        setEvents([]);
       } finally {
         setLoading(false);
       }
