@@ -49,6 +49,10 @@ export const config = {
   // Storage
   dataDir: process.env.TASK_DATA_DIR || path.join(os.homedir(), '.openclaw', 'agent-tasks'),
 
+  // $HIRE Token + RevenueShare (Base Sepolia)
+  HIRE_TOKEN: process.env.HIRE_TOKEN || '0x1AF756EfBde13C723ae191120a0a37279783d5b9',
+  REVENUE_SHARE: process.env.REVENUE_SHARE || '0xEA03C6DA1558fA5D428B4ef36bc49E6E1B8Cd23f',
+
   // Timeouts
   claimTimeoutSeconds: parseInt(process.env.CLAIM_TIMEOUT || String(7 * 24 * 3600)), // 7 days
   disputeWindowSeconds: parseInt(process.env.DISPUTE_WINDOW || String(3 * 24 * 3600)), // 3 days
