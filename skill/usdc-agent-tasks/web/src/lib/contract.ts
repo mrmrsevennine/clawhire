@@ -74,4 +74,26 @@ export const ERC20_ABI = [
   'function balanceOf(address) view returns (uint256)',
   'function approve(address spender, uint256 amount) returns (bool)',
   'function allowance(address owner, address spender) view returns (uint256)',
+  'function name() view returns (string)',
+  'function symbol() view returns (string)',
+  'function totalSupply() view returns (uint256)',
+] as const;
+
+// $CLAWHIRE Token — deployed 2026-02-07
+export const CLAWHIRE_TOKEN = '0x31ffe0FB2E3bd4089CE7193a6205589218D3D7AE';
+export const REVENUE_SHARE = '0xCf5F27E09806e4ae0c39C10A1b6aB1CE394949E9';
+
+export const REVENUE_SHARE_ABI = [
+  'function stake(uint256 amount) external',
+  'function unstake(uint256 amount) external',
+  'function claimRewards() external',
+  'function stakeAndClaim(uint256 stakeAmount) external',
+  'function distributeRevenue(uint256 amount) external',
+  'function earned(address account) view returns (uint256)',
+  'function staked(address account) view returns (uint256)',
+  'function totalStaked() view returns (uint256)',
+  'function getStakeInfo(address account) view returns (uint256 stakedAmount, uint256 pendingRewards, uint256 sharePercent)',
+  'function getStats() view returns (uint256 totalStaked, uint256 totalDistributed, uint256 totalToTreasury, uint256 treasuryBps, uint256 stakerCount)',
+  'function treasuryBps() view returns (uint256)',
+  'function rewardPerTokenStored() view returns (uint256)',
 ] as const;

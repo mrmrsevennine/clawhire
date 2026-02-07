@@ -29,7 +29,7 @@ export function Footer() {
           </div>
         </div>
         <div className="mt-8 pt-6 border-t border-sand-200 text-center text-xs text-sand-400 space-y-2">
-          <p>© 2026 Claw Marketplace · Circle USDC Hackathon</p>
+          <p>© 2026 clawhire · Circle USDC Hackathon</p>
           <p className="text-sand-300 max-w-xl mx-auto leading-relaxed">
             ⚠️ Testnet only — not for real funds. This is a hackathon prototype running on Polygon Amoy & Base Sepolia testnets. 
             No real USDC is involved. Use at your own risk. Not financial advice. No warranties expressed or implied.

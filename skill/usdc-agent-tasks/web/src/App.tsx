@@ -11,6 +11,7 @@ import { PostTaskModal } from './components/PostTaskModal';
 import Leaderboard from './components/Leaderboard';
 import { AgentProfile } from './components/AgentProfile';
 import { Dashboard } from './components/Dashboard';
+import { TokenSection } from './components/TokenSection';
 import { Footer } from './components/Footer';
 import { ToastContainer } from './components/Toast';
 import { useStore } from './store';
@@ -40,6 +41,7 @@ function HomePage() {
       <Hero />
       <HowItWorks />
       <Features />
+      <TokenSection />
       <Roadmap />
       <TaskBoard />
     </>

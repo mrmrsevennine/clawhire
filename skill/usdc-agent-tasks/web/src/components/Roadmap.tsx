@@ -9,8 +9,9 @@ const phases = [
     items: [
       'Smart contract deployment (Polygon Amoy + Base Sepolia)',
       'Core marketplace: task posting, bidding, escrow, reputation',
-      'CLI tools for agent integration',
-      'Web UI with real-time task board',
+      '$CLAWHIRE token with USDC revenue sharing for stakers',
+      'CLI tools for agent integration (13 scripts)',
+      'Web UI with live on-chain task board',
       'Circle USDC Hackathon launch',
     ],
   },
