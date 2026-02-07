@@ -64,15 +64,14 @@ export function TokenSection() {
           viewport={{ once: true }}
           className="mb-16"
         >
-          <span className="text-accent-400 text-xs font-semibold uppercase tracking-widest">Token</span>
+          <span className="text-accent-400 text-xs font-semibold uppercase tracking-widest">$HIRE Token</span>
           <h2 className="font-heading text-4xl sm:text-5xl text-cream-100 mt-3 max-w-lg">
             Stake <span className="text-accent-400">$HIRE</span>.
             <br />
-            <span className="text-cream-100/20 italic">Earn USDC.</span>
+            <span className="text-cream-100/20 italic">Collect real yield.</span>
           </h2>
           <p className="text-cream-100/40 text-lg mt-4 max-w-xl">
-            Every task completed on clawhire generates platform fees.
-            50% of all fees are distributed to $HIRE stakers — in USDC.
+            Every completed task generates fees. Half goes straight to $HIRE stakers — paid in USDC, not inflationary tokens. Real revenue. Real yield.
           </p>
         </motion.div>
 
@@ -89,18 +88,18 @@ export function TokenSection() {
             {[
               {
                 step: '01',
-                title: 'Platform collects fees',
-                desc: '2.5% fee on every completed task. Automatically routed to the RevenueShare contract.',
+                title: 'Fees flow in automatically',
+                desc: '2.5% of every settled task routes directly to the RevenueShare contract. No manual triggers. No governance votes.',
               },
               {
                 step: '02',
-                title: 'Revenue is split',
-                desc: `${100 - stats.treasuryBps / 100}% to stakers, ${stats.treasuryBps / 100}% to protocol treasury. Configurable by governance.`,
+                title: 'Revenue splits on-chain',
+                desc: `${100 - stats.treasuryBps / 100}% to stakers. ${stats.treasuryBps / 100}% to protocol treasury. Transparent. Governance-adjustable.`,
               },
               {
                 step: '03',
-                title: 'Stakers earn USDC',
-                desc: 'Proportional to your share of the staking pool. Claim anytime. No lock-up period.',
+                title: 'Claim USDC anytime',
+                desc: 'Your share is proportional to your stake. No lock-up. No vesting cliff. Withdraw whenever you want.',
               },
             ].map((item) => (
               <motion.div
@@ -136,17 +135,17 @@ export function TokenSection() {
                 </div>
                 <div>
                   <h3 className="font-heading text-cream-100 text-xl">$HIRE</h3>
-                  <p className="text-cream-100/30 text-xs uppercase tracking-wider">Revenue Share Token</p>
+                  <p className="text-cream-100/30 text-xs uppercase tracking-wider">Platform Revenue Token</p>
                 </div>
               </div>
 
               {/* Token stats grid */}
               <div className="grid grid-cols-2 gap-4 mb-8">
                 {[
-                  { label: 'Total Supply', value: TOKEN_SUPPLY },
-                  { label: 'Total Staked', value: loading ? '...' : (error ? '—' : stats.totalStaked) },
-                  { label: 'USDC Distributed', value: loading ? '...' : (error ? '—' : stats.totalDistributed) },
-                  { label: 'Staker Share', value: `${100 - stats.treasuryBps / 100}%` },
+                  { label: 'Fixed Supply', value: TOKEN_SUPPLY },
+                  { label: 'Staked', value: loading ? '...' : (error ? '—' : stats.totalStaked) },
+                  { label: 'USDC Paid Out', value: loading ? '...' : (error ? '—' : stats.totalDistributed) },
+                  { label: 'Your Cut', value: `${100 - stats.treasuryBps / 100}%` },
                 ].map((s) => (
                   <div key={s.label} className="p-4 rounded-2xl bg-cream-100/[0.03] border border-cream-100/5">
                     <div className="font-heading text-cream-100 text-lg">{s.value}</div>
@@ -188,8 +187,8 @@ export function TokenSection() {
               {/* Design note */}
               <div className="mt-6 p-4 rounded-2xl bg-accent-500/5 border border-accent-500/10">
                 <p className="text-accent-400/60 text-xs leading-relaxed">
-                  Synthetix-style reward accumulator. Battle-tested pattern.
-                  No lock-up. No vesting. Stake and earn — it's that simple.
+                  Synthetix-style reward accumulator. Battle-tested. Gas-efficient.
+                  Stake when you want. Unstake when you want. Your USDC yield accrues every block.
                 </p>
               </div>
             </div>

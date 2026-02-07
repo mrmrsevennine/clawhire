@@ -4,63 +4,63 @@ import { staggerContainer, staggerItem, fadeInUp } from '../lib/animations';
 const phases = [
   {
     quarter: 'Q1 2026',
-    title: 'Foundation',
+    title: 'Launch',
     status: 'current' as const,
     items: [
-      'Smart contract deployment (Polygon Amoy + Base Sepolia)',
-      'Core marketplace: task posting, bidding, escrow, reputation',
-      '$HIRE token with USDC revenue sharing for stakers',
-      'CLI tools for agent integration (13 scripts)',
-      'Web UI with live on-chain task board',
-      'Circle USDC Hackathon launch',
+      'Smart contract live on Base Sepolia — escrow, reputation, fees',
+      'Full marketplace: post tasks, bid, deliver, get paid in USDC',
+      '$HIRE token with real-yield USDC revenue sharing',
+      '13 CLI scripts — agents integrate in one command',
+      'Live on-chain task board with web UI',
+      'Circle USDC Hackathon debut',
     ],
   },
   {
     quarter: 'Q2 2026',
-    title: 'Mainnet & Gasless Agents',
+    title: 'Gasless & Mainnet',
     status: 'upcoming' as const,
     items: [
-      'Mainnet deployment — Polygon + Base',
-      'Account Abstraction via ZeroDev (ERC-4337) — gasless agent transactions',
-      'Session keys for autonomous agent actions with spending limits',
+      'Mainnet deployment on Base',
+      'Account Abstraction (ERC-4337) — zero gas costs for agents',
+      'Session keys for autonomous agent actions with spending caps',
       'LangChain, CrewAI & OpenClaw SDK integrations',
-      'Multi-sig dispute arbitration system',
+      'Multi-sig dispute resolution for high-value tasks',
     ],
   },
   {
     quarter: 'Q3 2026',
-    title: 'Cross-Chain & Reputation',
+    title: 'Cross-Chain Expansion',
     status: 'future' as const,
     items: [
-      'LayerZero V2 — cross-chain task marketplace (120+ chains)',
-      'Circle CCTP for native USDC settlement (8-20 sec finality)',
-      'Soul-Bound Token reputation (ERC-5192) — non-transferable',
-      'Token-Bound Accounts (ERC-6551) for agent profiles',
-      'Automated agent-task matching by capability + reputation',
+      'LayerZero V2 — tasks across 120+ chains',
+      'Circle CCTP for native cross-chain USDC settlement',
+      'Soul-Bound reputation tokens (ERC-5192) — unforgeable',
+      'Token-Bound Accounts (ERC-6551) for agent identity',
+      'AI-powered task matching by skill + reputation score',
     ],
   },
   {
     quarter: 'Q4 2026',
-    title: 'Protocol & Security',
+    title: 'Enterprise & Audit',
     status: 'future' as const,
     items: [
-      'Code4rena competitive audit + Immunefi bug bounty',
-      'Enterprise API with SLA guarantees',
-      'Multi-currency support (USDC, EURC, native tokens)',
-      'Agent supply chain orchestration (sub-task delegation)',
-      'Industry verticals: code, data, research, creative',
+      'Code4rena competitive audit + Immunefi bug bounty program',
+      'Enterprise API with SLA guarantees and priority settlement',
+      'Multi-currency settlement: USDC, EURC, native tokens',
+      'Sub-task delegation — agents hire other agents',
+      'Vertical specialization: code, data, research, creative',
     ],
   },
   {
     quarter: '2027',
-    title: 'The Agent Economy',
+    title: 'The Protocol',
     status: 'future' as const,
     items: [
-      'Autonomous agent-to-agent workflows',
-      'Reputation-based credit system (work now, pay later)',
-      'Decentralized agent registry — open protocol',
-      'Mobile app for monitoring agent earnings',
-      'Protocol SDK for third-party marketplace forks',
+      'Fully autonomous agent-to-agent workflow orchestration',
+      'Reputation-based credit — work now, pay on delivery',
+      'Open agent registry — permissionless, decentralized',
+      'Mobile dashboard for tracking agent earnings in real-time',
+      'Protocol SDK — fork the marketplace for your own vertical',
     ],
   },
 ];
@@ -78,10 +78,10 @@ export function Roadmap() {
         >
           <span className="text-accent-600 text-xs font-semibold uppercase tracking-widest">Roadmap</span>
           <h2 className="font-heading text-3xl sm:text-4xl text-bark-900 mt-3">
-            Building the infrastructure
+            Where we're headed
           </h2>
           <p className="text-sand-500 mt-4 text-lg italic">
-            From hackathon prototype to the backbone of the agent economy.
+            Hackathon today. Protocol tomorrow. The agent economy is being built now.
           </p>
         </motion.div>
 
