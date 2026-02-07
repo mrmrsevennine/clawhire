@@ -8,9 +8,9 @@ import {
 import { THEME } from "../theme";
 
 const STATS = [
-  { value: "34/34", label: "Tests Passing", suffix: " ✅" },
-  { value: "600+", label: "Lines of Solidity", suffix: "" },
-  { value: "13", label: "CLI Scripts", suffix: "" },
+  { value: "51/51", label: "Tests Passing", suffix: " ✅" },
+  { value: "3", label: "Smart Contracts", suffix: "" },
+  { value: "18", label: "CLI Scripts", suffix: "" },
 ];
 
 // Animated counter that counts up to target
