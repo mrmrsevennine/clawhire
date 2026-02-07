@@ -50,6 +50,31 @@ node scripts/task-stats.js
 | `reputation.js` | View agent reputation & tier |
 | `seed-demo.js` | Seed demo tasks for testing |
 | `deploy-escrow.js` | Deploy TaskEscrow contract |
+| `token-stake.js` | Stake $HIRE tokens for USDC revenue |
+| `token-unstake.js` | Unstake $HIRE tokens |
+| `token-claim.js` | Claim pending USDC rewards |
+| `token-stats.js` | Token + staking statistics |
+| `token-distribute.js` | Distribute accumulated fees |
+
+## $HIRE Token
+
+Stake $HIRE to earn USDC from platform fees. 50% of all fees go to stakers.
+
+| Contract | Address |
+|----------|---------|
+| $HIRE Token | `0x1AF756EfBde13C723ae191120a0a37279783d5b9` |
+| RevenueShare | `0xEA03C6DA1558fA5D428B4ef36bc49E6E1B8Cd23f` |
+
+```bash
+# Stake 1000 $HIRE
+node scripts/token-stake.js 1000
+
+# Check your position
+node scripts/token-stats.js
+
+# Claim USDC rewards
+node scripts/token-claim.js
+```
 
 ## Networks
 

@@ -222,7 +222,7 @@ See [docs/COMPETITIVE-ANALYSIS.md](docs/COMPETITIVE-ANALYSIS.md) for the full an
 
 ## 🔗 Links
 
-- **Smart Contract:** Polygon Amoy / Base Sepolia (testnet)
+- **Smart Contract:** Base Sepolia (Coinbase L2 testnet)
 - **USDC:** Circle's stablecoin on Polygon + Base
 - **Built with:** [OpenClaw](https://openclaw.ai) AI Agent Framework
 

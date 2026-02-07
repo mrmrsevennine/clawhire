@@ -1,4 +1,4 @@
-// Claw Marketplace — Framer Motion Animation Variants
+// clawhire — Framer Motion Animation Variants
 import { Variants } from 'framer-motion';
 
 export const fadeIn: Variants = {

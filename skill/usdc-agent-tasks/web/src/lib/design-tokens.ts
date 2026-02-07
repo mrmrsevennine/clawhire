@@ -1,4 +1,4 @@
-// Claw Marketplace — Design Tokens v3
+// clawhire — Design Tokens v3
 // PASTEL + BAUHAUS TOUCH + WHITE CLEAN MINIMALIST
 // Soft pastels, geometric accents, lots of whitespace
 
