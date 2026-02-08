@@ -131,7 +131,7 @@ describe("HireToken", function () {
 
     it("should return initial mining rate of 10", async function () {
       const { hire } = await deployFixture();
-      expect(await hire.read.miningRate()).to.equal(10n);
+      expect(await hire.read.miningRate()).to.equal(10000n); // 10000 with RATE_PRECISION=1000 → effective rate 10
     });
   });
 
@@ -188,15 +188,20 @@ describe("HireToken", function () {
     it("should revert if mining pool would be exceeded", async function () {
       const { hireAsMinter, worker, poster } = await deployFixture();
 
-      // Try to mint more than MINING_POOL in one go
-      // 40M HIRE / 10 rate = 4M USDC max per epoch
-      // 4,000,001 USDC * 10 = 40,000,010 > 40M pool
-      const hugeTask = parseUSDC(4_000_001);
+      // Mine the full pool first, then next mint should revert
+      // 4M USDC * rate 10 = 40M HIRE = full pool
+      const maxTask = parseUSDC(4_000_000);
+      await hireAsMinter.write.mintForWork([
+        worker.account.address,
+        poster.account.address,
+        maxTask,
+      ]);
+      // Pool is now exhausted, next mint should revert
       await expectRevert(
         hireAsMinter.write.mintForWork([
           worker.account.address,
           poster.account.address,
-          hugeTask,
+          parseUSDC(1),
         ]),
         "MiningPoolExhausted"
       );

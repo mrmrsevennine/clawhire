@@ -34,8 +34,14 @@ contract HireToken is ERC20, ERC20Burnable, Ownable {
     /// @notice Duration of each mining epoch (180 days)
     uint256 public constant EPOCH_DURATION = 180 days;
 
-    /// @notice Initial mining rate: 10 HIRE per 1 USDC of task value
-    uint256 public constant INITIAL_RATE = 10;
+    /// @notice Initial mining rate: 10000 base units per 1 USDC of task value
+    /// @dev Stored with 3 decimals of precision (10000 = 10.000 HIRE per USDC)
+    ///      This allows halving to continue for 13 epochs (~6.5 years) before reaching 0
+    ///      10000 → 5000 → 2500 → 1250 → 625 → 312 → 156 → 78 → 39 → 19 → 9 → 4 → 2 → 1 → 0
+    uint256 public constant INITIAL_RATE = 10000;
+
+    /// @notice Precision divisor for mining rate (3 extra decimals)
+    uint256 public constant RATE_PRECISION = 1000;
 
     /// @notice Total tokens mined through work so far
     uint256 public totalMined;
@@ -135,6 +141,8 @@ contract HireToken is ERC20, ERC20Burnable, Ownable {
      * @notice Mint $HIRE tokens for completed work (Work Mining)
      * @dev Only callable by the authorized minter (TaskEscrow).
      *      Worker receives 80%, poster receives 20%.
+     *      Math: totalHIRE = taskValueUSDC * rate / RATE_PRECISION * 1e12
+     *      (USDC has 6 decimals, HIRE has 18 → multiply by 1e12 to bridge)
      * @param worker Address of the task worker
      * @param poster Address of the task poster
      * @param taskValueUSDC Value of the completed task in USDC (6 decimals)
@@ -149,11 +157,17 @@ contract HireToken is ERC20, ERC20Burnable, Ownable {
         uint256 rate = miningRate();
         if (rate == 0) revert MiningPoolExhausted();
 
-        // Calculate total HIRE to mint: taskValueUSDC * rate / 1e6 (USDC has 6 decimals)
-        // Result is in 18 decimals (HIRE)
-        uint256 totalAmount = (taskValueUSDC * rate * 1e18) / 1e6;
+        // Calculate total HIRE to mint:
+        // taskValueUSDC (6 dec) * rate / RATE_PRECISION * 1e12 = HIRE amount (18 dec)
+        // Example: 50e6 USDC * 10000 / 1000 * 1e12 = 500e18 HIRE (500 HIRE for 50 USDC task)
+        uint256 totalAmount = (taskValueUSDC * rate * 1e12) / RATE_PRECISION;
 
-        if (totalMined + totalAmount > MINING_POOL) revert MiningPoolExhausted();
+        // Cap at remaining mining pool
+        uint256 remaining = MINING_POOL - totalMined;
+        if (remaining == 0) revert MiningPoolExhausted();
+        if (totalAmount > remaining) {
+            totalAmount = remaining; // Mine the last tokens partially
+        }
 
         uint256 workerAmount = (totalAmount * 80) / 100;
         uint256 posterAmount = totalAmount - workerAmount;

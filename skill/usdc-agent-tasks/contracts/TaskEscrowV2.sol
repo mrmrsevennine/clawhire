@@ -406,8 +406,7 @@ contract TaskEscrowV2 is ReentrancyGuard, Ownable, Pausable {
         // Stake-to-Work: require $HIRE stake if token is configured
         if (address(hireToken) != address(0)) {
             uint256 requiredStake = getRequiredStake(task.bounty);
-            bool success = hireToken.transferFrom(msg.sender, address(this), requiredStake);
-            if (!success) revert InsufficientStake();
+            IERC20(address(hireToken)).safeTransferFrom(msg.sender, address(this), requiredStake);
             bidStakes[taskId][msg.sender] = requiredStake;
         }
 
@@ -481,8 +480,7 @@ contract TaskEscrowV2 is ReentrancyGuard, Ownable, Pausable {
         // Stake-to-Work: require $HIRE stake if token is configured
         if (address(hireToken) != address(0)) {
             uint256 requiredStake = getRequiredStake(task.bounty);
-            bool success = hireToken.transferFrom(msg.sender, address(this), requiredStake);
-            if (!success) revert InsufficientStake();
+            IERC20(address(hireToken)).safeTransferFrom(msg.sender, address(this), requiredStake);
             bidStakes[taskId][msg.sender] = requiredStake;
         }
 
@@ -501,7 +499,7 @@ contract TaskEscrowV2 is ReentrancyGuard, Ownable, Pausable {
         uint256 stakeAmount = bidStakes[taskId][bidder];
         if (stakeAmount > 0) {
             bidStakes[taskId][bidder] = 0;
-            hireToken.transfer(bidder, stakeAmount);
+            IERC20(address(hireToken)).safeTransfer(bidder, stakeAmount);
         }
     }
 
@@ -744,7 +742,7 @@ contract TaskEscrowV2 is ReentrancyGuard, Ownable, Pausable {
 
                 // Return unslashed portion to worker
                 if (remainingStake > 0) {
-                    hireToken.transfer(task.worker, remainingStake);
+                    IERC20(address(hireToken)).safeTransfer(task.worker, remainingStake);
                 }
 
                 // Distribute slashed amount: 60% poster, 20% resolver, 20% burn
@@ -752,8 +750,8 @@ contract TaskEscrowV2 is ReentrancyGuard, Ownable, Pausable {
                 uint256 toResolver = (slashAmount * slashResolverBps) / BPS_DENOMINATOR;
                 uint256 toBurn = slashAmount - toPoster - toResolver;
 
-                if (toPoster > 0) hireToken.transfer(task.poster, toPoster);
-                if (toResolver > 0) hireToken.transfer(msg.sender, toResolver);
+                if (toPoster > 0) IERC20(address(hireToken)).safeTransfer(task.poster, toPoster);
+                if (toResolver > 0) IERC20(address(hireToken)).safeTransfer(msg.sender, toResolver);
                 if (toBurn > 0) hireToken.burn(toBurn);
 
                 emit StakeSlashed(task.worker, slashAmount, taskId);
