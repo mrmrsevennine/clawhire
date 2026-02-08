@@ -1,17 +1,197 @@
-import { motion } from 'framer-motion';
+import { motion, useMotionValue, useTransform, animate, useInView } from 'framer-motion';
 import { fadeInUp, staggerContainer, staggerItem } from '../lib/animations';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { JsonRpcProvider, BrowserProvider, Contract, formatUnits, parseUnits, MaxUint256 } from 'ethers';
 import { CLAWHIRE_TOKEN, REVENUE_SHARE, REVENUE_SHARE_ABI, ERC20_ABI, RPC_URL, BLOCK_EXPLORER } from '../lib/contract';
 import { useWallet } from '../hooks/useWallet';
 
 const TOKEN_SUPPLY = '100,000,000';
 
+// Animated counter for numbers
+function AnimatedCounter({ value, decimals = 0, prefix = '', suffix = '' }: { 
+  value: number; 
+  decimals?: number; 
+  prefix?: string; 
+  suffix?: string;
+}) {
+  const ref = useRef<HTMLSpanElement>(null);
+  const isInView = useInView(ref, { once: true });
+  const count = useMotionValue(0);
+  const rounded = useTransform(count, (v) => 
+    `${prefix}${v.toLocaleString(undefined, { minimumFractionDigits: decimals, maximumFractionDigits: decimals })}${suffix}`
+  );
+
+  useEffect(() => {
+    if (isInView) {
+      animate(count, value, { duration: 2, ease: 'easeOut' });
+    }
+  }, [isInView, value, count]);
+
+  return <motion.span ref={ref}>{rounded}</motion.span>;
+}
+
+// Token Distribution Chart
+function TokenDistributionChart() {
+  const distribution = [
+    { label: 'Work Mining', value: 40, color: 'bg-accent-500' },
+    { label: 'Treasury', value: 25, color: 'bg-accent-600' },
+    { label: 'Staking Rewards', value: 15, color: 'bg-accent-400' },
+    { label: 'Team', value: 10, color: 'bg-sand-400' },
+    { label: 'Community', value: 10, color: 'bg-sand-300' },
+  ];
+
+  return (
+    <div className="space-y-3">
+      {distribution.map((item, i) => (
+        <motion.div
+          key={item.label}
+          initial={{ opacity: 0, x: -20 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          viewport={{ once: true }}
+          transition={{ delay: i * 0.1 }}
+        >
+          <div className="flex justify-between text-xs mb-1">
+            <span className="text-cream-100/60">{item.label}</span>
+            <span className="text-cream-100 font-mono">{item.value}%</span>
+          </div>
+          <div className="h-2 rounded-full bg-cream-100/5 overflow-hidden">
+            <motion.div
+              className={`h-full rounded-full ${item.color}`}
+              initial={{ width: 0 }}
+              whileInView={{ width: `${item.value}%` }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8, delay: i * 0.1, ease: 'easeOut' }}
+            />
+          </div>
+        </motion.div>
+      ))}
+    </div>
+  );
+}
+
+// Fee Split Visualization
+function FeeSplitViz() {
+  const splits = [
+    { label: 'Staker Yield', value: 50, amount: '1.25%', color: 'bg-accent-500' },
+    { label: 'Treasury', value: 30, amount: '0.75%', color: 'bg-accent-600' },
+    { label: 'Burn 🔥', value: 20, amount: '0.5%', color: 'bg-orange-500' },
+  ];
+
+  return (
+    <div className="flex gap-1 h-8 rounded-full overflow-hidden">
+      {splits.map((split, i) => (
+        <motion.div
+          key={split.label}
+          className={`${split.color} flex items-center justify-center relative group`}
+          style={{ width: `${split.value}%` }}
+          initial={{ scaleX: 0 }}
+          whileInView={{ scaleX: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5, delay: i * 0.1 }}
+          aria-label={`${split.label}: ${split.amount} of 2.5% total fee`}
+        >
+          <span className="text-[10px] text-cream-50 font-semibold whitespace-nowrap">
+            {split.amount}
+          </span>
+        </motion.div>
+      ))}
+    </div>
+  );
+}
+
+// Dead Man's Switch Visualization
+function DeadMansSwitchViz() {
+  const [daysRemaining, setDaysRemaining] = useState(90);
+  
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setDaysRemaining((d) => (d <= 0 ? 90 : d - 1));
+    }, 100);
+    return () => clearInterval(timer);
+  }, []);
+
+  const percentage = (daysRemaining / 90) * 100;
+  const isWarning = daysRemaining < 30;
+  const isCritical = daysRemaining < 10;
+
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <span className="text-cream-100/60 text-sm">Heartbeat Timer</span>
+        <motion.span 
+          className={`font-mono text-lg ${
+            isCritical ? 'text-red-400' : isWarning ? 'text-orange-400' : 'text-accent-400'
+          }`}
+          animate={{ scale: isCritical ? [1, 1.05, 1] : 1 }}
+          transition={{ duration: 0.5, repeat: isCritical ? Infinity : 0 }}
+        >
+          {daysRemaining} days
+        </motion.span>
+      </div>
+      <div className="h-3 rounded-full bg-cream-100/5 overflow-hidden">
+        <motion.div
+          className={`h-full rounded-full transition-colors duration-300 ${
+            isCritical ? 'bg-red-500' : isWarning ? 'bg-orange-500' : 'bg-accent-500'
+          }`}
+          style={{ width: `${percentage}%` }}
+        />
+      </div>
+      <p className="text-cream-100/30 text-xs">
+        {daysRemaining === 0 
+          ? '⚠️ Auto-distribution triggered!' 
+          : 'Creators must sign in every 90 days or funds auto-distribute to stakers'}
+      </p>
+    </div>
+  );
+}
+
+// Burn Counter Animation
+function BurnCounter() {
+  const [burned, setBurned] = useState(0);
+  
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setBurned((b) => b + Math.random() * 0.01);
+    }, 2000);
+    return () => clearInterval(timer);
+  }, []);
+
+  return (
+    <motion.div 
+      className="p-4 rounded-2xl bg-gradient-to-r from-orange-500/10 to-red-500/10 border border-orange-500/20"
+      animate={{ 
+        boxShadow: ['0 0 20px rgba(249,115,22,0.1)', '0 0 30px rgba(249,115,22,0.2)', '0 0 20px rgba(249,115,22,0.1)']
+      }}
+      transition={{ duration: 2, repeat: Infinity }}
+    >
+      <div className="flex items-center gap-3">
+        <motion.div
+          animate={{ scale: [1, 1.2, 1], rotate: [0, 10, -10, 0] }}
+          transition={{ duration: 2, repeat: Infinity }}
+          className="text-2xl"
+          aria-hidden="true"
+        >
+          🔥
+        </motion.div>
+        <div>
+          <div className="font-heading text-orange-400 text-lg">
+            <AnimatedCounter value={burned} decimals={4} suffix=" $HIRE" />
+          </div>
+          <div className="text-cream-100/25 text-[10px] uppercase tracking-wider">Burned Forever</div>
+        </div>
+      </div>
+      <p className="text-cream-100/30 text-xs mt-2">
+        0.5% of every fee is burned. Deflationary by design.
+      </p>
+    </motion.div>
+  );
+}
+
 export function TokenSection() {
   const [stats, setStats] = useState({
     totalStaked: '—',
     totalDistributed: '—',
-    treasuryBps: 5000,
+    treasuryBps: 3000, // 30% treasury (new split)
     stakerApy: '—',
   });
   const [loading, setLoading] = useState(true);
@@ -36,7 +216,7 @@ export function TokenSection() {
         setStats({
           totalStaked: staked > 1_000_000 ? `${(staked / 1_000_000).toFixed(1)}M` : staked.toLocaleString(),
           totalDistributed: `$${distributed.toFixed(2)}`,
-          treasuryBps: bps,
+          treasuryBps: bps || 3000,
           stakerApy: distributed > 0 && staked > 0 ? `${((distributed / staked) * 365 * 100).toFixed(1)}%` : '—',
         });
       } catch (e) {
@@ -72,12 +252,13 @@ export function TokenSection() {
             <span className="text-cream-100/20 italic">Collect real yield.</span>
           </h2>
           <p className="text-cream-100/40 text-lg mt-4 max-w-xl">
-            Every completed task generates fees. Half goes straight to $HIRE stakers — paid in USDC, not inflationary tokens. Real revenue. Real yield.
+            Every completed task generates 2.5% in fees. 50% to stakers, 30% to treasury, 20% burned forever. 
+            Real revenue. Real yield. Deflationary.
           </p>
         </motion.div>
 
-        {/* Two column layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {/* Three column layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Left: How it works */}
           <motion.div
             variants={staggerContainer}
@@ -90,17 +271,17 @@ export function TokenSection() {
               {
                 step: '01',
                 title: 'Fees flow in automatically',
-                desc: '2.5% of every settled task routes directly to the RevenueShare contract. No manual triggers. No governance votes.',
+                desc: '2.5% of every settled task routes to the fee distribution contract. No manual triggers.',
               },
               {
                 step: '02',
-                title: 'Revenue splits on-chain',
-                desc: `${100 - stats.treasuryBps / 100}% to stakers. ${stats.treasuryBps / 100}% to protocol treasury. Transparent. Governance-adjustable.`,
+                title: 'Revenue splits three ways',
+                desc: '50% to stakers (1.25%). 30% to treasury (0.75%). 20% burned forever (0.5%). Deflationary.',
               },
               {
                 step: '03',
                 title: 'Claim USDC anytime',
-                desc: 'Your share is proportional to your stake. No lock-up. No vesting cliff. Withdraw whenever you want.',
+                desc: 'Your share is proportional to your stake. No lock-up. No vesting. Withdraw whenever.',
               },
             ].map((item) => (
               <motion.div
@@ -117,46 +298,80 @@ export function TokenSection() {
                 </div>
               </motion.div>
             ))}
+
+            {/* Fee Split Visualization */}
+            <div className="p-5 rounded-2xl border border-cream-100/5 bg-cream-100/[0.02]">
+              <h4 className="text-cream-100/60 text-xs uppercase tracking-wider mb-3">Fee Distribution (2.5% total)</h4>
+              <FeeSplitViz />
+              <div className="flex justify-between mt-3 text-[10px] text-cream-100/40">
+                <span>Stakers 50%</span>
+                <span>Treasury 30%</span>
+                <span>Burn 20%</span>
+              </div>
+            </div>
           </motion.div>
 
-          {/* Right: Token card */}
+          {/* Middle: Token Distribution */}
           <motion.div
             variants={fadeInUp}
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true }}
           >
-            <div className="rounded-3xl border border-cream-100/8 bg-cream-100/[0.03] p-8 h-full">
-              {/* Token header */}
-              <div className="flex items-center gap-4 mb-8">
-                <div className="w-14 h-14 rounded-2xl bg-accent-500/20 border border-accent-500/30 flex items-center justify-center">
-                  <svg viewBox="0 0 24 24" className="w-7 h-7 text-accent-400" fill="currentColor">
-                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                </div>
-                <div>
-                  <h3 className="font-heading text-cream-100 text-xl">$HIRE</h3>
-                  <p className="text-cream-100/30 text-xs uppercase tracking-wider">Platform Revenue Token</p>
-                </div>
-              </div>
+            <div className="rounded-3xl border border-cream-100/8 bg-cream-100/[0.03] p-6 h-full">
+              <h3 className="font-heading text-cream-100 text-lg mb-6">Token Distribution</h3>
+              
+              <TokenDistributionChart />
 
-              {/* Token stats grid */}
-              <div className="grid grid-cols-2 gap-4 mb-8">
+              {/* Token stats */}
+              <div className="grid grid-cols-2 gap-3 mt-6 pt-6 border-t border-cream-100/5">
                 {[
-                  { label: 'Fixed Supply', value: TOKEN_SUPPLY },
+                  { label: 'Total Supply', value: TOKEN_SUPPLY },
                   { label: 'Staked', value: loading ? '...' : (error ? '—' : stats.totalStaked) },
-                  { label: 'USDC Paid Out', value: loading ? '...' : (error ? '—' : stats.totalDistributed) },
-                  { label: 'Your Cut', value: `${100 - stats.treasuryBps / 100}%` },
+                  { label: 'USDC Distributed', value: loading ? '...' : (error ? '—' : stats.totalDistributed) },
+                  { label: 'Staker Share', value: '50%' },
                 ].map((s) => (
-                  <div key={s.label} className="p-4 rounded-2xl bg-cream-100/[0.03] border border-cream-100/5">
-                    <div className="font-heading text-cream-100 text-lg">{s.value}</div>
+                  <div key={s.label} className="p-3 rounded-xl bg-cream-100/[0.03] border border-cream-100/5">
+                    <div className="font-heading text-cream-100 text-sm">{s.value}</div>
                     <div className="text-cream-100/25 text-[10px] uppercase tracking-wider mt-1">{s.label}</div>
                   </div>
                 ))}
               </div>
 
-              {/* Contract info */}
-              <div className="space-y-3 pt-6 border-t border-cream-100/5">
+              {/* Burn counter */}
+              <div className="mt-6">
+                <BurnCounter />
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Right: Dead Man's Switch + Contract Info */}
+          <motion.div
+            variants={fadeInUp}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            className="space-y-4"
+          >
+            {/* Dead Man's Switch */}
+            <div className="rounded-3xl border border-cream-100/8 bg-cream-100/[0.03] p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 rounded-full bg-orange-500/10 border border-orange-500/20 flex items-center justify-center">
+                  <span className="text-lg" aria-hidden="true">💀</span>
+                </div>
+                <div>
+                  <h3 className="font-heading text-cream-100 text-lg">Dead Man's Switch</h3>
+                  <p className="text-cream-100/30 text-xs">90-day heartbeat protection</p>
+                </div>
+              </div>
+              
+              <DeadMansSwitchViz />
+            </div>
+
+            {/* Contract info */}
+            <div className="rounded-3xl border border-cream-100/8 bg-cream-100/[0.03] p-6">
+              <h4 className="text-cream-100/60 text-xs uppercase tracking-wider mb-4">Contracts</h4>
+              <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <span className="text-cream-100/30 text-xs uppercase tracking-wider">Token</span>
                   <a
@@ -164,6 +379,7 @@ export function TokenSection() {
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-accent-400 text-xs font-mono hover:underline"
+                    aria-label="View $HIRE token contract on block explorer"
                   >
                     {CLAWHIRE_TOKEN.slice(0, 6)}...{CLAWHIRE_TOKEN.slice(-4)}
                   </a>
@@ -175,6 +391,7 @@ export function TokenSection() {
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-accent-400 text-xs font-mono hover:underline"
+                    aria-label="View staking contract on block explorer"
                   >
                     {REVENUE_SHARE.slice(0, 6)}...{REVENUE_SHARE.slice(-4)}
                   </a>
@@ -186,10 +403,10 @@ export function TokenSection() {
               </div>
 
               {/* Design note */}
-              <div className="mt-6 p-4 rounded-2xl bg-accent-500/5 border border-accent-500/10">
+              <div className="mt-4 p-3 rounded-xl bg-accent-500/5 border border-accent-500/10">
                 <p className="text-accent-400/60 text-xs leading-relaxed">
                   Synthetix-style reward accumulator. Battle-tested. Gas-efficient.
-                  Stake when you want. Unstake when you want. Your USDC yield accrues every block.
+                  USDC yield accrues every block.
                 </p>
               </div>
             </div>
@@ -264,9 +481,10 @@ function StakingPanel() {
       setTxHash(receipt.hash);
       setStakeAmount('');
       await fetchUserData();
-    } catch (e: any) {
+    } catch (e: unknown) {
       console.error('Stake failed:', e);
-      alert(e.reason || e.message || 'Stake failed');
+      const msg = e instanceof Error ? e.message : 'Stake failed';
+      alert(msg);
     } finally {
       setLoading('');
     }
@@ -284,9 +502,10 @@ function StakingPanel() {
       setTxHash(receipt.hash);
       setUnstakeAmount('');
       await fetchUserData();
-    } catch (e: any) {
+    } catch (e: unknown) {
       console.error('Unstake failed:', e);
-      alert(e.reason || e.message || 'Unstake failed');
+      const msg = e instanceof Error ? e.message : 'Unstake failed';
+      alert(msg);
     } finally {
       setLoading('');
     }
@@ -302,9 +521,10 @@ function StakingPanel() {
       const receipt = await tx.wait();
       setTxHash(receipt.hash);
       await fetchUserData();
-    } catch (e: any) {
+    } catch (e: unknown) {
       console.error('Claim failed:', e);
-      alert(e.reason || e.message || 'Claim failed');
+      const msg = e instanceof Error ? e.message : 'Claim failed';
+      alert(msg);
     } finally {
       setLoading('');
     }
@@ -343,7 +563,9 @@ function StakingPanel() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {/* Stake */}
           <div className="space-y-2">
+            <label htmlFor="stake-amount" className="sr-only">Amount to stake</label>
             <input
+              id="stake-amount"
               type="number"
               placeholder="Amount to stake"
               value={stakeAmount}
@@ -354,6 +576,7 @@ function StakingPanel() {
               onClick={handleStake}
               disabled={loading === 'stake' || !stakeAmount}
               className="w-full py-3 rounded-xl font-semibold text-sm bg-accent-500 text-bark-950 hover:bg-accent-400 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+              aria-label="Stake HIRE tokens"
             >
               {loading === 'stake' ? 'Staking...' : 'Stake $HIRE'}
             </button>
@@ -361,7 +584,9 @@ function StakingPanel() {
 
           {/* Unstake */}
           <div className="space-y-2">
+            <label htmlFor="unstake-amount" className="sr-only">Amount to unstake</label>
             <input
+              id="unstake-amount"
               type="number"
               placeholder="Amount to unstake"
               value={unstakeAmount}
@@ -372,6 +597,7 @@ function StakingPanel() {
               onClick={handleUnstake}
               disabled={loading === 'unstake' || !unstakeAmount}
               className="w-full py-3 rounded-xl font-semibold text-sm border border-cream-100/20 text-cream-100 hover:bg-cream-100/5 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+              aria-label="Unstake HIRE tokens"
             >
               {loading === 'unstake' ? 'Unstaking...' : 'Unstake'}
             </button>
@@ -387,6 +613,7 @@ function StakingPanel() {
               onClick={handleClaim}
               disabled={loading === 'claim' || Number(pendingRewards) === 0}
               className="w-full py-3 rounded-xl font-semibold text-sm bg-accent-500/20 text-accent-400 border border-accent-500/30 hover:bg-accent-500/30 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+              aria-label="Claim USDC rewards"
             >
               {loading === 'claim' ? 'Claiming...' : 'Claim USDC'}
             </button>
@@ -396,8 +623,14 @@ function StakingPanel() {
         {/* TX feedback */}
         {txHash && (
           <div className="mt-4 p-3 rounded-xl bg-accent-500/10 border border-accent-500/20 text-center">
-            <span className="text-accent-400 text-xs">✅ </span>
-            <a href={`${BLOCK_EXPLORER}tx/${txHash}`} target="_blank" rel="noopener noreferrer" className="text-accent-400 text-xs hover:underline font-mono">
+            <span className="text-accent-400 text-xs" aria-hidden="true">✅ </span>
+            <a 
+              href={`${BLOCK_EXPLORER}tx/${txHash}`} 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="text-accent-400 text-xs hover:underline font-mono"
+              aria-label="View transaction on block explorer"
+            >
               {txHash.slice(0, 10)}...{txHash.slice(-8)}
             </a>
           </div>
